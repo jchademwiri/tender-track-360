@@ -107,5 +107,3 @@ docs/
     ├── admin-guide.md
     └── faq.md
 ```
-
-Would you like me to expand on any specific document type or help you create a template for any of these documents to get you started?
