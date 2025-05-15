@@ -1,5 +1,9 @@
 ```json
 // This is a simple ERD for the Tender Track 360 Data Model
+Link to the ERD: https://app.eraser.io/workspace/NwZI5JTezUQS3mnS8CaQ?origin=share
+// This ERD is created using Eraser.io
+// Eraser.io is a collaborative diagramming tool that allows you to create and share diagrams with your team.
+// link: https://app.eraser.io/workspace/NwZI5JTezUQS3mnS8CaQ?origin=share
 // title
 title: Tender Track 360 Data Model
 
