@@ -154,4 +154,4 @@ See [LICENSE](LICENSE) for details.
 
 ---
 
-*Tender Track 360 is designed specifically for organizations that regularly participate in government procurement processes, helping them transform their tender management from a reactive, document-heavy process into a streamlined, data-driven operation.*
+*Tender Track 360 is designed specifically for organizations that regularly participate in procurement processes, helping them transform their tender management from a reactive, document-heavy process into a streamlined, data-driven operation.*
