@@ -11,7 +11,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:reset": "drizzle-kit drop --out supabase/migrations && drizzle-kit generate:pg && drizzle-kit push:pg"
+    "db:reset": "drizzle-kit drop --out supabase/migrations && drizzle-kit generate:pg && drizzle-kit push:pg",
+    "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
     "dotenv": "^16.5.0",
