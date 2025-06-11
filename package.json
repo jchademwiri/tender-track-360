@@ -11,7 +11,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "create-docs": "bash create-folders.sh"
+    "db:reset": "drizzle-kit drop --out supabase/migrations && drizzle-kit generate:pg && drizzle-kit push:pg"
   },
   "dependencies": {
     "dotenv": "^16.5.0",
