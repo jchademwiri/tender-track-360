@@ -1,10 +1,13 @@
 import { pgEnum } from 'drizzle-orm/pg-core';
 
-export const userRoleEnum = pgEnum('user_role', ['admin', 'tender_manager', 'viewer']);
+export const userRoleEnum = pgEnum('user_role', [
+  'admin',
+  'tender_manager',
+  'tender_specialist',
+  'viewer',
+]);
 
 export const tenderStatusEnum = pgEnum('tender_status', [
-  'draft',
-  'published',
   'in_progress',
   'submitted',
   'evaluation',
