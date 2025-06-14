@@ -1,41 +1,40 @@
 import { db } from '@/db';
 import { clients } from '@/db/schema';
+import { Button } from '@/components/ui/button';
+import { ClientTable } from '@/components/clients/client-table';
+import { PlusCircle } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { ClientForm } from '@/components/clients/client-form';
 
 export default async function ClientsPage() {
-  const allClients = await db.select().from(clients);
+  const allClients = await db.select().from(clients).orderBy(clients.name);
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Clients</h1>
-      <table className="min-w-full border border-gray-200 bg-white dark:bg-black">
-        <thead>
-          <tr>
-            <th className="px-4 py-2 border-b">Name</th>
-            <th className="px-4 py-2 border-b">Type</th>
-            <th className="px-4 py-2 border-b">Contact Person</th>
-            <th className="px-4 py-2 border-b">Email</th>
-            <th className="px-4 py-2 border-b">Phone</th>
-            <th className="px-4 py-2 border-b">Active</th>
-          </tr>
-        </thead>
-        <tbody>
-          {allClients.map((client) => (
-            <tr
-              key={client.id}
-              className="hover:bg-gray-50 dark:hover:bg-gray-900"
-            >
-              <td className="px-4 py-2 border-b">{client.name}</td>
-              <td className="px-4 py-2 border-b">{client.type}</td>
-              <td className="px-4 py-2 border-b">{client.contactPerson}</td>
-              <td className="px-4 py-2 border-b">{client.contactEmail}</td>
-              <td className="px-4 py-2 border-b">{client.contactPhone}</td>
-              <td className="px-4 py-2 border-b">
-                {client.isActive ? 'Yes' : 'No'}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Clients</h1>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Client
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Client</DialogTitle>
+            </DialogHeader>
+            <ClientForm />
+          </DialogContent>
+        </Dialog>
+      </div>{' '}
+      <ClientTable clients={allClients} />
     </div>
   );
 }
