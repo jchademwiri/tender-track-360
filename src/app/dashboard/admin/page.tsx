@@ -10,8 +10,6 @@ import {
   Clock,
   CheckCircle,
   Eye,
-  Calendar,
-  DollarSign,
 } from 'lucide-react';
 import { db } from '@/db';
 import {
@@ -23,7 +21,7 @@ import {
   tasks,
   notifications,
 } from '@/db/schema';
-import { eq, count, desc, and, isNull, sql, gte } from 'drizzle-orm';
+import { eq, count, desc, and, sql, gte } from 'drizzle-orm';
 
 // Server component to fetch data
 async function getAdminStats() {

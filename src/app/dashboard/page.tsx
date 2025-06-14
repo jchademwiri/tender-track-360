@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import {
   FolderOpen,
-  Users,
   Building2,
   Bell,
   BarChart3,
@@ -9,9 +8,7 @@ import {
   FileText,
   Calendar,
   TrendingUp,
-  AlertTriangle,
   Clock,
-  Award,
 } from 'lucide-react';
 import { db } from '@/db';
 import { tenders, tasks, clients, activityLogs } from '@/db/schema';
