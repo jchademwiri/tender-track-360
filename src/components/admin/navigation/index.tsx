@@ -1,30 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './sidebar';
-// import Header from './header';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
 export default function AdminNavigation() {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const isMobile = useIsMobile();
+  const [isSidebarOpen, setSidebarOpen] = useState(!isMobile);
+
+  // Update sidebar state when screen size changes
+  useEffect(() => {
+    setSidebarOpen(!isMobile);
+  }, [isMobile]);
 
   const toggleSidebar = () => {
     setSidebarOpen((open) => !open);
   };
 
   return (
-    <div className="flex h-screen">
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+    <div className="flex min-h-screen relative">
+      <Sidebar
+        isOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
+        isMobile={isMobile}
+      />
       <div
         className={cn(
-          'flex-1 flex flex-col transition-all duration-300',
-          isSidebarOpen
-            ? 'ml-64' // Expanded desktop sidebar
-            : 'ml-16' // Collapsed desktop sidebar
+          'flex-1 transition-all duration-300',
+          !isMobile && (isSidebarOpen ? 'ml-64' : 'ml-16')
         )}
-      >
-        {/* <Header toggleSidebar={toggleSidebar} /> */}
-      </div>
+      ></div>
     </div>
   );
 }
