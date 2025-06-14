@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -36,11 +38,13 @@ export default function NotFound() {
                   Go Home
                 </Link>
               </Button>
-              <Button variant="outline" asChild className="flex-1">
-                <Link href="#">
-                  <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                  Go Back
-                </Link>
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => window.history.back()}
+              >
+                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                Go Back
               </Button>
             </div>
 
