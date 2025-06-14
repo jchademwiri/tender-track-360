@@ -13,7 +13,6 @@ import {
   Home,
   Briefcase,
   Menu,
-  X,
   PanelLeftClose,
   PanelLeftOpen,
 } from 'lucide-react';
@@ -22,17 +21,23 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
-import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '../ui/sheet';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const navLinks = [
   {
@@ -104,21 +109,31 @@ function NavItem({ item, pathname, onNavigate, isCollapsed }: NavItemProps) {
     );
 
   if (hasSubmenu) {
-    // Don't show collapsible submenus when collapsed
+    // When collapsed, show only icon for submenu items with tooltip
     if (isCollapsed) {
       return (
-        <Button
-          variant="ghost"
-          asChild
-          className={cn(
-            'w-full justify-center h-auto p-3 font-normal',
-            (isActive || isSubmenuActive) && 'bg-accent text-accent-foreground'
-          )}
-        >
-          <Link href={item.href} onClick={onNavigate}>
-            <Icon className="h-4 w-4" />
-          </Link>
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                asChild
+                className={cn(
+                  'w-full justify-center h-10 p-0 font-normal',
+                  (isActive || isSubmenuActive) &&
+                    'bg-accent text-accent-foreground'
+                )}
+              >
+                <Link href={item.href} onClick={onNavigate}>
+                  <Icon className="h-5 w-5" />
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>{item.label}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       );
     }
 
@@ -128,31 +143,31 @@ function NavItem({ item, pathname, onNavigate, isCollapsed }: NavItemProps) {
           <Button
             variant="ghost"
             className={cn(
-              'w-full justify-between h-auto p-3 font-normal',
+              'w-full justify-between h-10 px-3 font-normal',
               (isActive || isSubmenuActive) &&
                 'bg-accent text-accent-foreground'
             )}
           >
             <div className="flex items-center gap-3">
-              <Icon className="h-4 w-4 min-w-4" />
-              <span className="text-sm">{item.label}</span>
+              <Icon className="h-5 w-5 flex-shrink-0" />
+              <span className="text-sm truncate">{item.label}</span>
             </div>
             <ChevronDown
               className={cn(
-                'h-4 w-4 transition-transform duration-200',
+                'h-4 w-4 flex-shrink-0 transition-transform duration-200',
                 isOpen && 'rotate-180'
               )}
             />
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-1 pl-7 mt-1">
+        <CollapsibleContent className="space-y-1 pl-8 mt-1">
           {item.submenu?.map((subItem) => (
             <Button
               key={subItem.href}
               variant="ghost"
               asChild
               className={cn(
-                'w-full justify-start h-auto p-2 font-normal text-sm',
+                'w-full justify-start h-8 px-3 font-normal text-sm',
                 pathname === subItem.href && 'bg-accent text-accent-foreground'
               )}
             >
@@ -166,22 +181,31 @@ function NavItem({ item, pathname, onNavigate, isCollapsed }: NavItemProps) {
     );
   }
 
-  return (
+  // Regular nav item
+  const NavButton = (
     <Button
       variant="ghost"
       asChild
       className={cn(
-        'w-full justify-start h-auto p-3 font-normal',
+        'w-full h-10 font-normal',
+        isCollapsed ? 'justify-center p-0' : 'justify-start px-3',
         isActive && 'bg-accent text-accent-foreground'
       )}
     >
-      <Link href={item.href} onClick={onNavigate} className="flex items-center">
-        <Icon className="h-4 w-4 min-w-4" />
+      <Link
+        href={item.href}
+        onClick={onNavigate}
+        className="flex items-center gap-3"
+      >
+        <Icon className="h-5 w-5 flex-shrink-0" />
         {!isCollapsed && (
           <>
-            <span className="ml-3 text-sm">{item.label}</span>
+            <span className="text-sm truncate">{item.label}</span>
             {item.badge && (
-              <Badge variant="destructive" className="ml-auto text-xs">
+              <Badge
+                variant="destructive"
+                className="ml-auto text-xs h-5 px-1.5"
+              >
                 {item.badge}
               </Badge>
             )}
@@ -190,6 +214,27 @@ function NavItem({ item, pathname, onNavigate, isCollapsed }: NavItemProps) {
       </Link>
     </Button>
   );
+
+  // When collapsed, wrap with tooltip
+  if (isCollapsed) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>{NavButton}</TooltipTrigger>
+          <TooltipContent side="right">
+            <p>{item.label}</p>
+            {item.badge && (
+              <Badge variant="destructive" className="ml-2 text-xs">
+                {item.badge}
+              </Badge>
+            )}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  return NavButton;
 }
 
 // Desktop Navigation Component
@@ -216,17 +261,17 @@ function DesktopNav({
       <div
         className={cn(
           'flex items-center border-b py-4',
-          isCollapsed ? 'justify-center px-3' : 'justify-between px-6'
+          isCollapsed ? 'justify-center px-2' : 'justify-between px-6'
         )}
       >
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary flex-shrink-0">
             <span className="text-sm font-bold text-primary-foreground">
-              {isCollapsed ? title.charAt(0) : title.charAt(0)}
+              {title.charAt(0)}
             </span>
           </div>
           {!isCollapsed && (
-            <span className="text-lg font-semibold">{title}</span>
+            <span className="text-lg font-semibold truncate">{title}</span>
           )}
         </div>
 
@@ -235,7 +280,7 @@ function DesktopNav({
             variant="ghost"
             size="icon"
             onClick={onToggleCollapse}
-            className="h-8 w-8"
+            className="h-8 w-8 flex-shrink-0"
           >
             {isCollapsed ? (
               <PanelLeftOpen className="h-4 w-4" />
@@ -247,17 +292,19 @@ function DesktopNav({
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <nav className={cn('space-y-1', className)}>
-          {navLinks.map((item) => (
-            <NavItem
-              key={item.href}
-              item={item}
-              pathname={pathname}
-              isCollapsed={isCollapsed}
-            />
-          ))}
-        </nav>
+      <div className="flex-1 overflow-y-auto">
+        <div className={cn('p-3', isCollapsed && 'px-2')}>
+          <nav className={cn('space-y-1', className)}>
+            {navLinks.map((item) => (
+              <NavItem
+                key={item.href}
+                item={item}
+                pathname={pathname}
+                isCollapsed={isCollapsed}
+              />
+            ))}
+          </nav>
+        </div>
       </div>
     </div>
   );
@@ -266,9 +313,10 @@ function DesktopNav({
 // Mobile Navigation Component
 interface MobileNavProps {
   className?: string;
+  title?: string;
 }
 
-function MobileNav({ className }: MobileNavProps) {
+function MobileNav({ className, title = 'Admin' }: MobileNavProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -286,7 +334,14 @@ function MobileNav({ className }: MobileNavProps) {
       </SheetTrigger>
       <SheetContent side="left" className="w-64 p-0">
         <SheetHeader className="border-b p-4">
-          <SheetTitle className="text-left">Navigation</SheetTitle>
+          <SheetTitle className="text-left flex items-center gap-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary">
+              <span className="text-xs font-bold text-primary-foreground">
+                {title.charAt(0)}
+              </span>
+            </div>
+            {title}
+          </SheetTitle>
         </SheetHeader>
         <div className="p-4">
           <nav className="space-y-1">
@@ -329,7 +384,9 @@ export function AdminSidebarNav({
   return (
     <>
       {/* Mobile Navigation Toggle */}
-      {showMobileToggle && <MobileNav className={mobileToggleClassName} />}
+      {showMobileToggle && (
+        <MobileNav className={mobileToggleClassName} title={title} />
+      )}
 
       {/* Desktop Navigation */}
       <div className="hidden lg:block h-full">
