@@ -31,39 +31,24 @@ export default async function ProjectsPage() {
           </tr>
         </thead>
         <tbody>
-          {projects.length === 0 ? (
-            <tr>
-              <td
-                colSpan={5}
-                className="px-4 py-6 text-center text-gray-500 dark:text-gray-400"
-              >
-                No active projects.
+          {projects.map((project) => (
+            <tr
+              key={project.id}
+              className="hover:bg-gray-50 dark:hover:bg-gray-900"
+            >
+              <td className="px-4 py-2 border-b">{project.referenceNumber}</td>
+              <td className="px-4 py-2 border-b">{project.title}</td>
+              <td className="px-4 py-2 border-b">{project.clientName ?? ''}</td>
+              <td className="px-4 py-2 border-b">
+                {project.awardDate
+                  ? new Date(project.awardDate).toLocaleDateString()
+                  : ''}
+              </td>
+              <td className="px-4 py-2 border-b">
+                {project.estimatedValue ?? ''}
               </td>
             </tr>
-          ) : (
-            projects.map((project) => (
-              <tr
-                key={project.id}
-                className="hover:bg-gray-50 dark:hover:bg-gray-900"
-              >
-                <td className="px-4 py-2 border-b">
-                  {project.referenceNumber}
-                </td>
-                <td className="px-4 py-2 border-b">{project.title}</td>
-                <td className="px-4 py-2 border-b">
-                  {project.clientName ?? ''}
-                </td>
-                <td className="px-4 py-2 border-b">
-                  {project.awardDate
-                    ? new Date(project.awardDate).toLocaleDateString()
-                    : ''}
-                </td>
-                <td className="px-4 py-2 border-b">
-                  {project.estimatedValue ?? ''}
-                </td>
-              </tr>
-            ))
-          )}
+          ))}
         </tbody>
       </table>
     </div>
