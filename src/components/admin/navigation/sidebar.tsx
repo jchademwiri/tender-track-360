@@ -3,19 +3,22 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Layers,
+  FileText,
   Users,
-  Briefcase,
-  CheckSquare,
-  Bell,
+  UserCheck,
   BarChart3,
+  Tag,
+  Settings,
+  ChevronDown,
+  Home,
+  Briefcase,
   LogOut,
   ChevronLeft,
   ChevronRight,
-  FolderOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -29,18 +32,43 @@ const Sidebar: React.FC<SidebarProps> = ({
   isMobile,
 }) => {
   const pathname = usePathname();
-
   const navItems = [
-    { title: 'Dashboard', path: '/', icon: <BarChart3 size={20} /> },
-    { title: 'Tenders', path: '/tenders', icon: <Layers size={20} /> },
-    { title: 'Projects', path: '/projects', icon: <FolderOpen size={20} /> },
-    { title: 'Clients', path: '/clients', icon: <Briefcase size={20} /> },
-    { title: 'Tasks', path: '/tasks', icon: <CheckSquare size={20} /> },
-    { title: 'Users', path: '/users', icon: <Users size={20} /> },
+    { title: 'Dashboard', path: '/dashboard/admin', icon: <Home size={20} /> },
     {
-      title: 'Notifications',
-      path: '/notifications',
-      icon: <Bell size={20} />,
+      title: 'Tenders',
+      path: '/dashboard/admin/tenders',
+      icon: <FileText size={20} />,
+      badge: 12,
+    },
+    {
+      title: 'Projects',
+      path: '/dashboard/admin/projects',
+      icon: <Briefcase size={20} />,
+    },
+    {
+      title: 'Clients',
+      path: '/dashboard/admin/clients',
+      icon: <Users size={20} />,
+    },
+    {
+      title: 'Users',
+      path: '/dashboard/admin/users',
+      icon: <UserCheck size={20} />,
+    },
+    {
+      title: 'Reports',
+      path: '/dashboard/admin/reports',
+      icon: <BarChart3 size={20} />,
+    },
+    {
+      title: 'Categories',
+      path: '/dashboard/admin/categories',
+      icon: <Tag size={20} />,
+    },
+    {
+      title: 'Settings',
+      path: '/dashboard/admin/settings',
+      icon: <Settings size={20} />,
     },
   ];
   return (
@@ -98,7 +126,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                 )}
               >
                 <span className="mr-3">{item.icon}</span>
-                {isOpen && <span>{item.title}</span>}
+                {isOpen && (
+                  <div className="flex items-center justify-between flex-1">
+                    <span>{item.title}</span>
+                    {item.badge && (
+                      <Badge variant="destructive" className="ml-2 text-xs">
+                        {item.badge}
+                      </Badge>
+                    )}
+                  </div>
+                )}
               </Link>
             ))}
           </nav>
