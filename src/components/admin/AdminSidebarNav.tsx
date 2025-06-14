@@ -10,35 +10,29 @@ import {
   Tag,
   Settings,
   ChevronDown,
-  Search,
-  Bell,
-  LogOut,
-  Menu,
   Home,
   Briefcase,
+  Menu,
+  X,
   PanelLeftClose,
   PanelLeftOpen,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 const navLinks = [
   {
@@ -198,74 +192,50 @@ function NavItem({ item, pathname, onNavigate, isCollapsed }: NavItemProps) {
   );
 }
 
-interface AdminSidebarNavProps {
-  onNavigate?: () => void;
+// Desktop Navigation Component
+interface DesktopNavProps {
   isCollapsed?: boolean;
+  className?: string;
+  onToggleCollapse?: () => void;
+  showToggle?: boolean;
+  title?: string;
 }
 
-export function AdminSidebarNav({
-  onNavigate,
+function DesktopNav({
   isCollapsed,
-}: AdminSidebarNavProps) {
+  className,
+  onToggleCollapse,
+  showToggle = true,
+  title = 'Admin',
+}: DesktopNavProps) {
   const pathname = usePathname();
 
   return (
-    <nav className="space-y-1">
-      {navLinks.map((item) => (
-        <NavItem
-          key={item.href}
-          item={item}
-          pathname={pathname}
-          onNavigate={onNavigate}
-          isCollapsed={isCollapsed}
-        />
-      ))}
-    </nav>
-  );
-}
-
-function SidebarContent({
-  onNavigate,
-  isCollapsed,
-  onToggle,
-}: {
-  onNavigate?: () => void;
-  isCollapsed?: boolean;
-  onToggle?: () => void;
-}) {
-  return (
-    <div className="flex h-full flex-col">
-      {/* Header */}
+    <div className="flex flex-col h-full">
+      {/* Header with Title and Toggle */}
       <div
         className={cn(
-          'flex items-center border-b py-4 px-6',
-          isCollapsed ? 'justify-center px-3' : 'gap-2'
+          'flex items-center border-b py-4',
+          isCollapsed ? 'justify-center px-3' : 'justify-between px-6'
         )}
       >
-        {!isCollapsed && (
-          <>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <span className="text-sm font-bold text-primary-foreground">
-                A
-              </span>
-            </div>
-            <span className="text-lg font-semibold">Admin Panel</span>
-          </>
-        )}
-        {isCollapsed && (
+        <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-sm font-bold text-primary-foreground">A</span>
+            <span className="text-sm font-bold text-primary-foreground">
+              {isCollapsed ? title.charAt(0) : title.charAt(0)}
+            </span>
           </div>
-        )}
-        {onToggle && (
+          {!isCollapsed && (
+            <span className="text-lg font-semibold">{title}</span>
+          )}
+        </div>
+
+        {showToggle && onToggleCollapse && (
           <Button
             variant="ghost"
             size="icon"
-            onClick={onToggle}
-            className={cn(
-              'h-8 w-8 hidden lg:flex',
-              isCollapsed ? 'ml-0' : 'ml-auto'
-            )}
+            onClick={onToggleCollapse}
+            className="h-8 w-8"
           >
             {isCollapsed ? (
               <PanelLeftOpen className="h-4 w-4" />
@@ -276,198 +246,104 @@ function SidebarContent({
         )}
       </div>
 
-      {/* Search */}
-      {!isCollapsed && (
-        <div className="border-b p-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search..." className="pl-9" />
-          </div>
-        </div>
-      )}
-
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto p-4">
-        <AdminSidebarNav onNavigate={onNavigate} isCollapsed={isCollapsed} />
+        <nav className={cn('space-y-1', className)}>
+          {navLinks.map((item) => (
+            <NavItem
+              key={item.href}
+              item={item}
+              pathname={pathname}
+              isCollapsed={isCollapsed}
+            />
+          ))}
+        </nav>
       </div>
-
-      {/* User Section */}
-      {!isCollapsed && (
-        <div className="border-t p-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 p-2"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="/placeholder-avatar.jpg" />
-                  <AvatarFallback>AD</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col items-start text-left">
-                  <p className="text-sm font-medium">Admin User</p>
-                  <p className="text-xs text-muted-foreground">
-                    admin@company.com
-                  </p>
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      )}
-
-      {/* Collapsed User Section */}
-      {isCollapsed && (
-        <div className="border-t p-3 flex justify-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="/placeholder-avatar.jpg" />
-                  <AvatarFallback>AD</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      )}
     </div>
   );
 }
 
-// Enhanced Layout Component
-interface AdminLayoutProps {
-  children: React.ReactNode;
+// Mobile Navigation Component
+interface MobileNavProps {
+  className?: string;
 }
 
-export function AdminLayout({ children }: AdminLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+function MobileNav({ className }: MobileNavProps) {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen">
-      {/* Desktop Sidebar */}
-      <aside className="hidden w-64 border-r bg-background lg:block">
-        <SidebarContent />
-      </aside>
-
-      {/* Mobile Sidebar */}
-      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="w-64 p-0 lg:hidden">
-          <SidebarContent onNavigate={() => setSidebarOpen(false)} />
-        </SheetContent>
-      </Sheet>
-
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col">
-        {/* Mobile Header */}
-        <header className="flex h-14 items-center justify-between border-b bg-background px-4 lg:hidden">
-          <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-          </Sheet>
-
-          <h1 className="text-lg font-semibold">Admin Panel</h1>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <Badge className="absolute -right-1 -top-1 h-2 w-2 p-0">
-                  <span className="sr-only">New notifications</span>
-                </Badge>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>New tender submitted</DropdownMenuItem>
-              <DropdownMenuItem>Client approval pending</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </header>
-
-        {/* Desktop Header - Optional */}
-        <header className="hidden border-b bg-background p-4 lg:block">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground">
-                Welcome back! Here&apos;s what&apos;s happening.
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
-                    <Bell className="h-5 w-5" />
-                    <Badge className="absolute -right-1 -top-1 h-2 w-2 p-0">
-                      <span className="sr-only">New notifications</span>
-                    </Badge>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-80">
-                  <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-medium">
-                        New tender submitted
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        2 minutes ago
-                      </p>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-medium">
-                        Client approval pending
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        1 hour ago
-                      </p>
-                    </div>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          {children}
-        </main>
-      </div>
-    </div>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn('lg:hidden', className)}
+        >
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Toggle navigation menu</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-64 p-0">
+        <SheetHeader className="border-b p-4">
+          <SheetTitle className="text-left">Navigation</SheetTitle>
+        </SheetHeader>
+        <div className="p-4">
+          <nav className="space-y-1">
+            {navLinks.map((item) => (
+              <NavItem
+                key={item.href}
+                item={item}
+                pathname={pathname}
+                onNavigate={() => setOpen(false)}
+              />
+            ))}
+          </nav>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
+
+// Main Responsive Navigation Component
+interface AdminSidebarNavProps {
+  // Desktop props
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+  showMobileToggle?: boolean;
+  showDesktopToggle?: boolean;
+  title?: string;
+  className?: string;
+  mobileToggleClassName?: string;
+}
+
+export function AdminSidebarNav({
+  isCollapsed = false,
+  onToggleCollapse,
+  showMobileToggle = true,
+  showDesktopToggle = true,
+  title = 'Admin',
+  className,
+  mobileToggleClassName,
+}: AdminSidebarNavProps) {
+  return (
+    <>
+      {/* Mobile Navigation Toggle */}
+      {showMobileToggle && <MobileNav className={mobileToggleClassName} />}
+
+      {/* Desktop Navigation */}
+      <div className="hidden lg:block h-full">
+        <DesktopNav
+          isCollapsed={isCollapsed}
+          className={className}
+          onToggleCollapse={onToggleCollapse}
+          showToggle={showDesktopToggle}
+          title={title}
+        />
+      </div>
+    </>
+  );
+}
+
+// Export individual components for more flexibility
+export { DesktopNav, MobileNav };
