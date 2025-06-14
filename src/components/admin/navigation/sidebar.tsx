@@ -9,7 +9,6 @@ import {
   BarChart3,
   Tag,
   Settings,
-  ChevronDown,
   Home,
   Briefcase,
   LogOut,
@@ -19,7 +18,12 @@ import {
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 
@@ -80,13 +84,15 @@ const Sidebar: React.FC<SidebarProps> = ({
         <Sheet open={isOpen} onOpenChange={toggleSidebar}>
           <SheetContent side="left" className="p-0 w-72">
             <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-4 h-16">
-                <Link href="/" className="flex items-center">
-                  <span className="text-xl font-bold text-primary">
-                    TenderTrack360
-                  </span>
-                </Link>
-              </div>
+              <SheetHeader className="p-4 h-16">
+                <SheetTitle asChild>
+                  <Link href="/" className="flex items-center">
+                    <span className="text-xl font-bold text-primary">
+                      TenderTrack360
+                    </span>
+                  </Link>
+                </SheetTitle>
+              </SheetHeader>
               <Separator />
               <ScrollArea className="flex-1 py-4">
                 <nav className="space-y-1 px-2">
@@ -145,6 +151,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               size="icon"
               className={cn('', isOpen && 'ml-auto')}
               onClick={toggleSidebar}
+              aria-label={isOpen ? 'Close sidebar' : 'Open sidebar'}
             >
               {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
             </Button>
