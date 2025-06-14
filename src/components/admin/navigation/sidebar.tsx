@@ -10,8 +10,8 @@ import {
   Bell,
   BarChart3,
   LogOut,
-  Menu,
   ChevronLeft,
+  ChevronRight,
   FolderOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -64,6 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             : 'w-16'
         )}
       >
+        {' '}
         <div className="flex items-center justify-between p-4 h-16">
           {isOpen && (
             <Link href="/" className="flex items-center">
@@ -72,16 +73,17 @@ const Sidebar: React.FC<SidebarProps> = ({
               </span>
             </Link>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="ml-auto"
-            onClick={toggleSidebar}
-          >
-            {isOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
-          </Button>
+          {!isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="ml-auto"
+              onClick={toggleSidebar}
+            >
+              {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+            </Button>
+          )}
         </div>
-
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="space-y-1 px-2">
             {navItems.map((item) => (
@@ -101,7 +103,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             ))}
           </nav>
         </div>
-
         <div className="p-4 border-t border-border">
           <Button
             variant="ghost"
