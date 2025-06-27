@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -9,7 +10,17 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Search, Building } from 'lucide-react';
+import {
+  Search,
+  Building,
+  FilePen,
+  CheckCircle,
+  Loader,
+  Send,
+  Award,
+  XCircle,
+  Ban,
+} from 'lucide-react';
 
 const getStatusBadgeClass = (status: string) => {
   const baseClasses = 'px-2 py-1 rounded-full text-xs font-medium';
@@ -73,6 +84,41 @@ export type Tender = {
   createdAt?: Date;
 };
 
+// Add a status display map for pretty labels
+const statusDisplayMap: Record<string, string> = {
+  draft: 'Draft',
+  published: 'Published',
+  in_progress: 'In Progress',
+  submitted: 'Submitted',
+  evaluation: 'Evaluation',
+  awarded: 'Awarded',
+  rejected: 'Rejected',
+  cancelled: 'Cancelled',
+};
+
+// Add a status icon map for pretty icons
+const statusIconMap: Record<string, React.ReactNode> = {
+  draft: <FilePen className="inline w-4 h-4 mr-1 align-text-bottom" />,
+  published: <CheckCircle className="inline w-4 h-4 mr-1 align-text-bottom" />,
+  in_progress: (
+    <Loader className="inline w-4 h-4 mr-1 align-text-bottom animate-spin" />
+  ),
+  submitted: <Send className="inline w-4 h-4 mr-1 align-text-bottom" />,
+  evaluation: <Search className="inline w-4 h-4 mr-1 align-text-bottom" />,
+  awarded: <Award className="inline w-4 h-4 mr-1 align-text-bottom" />,
+  rejected: <XCircle className="inline w-4 h-4 mr-1 align-text-bottom" />,
+  cancelled: <Ban className="inline w-4 h-4 mr-1 align-text-bottom" />,
+};
+
+// Client-only currency formatting to avoid hydration mismatch
+function ClientCurrency({ value }: { value: number | null }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  if (typeof value !== 'number' || isNaN(value)) return <>Not specified</>;
+  return <>{formatCurrency(value)}</>;
+}
+
 export default function TendersTable({
   allTenders,
   totalValue,
@@ -126,7 +172,7 @@ export default function TendersTable({
                 Total Value
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatCurrency(totalValue)}
+                <ClientCurrency value={totalValue} />
               </p>
             </div>
           </div>
@@ -217,14 +263,26 @@ export default function TendersTable({
                   </td>
                   <td className="px-6 py-4">
                     <span className={getStatusBadgeClass(tender.status)}>
-                      {tender.status || 'Unknown'}
+                      {statusIconMap[tender.status?.toLowerCase?.()]}
+                      {statusDisplayMap[tender.status?.toLowerCase?.()] ||
+                        (tender.status
+                          ? tender.status
+                              .replace(/_/g, ' ')
+                              .replace(/\b\w/g, (c) => c.toUpperCase())
+                          : 'Unknown')}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
                     {formatDate(tender.submissionDeadline)}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
-                    {formatCurrency(tender.estimatedValue)}
+                    <ClientCurrency
+                      value={
+                        typeof tender.estimatedValue === 'number'
+                          ? tender.estimatedValue
+                          : null
+                      }
+                    />
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
                     {tender.department || 'Not assigned'}

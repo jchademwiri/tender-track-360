@@ -119,7 +119,7 @@ export default async function TendersPage() {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Total Value
+                Total Values
               </p>
             </div>
           </div>
