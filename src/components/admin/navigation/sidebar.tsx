@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { JSX, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -107,49 +107,61 @@ const Sidebar: React.FC<SidebarProps> = ({
     const isSubmenuActive =
       hasSubmenu && item.submenu?.some((subItem) => pathname === subItem.path);
 
+    const handleItemClick = () => {
+      if (hasSubmenu) {
+        setReportsOpen(!reportsOpen);
+      } else if (isMobile) {
+        toggleSidebar();
+      }
+    };
+
+    const itemContent = (
+      <div
+        className={cn(
+          'flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer',
+          isActive || isSubmenuActive
+            ? 'bg-primary text-primary-foreground'
+            : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+        )}
+        onClick={handleItemClick}
+      >
+        <span className="mr-3">{item.icon}</span>
+        {(isOpen || isMobile) && (
+          <div className="flex items-center justify-between flex-1">
+            <span>{item.title}</span>
+            <div className="flex items-center">
+              {item.badge && (
+                <Badge
+                  variant="destructive"
+                  className="ml-2 text-xs bg-red-500"
+                >
+                  {item.badge}
+                </Badge>
+              )}
+              {hasSubmenu && (
+                <ChevronDown
+                  size={16}
+                  className={cn(
+                    'ml-2 transition-transform',
+                    isSubmenuOpen && 'transform rotate-180'
+                  )}
+                />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+
     return (
       <>
-        <div
-          className={cn(
-            'flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer',
-            isActive || isSubmenuActive
-              ? 'bg-primary text-primary-foreground'
-              : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-          )}
-          onClick={() => {
-            if (hasSubmenu) {
-              setReportsOpen(!reportsOpen);
-            } else if (isMobile) {
-              toggleSidebar();
-            }
-          }}
-        >
-          <span className="mr-3">{item.icon}</span>
-          {(isOpen || isMobile) && (
-            <div className="flex items-center justify-between flex-1">
-              <span>{item.title}</span>
-              <div className="flex items-center">
-                {item.badge && (
-                  <Badge
-                    variant="destructive"
-                    className="ml-2 text-xs bg-red-500"
-                  >
-                    {item.badge}
-                  </Badge>
-                )}
-                {hasSubmenu && (
-                  <ChevronDown
-                    size={16}
-                    className={cn(
-                      'ml-2 transition-transform',
-                      isSubmenuOpen && 'transform rotate-180'
-                    )}
-                  />
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+        {hasSubmenu ? (
+          itemContent
+        ) : (
+          <Link href={item.path} passHref>
+            {itemContent}
+          </Link>
+        )}
         {hasSubmenu && isSubmenuOpen && (isOpen || isMobile) && (
           <div className="ml-8 space-y-1">
             {item.submenu?.map((subItem) => (
