@@ -86,27 +86,23 @@ export type Tender = {
 
 // Add a status display map for pretty labels
 const statusDisplayMap: Record<string, string> = {
-  draft: 'Draft',
-  published: 'Published',
-  in_progress: 'In Progress',
+  open: 'Open',
+  closed: 'Closed',
   submitted: 'Submitted',
   evaluation: 'Evaluation',
   awarded: 'Awarded',
-  rejected: 'Rejected',
   cancelled: 'Cancelled',
 };
 
 // Add a status icon map for pretty icons
 const statusIconMap: Record<string, React.ReactNode> = {
-  draft: <FilePen className="inline w-4 h-4 mr-1 align-text-bottom" />,
-  published: <CheckCircle className="inline w-4 h-4 mr-1 align-text-bottom" />,
-  in_progress: (
-    <Loader className="inline w-4 h-4 mr-1 align-text-bottom animate-spin" />
-  ),
+  open: <CheckCircle className="inline w-4 h-4 mr-1 align-text-bottom" />,
+  closed: <XCircle className="inline w-4 h-4 mr-1 align-text-bottom" />,
   submitted: <Send className="inline w-4 h-4 mr-1 align-text-bottom" />,
-  evaluation: <Search className="inline w-4 h-4 mr-1 align-text-bottom" />,
+  evaluation: (
+    <Search className="inline w-4 h-4 mr-1 align-text-bottom animate-spin" />
+  ),
   awarded: <Award className="inline w-4 h-4 mr-1 align-text-bottom" />,
-  rejected: <XCircle className="inline w-4 h-4 mr-1 align-text-bottom" />,
   cancelled: <Ban className="inline w-4 h-4 mr-1 align-text-bottom" />,
 };
 
@@ -180,8 +176,10 @@ export default function TendersTable({
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="open">Open</SelectItem>
               <SelectItem value="closed">Closed</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="submitted">Submitted</SelectItem>
+              <SelectItem value="evaluation">Evaluation</SelectItem>
               <SelectItem value="awarded">Awarded</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
           <Select value={department} onValueChange={setDepartment}>
