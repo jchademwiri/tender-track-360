@@ -107,41 +107,7 @@ export default async function UsersPage() {
         </div>
       </div>
 
-      {/* Filters and Search */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              type="text"
-              placeholder="Search users by name or email..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <Select>
-            <SelectTrigger className="w-full sm:w-auto">
-              <SelectValue placeholder="All Roles" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Roles</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
-              <SelectItem value="tender_manager">Manager</SelectItem>
-              <SelectItem value="tender_specialist">Specialist</SelectItem>
-              <SelectItem value="viewer">Viewer</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select>
-            <SelectTrigger className="w-full sm:w-auto">
-              <SelectValue placeholder="All Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+        
 
       <UsersTable allUsers={allUsers} />
     </div>
