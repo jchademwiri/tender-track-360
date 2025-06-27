@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Plus, Calendar, DollarSign, Building } from 'lucide-react';
-import TendersTable from '@/components/tenders/TendersTable';
+import TendersTable, {
+  ClientCurrency,
+} from '@/components/tenders/TendersTable';
 import { db } from '@/db';
 import { tenders } from '@/db/schema/tenders';
 
@@ -116,10 +118,14 @@ export default async function TendersPage() {
           <div className="flex items-center">
             <div className="p-3 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
               <DollarSign className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+              <span className="sr-only">Total Value</span>
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Total Values
+                Total Value
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <ClientCurrency value={stats.totalValue} />
               </p>
             </div>
           </div>

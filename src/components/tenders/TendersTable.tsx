@@ -20,6 +20,7 @@ import {
   Award,
   XCircle,
   Ban,
+  DollarSign,
 } from 'lucide-react';
 
 const getStatusBadgeClass = (status: string) => {
@@ -111,7 +112,7 @@ const statusIconMap: Record<string, React.ReactNode> = {
 };
 
 // Client-only currency formatting to avoid hydration mismatch
-function ClientCurrency({ value }: { value: number | null }) {
+export function ClientCurrency({ value }: { value: number | null }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -160,24 +161,6 @@ export default function TendersTable({
 
   return (
     <>
-      {/* Stats Card for Total Value (client-side formatted) */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center">
-            <div className="p-3 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
-              <span className="sr-only">Total Value</span>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Total Value
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                <ClientCurrency value={totalValue} />
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
       {/* Filters and Search */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex flex-col sm:flex-row gap-4">
