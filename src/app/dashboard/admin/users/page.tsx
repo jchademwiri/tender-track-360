@@ -1,16 +1,13 @@
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { Search, Plus, Users, UserCheck, Shield, Eye } from 'lucide-react';
-
-interface User {
-  id: string;
-  fullName: string;
-  email: string;
-  role: string;
-  createdAt?: Date;
-  lastLogin?: Date;
-  isActive?: boolean;
-}
 
 const roleDisplayMap: Record<string, string> = {
   admin: 'Admin',
@@ -50,7 +47,8 @@ const getRoleIcon = (role: string) => {
   }
 };
 
-const getInitials = (name: string) => {
+const getInitials = (name: string | null) => {
+  if (!name) return '';
   return name
     .split(' ')
     .map((word) => word.charAt(0))
@@ -181,18 +179,28 @@ export default async function UsersPage() {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          <select className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
-            <option value="">All Roles</option>
-            <option value="admin">Admin</option>
-            <option value="tender_manager">Manager</option>
-            <option value="tender_specialist">Specialist</option>
-            <option value="viewer">Viewer</option>
-          </select>
-          <select className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
-            <option value="">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
+          <Select>
+            <SelectTrigger className="w-full sm:w-auto">
+              <SelectValue placeholder="All Roles" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="tender_manager">Manager</SelectItem>
+              <SelectItem value="tender_specialist">Specialist</SelectItem>
+              <SelectItem value="viewer">Viewer</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger className="w-full sm:w-auto">
+              <SelectValue placeholder="All Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
