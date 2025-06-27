@@ -20,7 +20,6 @@ import {
   Award,
   XCircle,
   Ban,
-  DollarSign,
 } from 'lucide-react';
 
 const getStatusBadgeClass = (status: string) => {
@@ -122,7 +121,6 @@ export function ClientCurrency({ value }: { value: number | null }) {
 
 export default function TendersTable({
   allTenders,
-  totalValue,
 }: {
   allTenders: Tender[];
   totalValue: number;
