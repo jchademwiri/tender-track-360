@@ -1,8 +1,10 @@
 CREATE TYPE "public"."client_type" AS ENUM('government', 'parastatal', 'private', 'ngo', 'international', 'other');--> statement-breakpoint
 CREATE TYPE "public"."document_category" AS ENUM('tender_notice', 'technical_specifications', 'financial_proposal', 'legal_documents', 'correspondence', 'other');--> statement-breakpoint
 CREATE TYPE "public"."notification_type" AS ENUM('deadline', 'status_change', 'task_assignment', 'document_update', 'custom');--> statement-breakpoint
-CREATE TYPE "public"."tender_status" AS ENUM('draft', 'published', 'in_progress', 'submitted', 'evaluation', 'awarded', 'rejected', 'cancelled');--> statement-breakpoint
-CREATE TYPE "public"."user_role" AS ENUM('admin', 'tender_manager', 'viewer');--> statement-breakpoint
+CREATE TYPE "public"."tender_status" AS ENUM('open', 'closed', 'submitted', 'evaluation', 'awarded', 'cancelled', 'rejected');--> statement-breakpoint
+CREATE TYPE "public"."user_role" AS ENUM('admin', 'tender_manager', 'tender_specialist', 'viewer');--> statement-breakpoint
+CREATE TYPE "public"."extension_status" AS ENUM('received', 'in_progress', 'completed', 'sent_to_client', 'acknowledged', 'expired');--> statement-breakpoint
+CREATE TYPE "public"."extension_type" AS ENUM('evaluation', 'award', 'both');--> statement-breakpoint
 CREATE TABLE "activity_logs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"tender_id" uuid,
@@ -97,7 +99,7 @@ CREATE TABLE "tenders" (
 	"description" text,
 	"client_id" uuid NOT NULL,
 	"category_id" uuid,
-	"status" "tender_status" DEFAULT 'draft' NOT NULL,
+	"status" "tender_status" DEFAULT 'open' NOT NULL,
 	"publication_date" date,
 	"submission_deadline" timestamp with time zone,
 	"evaluation_date" date,
@@ -166,6 +168,65 @@ CREATE TABLE "allowed_status_transitions" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "extension_history" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"extension_id" uuid NOT NULL,
+	"previous_status" "extension_status",
+	"new_status" "extension_status" NOT NULL,
+	"changed_by_id" uuid NOT NULL,
+	"change_reason" text,
+	"changed_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "extension_reminders" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"extension_id" uuid NOT NULL,
+	"reminder_type" varchar(50) NOT NULL,
+	"scheduled_for" timestamp with time zone NOT NULL,
+	"sent_at" timestamp with time zone,
+	"is_active" boolean DEFAULT true NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "tender_extensions" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"tender_id" uuid NOT NULL,
+	"extension_document_id" uuid,
+	"extension_number" varchar(50) NOT NULL,
+	"extension_type" "extension_type" NOT NULL,
+	"status" "extension_status" DEFAULT 'received' NOT NULL,
+	"original_deadline" timestamp with time zone NOT NULL,
+	"current_deadline" timestamp with time zone NOT NULL,
+	"requested_new_deadline" timestamp with time zone NOT NULL,
+	"actual_new_deadline" timestamp with time zone,
+	"extension_days" integer NOT NULL,
+	"cumulative_days" integer NOT NULL,
+	"reason" text NOT NULL,
+	"client_reference" varchar(100),
+	"urgency_level" varchar(20) DEFAULT 'normal',
+	"internal_notes" text,
+	"processing_notes" text,
+	"client_response" text,
+	"received_at" timestamp with time zone NOT NULL,
+	"processed_at" timestamp with time zone,
+	"sent_at" timestamp with time zone,
+	"acknowledged_at" timestamp with time zone,
+	"expires_at" timestamp with time zone,
+	"received_by_id" uuid NOT NULL,
+	"processed_by_id" uuid,
+	"sent_by_id" uuid,
+	"is_deleted" boolean DEFAULT false NOT NULL,
+	"deleted_at" timestamp with time zone,
+	"deleted_by_id" uuid,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "chk_valid_deadline_progression" CHECK (requested_new_deadline > current_deadline),
+	CONSTRAINT "chk_valid_extension_days" CHECK (extension_days > 0 AND extension_days <= 365),
+	CONSTRAINT "chk_valid_cumulative_days" CHECK (cumulative_days >= extension_days),
+	CONSTRAINT "chk_processed_after_received" CHECK (processed_at IS NULL OR processed_at >= received_at),
+	CONSTRAINT "chk_sent_after_processed" CHECK (sent_at IS NULL OR (processed_at IS NOT NULL AND sent_at >= processed_at))
+);
+--> statement-breakpoint
 ALTER TABLE "activity_logs" ADD CONSTRAINT "activity_logs_tender_id_tenders_id_fk" FOREIGN KEY ("tender_id") REFERENCES "public"."tenders"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "activity_logs" ADD CONSTRAINT "activity_logs_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "clients" ADD CONSTRAINT "clients_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -180,6 +241,15 @@ ALTER TABLE "tasks" ADD CONSTRAINT "tasks_tender_id_tenders_id_fk" FOREIGN KEY (
 ALTER TABLE "tasks" ADD CONSTRAINT "tasks_assigned_to_id_users_id_fk" FOREIGN KEY ("assigned_to_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "tasks" ADD CONSTRAINT "tasks_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "notifications" ADD CONSTRAINT "notifications_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "extension_history" ADD CONSTRAINT "extension_history_extension_id_tender_extensions_id_fk" FOREIGN KEY ("extension_id") REFERENCES "public"."tender_extensions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "extension_history" ADD CONSTRAINT "extension_history_changed_by_id_users_id_fk" FOREIGN KEY ("changed_by_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "extension_reminders" ADD CONSTRAINT "extension_reminders_extension_id_tender_extensions_id_fk" FOREIGN KEY ("extension_id") REFERENCES "public"."tender_extensions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "tender_extensions" ADD CONSTRAINT "tender_extensions_tender_id_tenders_id_fk" FOREIGN KEY ("tender_id") REFERENCES "public"."tenders"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "tender_extensions" ADD CONSTRAINT "tender_extensions_extension_document_id_documents_id_fk" FOREIGN KEY ("extension_document_id") REFERENCES "public"."documents"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "tender_extensions" ADD CONSTRAINT "tender_extensions_received_by_id_users_id_fk" FOREIGN KEY ("received_by_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "tender_extensions" ADD CONSTRAINT "tender_extensions_processed_by_id_users_id_fk" FOREIGN KEY ("processed_by_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "tender_extensions" ADD CONSTRAINT "tender_extensions_sent_by_id_users_id_fk" FOREIGN KEY ("sent_by_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "tender_extensions" ADD CONSTRAINT "tender_extensions_deleted_by_id_users_id_fk" FOREIGN KEY ("deleted_by_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "idx_activity_logs_tender" ON "activity_logs" USING btree ("tender_id","created_at");--> statement-breakpoint
 CREATE INDEX "idx_activity_logs_user" ON "activity_logs" USING btree ("user_id","created_at");--> statement-breakpoint
 CREATE INDEX "idx_activity_logs_action" ON "activity_logs" USING btree ("action");--> statement-breakpoint
@@ -195,4 +265,10 @@ CREATE INDEX "idx_tasks_tender" ON "tasks" USING btree ("tender_id");--> stateme
 CREATE INDEX "idx_tasks_status" ON "tasks" USING btree ("is_completed","due_date");--> statement-breakpoint
 CREATE INDEX "idx_notifications_user_unread" ON "notifications" USING btree ("user_id","is_read","created_at");--> statement-breakpoint
 CREATE INDEX "idx_notifications_type" ON "notifications" USING btree ("type");--> statement-breakpoint
-CREATE INDEX "idx_status_transitions" ON "allowed_status_transitions" USING btree ("from_status","to_status");
+CREATE INDEX "idx_status_transitions" ON "allowed_status_transitions" USING btree ("from_status","to_status");--> statement-breakpoint
+CREATE INDEX "idx_extension_history_time" ON "extension_history" USING btree ("extension_id","changed_at");--> statement-breakpoint
+CREATE INDEX "idx_extension_reminders_scheduled" ON "extension_reminders" USING btree ("scheduled_for","is_active");--> statement-breakpoint
+CREATE INDEX "idx_extensions_tender_status" ON "tender_extensions" USING btree ("tender_id","status");--> statement-breakpoint
+CREATE INDEX "idx_extensions_deadline" ON "tender_extensions" USING btree ("current_deadline","status");--> statement-breakpoint
+CREATE INDEX "idx_extensions_processed_by" ON "tender_extensions" USING btree ("processed_by_id");--> statement-breakpoint
+CREATE INDEX "idx_extensions_received_date" ON "tender_extensions" USING btree ("received_at");

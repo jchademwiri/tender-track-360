@@ -33,6 +33,8 @@ const getStatusBadgeClass = (status: string) => {
       return `${baseClasses} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200`;
     case 'awarded':
       return `${baseClasses} bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200`;
+    case 'rejected':
+      return `${baseClasses} bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200`;
     default:
       return `${baseClasses} bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200`;
   }
@@ -92,6 +94,7 @@ const statusDisplayMap: Record<string, string> = {
   evaluation: 'Evaluation',
   awarded: 'Awarded',
   cancelled: 'Cancelled',
+  rejected: 'Rejected',
 };
 
 // Add a status icon map for pretty icons
@@ -104,6 +107,7 @@ const statusIconMap: Record<string, React.ReactNode> = {
   ),
   awarded: <Award className="inline w-4 h-4 mr-1 align-text-bottom" />,
   cancelled: <Ban className="inline w-4 h-4 mr-1 align-text-bottom" />,
+  rejected: <XCircle className="inline w-4 h-4 mr-1 align-text-bottom" />,
 };
 
 // Client-only currency formatting to avoid hydration mismatch
@@ -180,6 +184,7 @@ export default function TendersTable({
               <SelectItem value="evaluation">Evaluation</SelectItem>
               <SelectItem value="awarded">Awarded</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
           </Select>
           <Select value={department} onValueChange={setDepartment}>
