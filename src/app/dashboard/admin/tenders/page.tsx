@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Plus, Calendar, DollarSign, Building } from 'lucide-react';
-import TendersTable, {
-  ClientCurrency,
-} from '@/components/tenders/TendersTable';
+import TendersTable from '@/components/tenders/TendersTable';
 import { getTenders } from '@/db/queries/tenders';
+import { ClientCurrency } from '@/components/tenders/ClientCurrency';
+import Link from 'next/link';
 
 // Define Tender type for this file
 interface Tender {
@@ -33,12 +33,14 @@ export default async function TendersPage() {
             Manage and monitor all tender processes
           </p>
         </div>
-        <Button
-          size="lg"
-          className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Tender
+        <Button asChild size="lg">
+          <Link
+            href="/dashboard/admin/tenders/new"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create Tender
+          </Link>
         </Button>
       </div>
 
@@ -111,7 +113,7 @@ export default async function TendersPage() {
       </div>
 
       {/* Filters, Search, and Table */}
-      <TendersTable allTenders={allTenders} totalValue={stats.totalValue} />
+      <TendersTable allTenders={allTenders} />
     </div>
   );
 }
