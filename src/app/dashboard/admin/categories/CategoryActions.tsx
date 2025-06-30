@@ -14,7 +14,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 
 interface CategoryActionsProps {
   categoryId: string;
@@ -30,33 +32,29 @@ export function CategoryActions({
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleDelete = async () => {
-    if (confirm(`Are you sure you want to delete "${categoryName}"?`)) {
-      try {
-        const response = await fetch(`/api/categories/${categoryId}`, {
-          method: 'DELETE',
-        });
+    try {
+      const response = await fetch(`/api/categories/${categoryId}`, {
+        method: 'DELETE',
+      });
 
-        if (!response.ok) {
-          const { error } = await response.json();
-          throw new Error(error || 'Failed to delete category');
-        }
+      if (!response.ok) {
+        const { error } = await response.json();
+        throw new Error(error || 'Failed to delete category');
+      }
 
-        toast.success('Category deleted successfully.');
-        router.refresh();
-      } catch (error) {
-        if (
-          error instanceof Error &&
-          error.message.includes('assigned to one or more tenders')
-        ) {
-          setErrorMessage(error.message);
-          setShowErrorDialog(true);
-        } else {
-          toast.error(
-            error instanceof Error
-              ? error.message
-              : 'An unknown error occurred.'
-          );
-        }
+      toast.success('Category deleted successfully.');
+      router.refresh();
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes('assigned to one or more tenders')
+      ) {
+        setErrorMessage(error.message);
+        setShowErrorDialog(true);
+      } else {
+        toast.error(
+          error instanceof Error ? error.message : 'An unknown error occurred.'
+        );
       }
     }
   };
@@ -71,13 +69,36 @@ export function CategoryActions({
         >
           <PencilIcon className="w-4 h-4" />
         </Link>
-        <button
-          className="inline-flex items-center p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
-          title="Delete category"
-          onClick={handleDelete}
-        >
-          <TrashIcon className="w-4 h-4" />
-        </button>
+
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              className="p-2 h-auto text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+              title="Delete category"
+            >
+              <TrashIcon className="w-4 h-4" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the
+                &quot;{categoryName}&quot; category.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       <AlertDialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
