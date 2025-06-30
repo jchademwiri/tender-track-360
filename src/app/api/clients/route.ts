@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/db';
-import { clients } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { createClient, updateClient } from '@/db/queries/clients';
 
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    await db.insert(clients).values(data);
+    await createClient(data);
     return NextResponse.json({ message: 'Client created' });
   } catch (error) {
     console.error('Error creating client:', error);
@@ -22,7 +20,7 @@ export async function PATCH(req: Request) {
     const data = await req.json();
     const { id, ...updateData } = data;
 
-    await db.update(clients).set(updateData).where(eq(clients.id, id));
+    await updateClient(id, updateData);
 
     return NextResponse.json({ message: 'Client updated' });
   } catch (error) {

@@ -1,5 +1,3 @@
-import { db } from '@/db';
-import { clients } from '@/db/schema';
 import { Button } from '@/components/ui/button';
 import { ClientTable } from '@/components/clients/client-table';
 import { PlusCircle } from 'lucide-react';
@@ -11,20 +9,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { ClientForm } from '@/components/clients/client-form';
+import { getClients } from '@/db/queries/clients';
 
 export default async function ClientsPage() {
-  const allClients = await db
-    .select({
-      id: clients.id,
-      name: clients.name,
-      type: clients.type,
-      contactPerson: clients.contactPerson,
-      contactEmail: clients.contactEmail,
-      contactPhone: clients.contactPhone,
-      isActive: clients.isActive,
-    })
-    .from(clients)
-    .orderBy(clients.name);
+  const allClients = await getClients();
 
   return (
     <div className="p-8">

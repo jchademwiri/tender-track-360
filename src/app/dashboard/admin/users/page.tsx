@@ -6,21 +6,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { db } from '@/db';
-import { users } from '@/db/schema';
 import { Search, Plus, Users, UserCheck, Shield, Eye } from 'lucide-react';
 import UsersTable from '@/components/users/UsersTable';
+import { getUsers } from '@/db/queries/users';
 
 export default async function UsersPage() {
-  const allUsers = await db.select().from(users);
-
-  const stats = {
-    total: allUsers.length,
-    admins: allUsers.filter((u) => u.role === 'admin').length,
-    managers: allUsers.filter((u) => u.role === 'tender_manager').length,
-    specialists: allUsers.filter((u) => u.role === 'tender_specialist').length,
-    viewers: allUsers.filter((u) => u.role === 'viewer').length,
-  };
+  const { allUsers, stats } = await getUsers();
 
   return (
     <div className="p-6 space-y-6">
@@ -106,8 +97,6 @@ export default async function UsersPage() {
           </div>
         </div>
       </div>
-
-        
 
       <UsersTable allUsers={allUsers} />
     </div>

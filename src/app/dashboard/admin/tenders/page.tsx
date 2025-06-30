@@ -3,8 +3,7 @@ import { Plus, Calendar, DollarSign, Building } from 'lucide-react';
 import TendersTable, {
   ClientCurrency,
 } from '@/components/tenders/TendersTable';
-import { db } from '@/db';
-import { tenders } from '@/db/schema/tenders';
+import { getTenders } from '@/db/queries/tenders';
 
 // Define Tender type for this file
 interface Tender {
@@ -20,28 +19,7 @@ interface Tender {
 }
 
 export default async function TendersPage() {
-  // Fetch and normalize tenders
-  const allTendersRaw = await db.select().from(tenders);
-  const allTenders: Tender[] = allTendersRaw.map((t) => ({
-    ...t,
-    estimatedValue:
-      typeof t.estimatedValue === 'string'
-        ? parseFloat(t.estimatedValue)
-        : t.estimatedValue,
-    description: typeof t.description === 'string' ? t.description : undefined,
-  }));
-
-  const stats = {
-    total: allTenders.length,
-    open: allTenders.filter((t) => t.status?.toLowerCase() === 'open').length,
-    closed: allTenders.filter((t) => t.status?.toLowerCase() === 'closed')
-      .length,
-    totalValue: allTenders.reduce(
-      (sum, t) =>
-        sum + (typeof t.estimatedValue === 'number' ? t.estimatedValue : 0),
-      0
-    ),
-  };
+  const { allTenders, stats } = await getTenders();
 
   return (
     <div className="p-6 space-y-6">
