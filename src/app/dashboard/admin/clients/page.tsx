@@ -13,7 +13,18 @@ import {
 import { ClientForm } from '@/components/clients/client-form';
 
 export default async function ClientsPage() {
-  const allClients = await db.select().from(clients).orderBy(clients.name);
+  const allClients = await db
+    .select({
+      id: clients.id,
+      name: clients.name,
+      type: clients.type,
+      contactPerson: clients.contactPerson,
+      contactEmail: clients.contactEmail,
+      contactPhone: clients.contactPhone,
+      isActive: clients.isActive,
+    })
+    .from(clients)
+    .orderBy(clients.name);
 
   return (
     <div className="p-8">
