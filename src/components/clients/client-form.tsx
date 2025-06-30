@@ -189,13 +189,13 @@ export function ClientForm({ client }: ClientFormProps) {
         />
         <FormField
           control={form.control}
-          name="address"
+          name="website"
           render={({ field }) => (
-            <FormItem className="md:col-span-2">
-              <FormLabel>Address</FormLabel>
+            <FormItem>
+              <FormLabel>Website</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="123 Main St, Anytown USA"
+                <Input
+                  placeholder="https://acme.com"
                   {...field}
                   value={field.value ?? ''}
                 />
@@ -206,13 +206,13 @@ export function ClientForm({ client }: ClientFormProps) {
         />
         <FormField
           control={form.control}
-          name="website"
+          name="address"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Website</FormLabel>
+            <FormItem className="md:col-span-2">
+              <FormLabel>Address</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="https://acme.com"
+                <Textarea
+                  placeholder="123 Main St, Anytown USA"
                   {...field}
                   value={field.value ?? ''}
                 />
