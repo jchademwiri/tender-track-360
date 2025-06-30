@@ -58,19 +58,20 @@ export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const { id } = params;
   // const session = await auth();
   // if (!session?.user?.id) {
   //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   // }
 
   try {
-    // await deleteTender(params.id, session.user.id);
-    await deleteTender(params.id, 'user-id-placeholder'); // Placeholder
+    // await deleteTender(id, session.user.id);
+    await deleteTender(id, '11111111-1111-1111-1111-111111111111'); // Placeholder
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error(`Failed to delete tender ${params.id}:`, error);
+    console.error(`Failed to delete tender ${id}:`, error);
     return NextResponse.json(
-      { error: `Failed to delete tender ${params.id}` },
+      { error: `Failed to delete tender ${id}` },
       { status: 500 }
     );
   }
