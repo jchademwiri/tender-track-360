@@ -3,8 +3,8 @@ import { getCategories } from '@/db/queries/categories';
 import { TenderForm } from '@/components/tenders/TenderForm';
 
 export default async function NewTenderPage() {
-  const { clients } = await getClients();
-  const { categories } = await getCategories();
+  const clients = await getClients();
+  const categories = await getCategories();
 
   return (
     <div className="p-6">

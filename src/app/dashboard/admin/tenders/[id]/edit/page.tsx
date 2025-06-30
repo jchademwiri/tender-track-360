@@ -15,7 +15,7 @@ export default async function EditTenderPage({ params }: EditTenderPageProps) {
   const clientsData = getClients();
   const categoriesData = getCategories();
 
-  const [tender, { clients }, { categories }] = await Promise.all([
+  const [tender, clients, categories] = await Promise.all([
     tenderData,
     clientsData,
     categoriesData,

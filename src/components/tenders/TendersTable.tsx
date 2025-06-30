@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { ClientCurrency } from './ClientCurrency';
 import { TenderActions } from './TenderActions';
+import Link from 'next/link';
 
 export default function TendersTable({ allTenders }: { allTenders: any[] }) {
   return (
@@ -31,7 +32,14 @@ export default function TendersTable({ allTenders }: { allTenders: any[] }) {
         <TableBody>
           {allTenders.map((tender) => (
             <TableRow key={tender.id}>
-              <TableCell className="font-medium">{tender.title}</TableCell>
+              <TableCell className="font-medium">
+                <Link
+                  href={`/dashboard/admin/tenders/${tender.id}`}
+                  className="hover:underline"
+                >
+                  {tender.title}
+                </Link>
+              </TableCell>
               <TableCell>{tender.client}</TableCell>
               <TableCell>{tender.category}</TableCell>
               <TableCell>

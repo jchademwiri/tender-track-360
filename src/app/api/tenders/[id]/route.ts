@@ -39,6 +39,7 @@ export async function PUT(
     const json = await request.json();
     const validatedData = insertTenderSchema.partial().parse({
       ...json,
+      updatedById: 'user-id-placeholder', // Placeholder
       // updatedById: session.user.id,
     });
 

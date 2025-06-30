@@ -9,11 +9,11 @@ import {
   boolean,
   index,
 } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
 import { tenderStatusEnum } from './enums';
 import { users } from './users';
 import { clients } from './clients';
 import { tenderCategories } from './categories';
-import { sql } from 'drizzle-orm';
 import { check } from 'drizzle-orm/gel-core';
 
 export const tenders = pgTable(
@@ -72,3 +72,26 @@ export const tenders = pgTable(
     ),
   })
 );
+
+export const tenderRelations = relations(tenders, ({ one }) => ({
+  client: one(clients, {
+    fields: [tenders.clientId],
+    references: [clients.id],
+    relationName: 'tender_client',
+  }),
+  category: one(tenderCategories, {
+    fields: [tenders.categoryId],
+    references: [tenderCategories.id],
+    relationName: 'tender_category',
+  }),
+  createdByUser: one(users, {
+    fields: [tenders.createdById],
+    references: [users.id],
+    relationName: 'tender_created_by_user',
+  }),
+  updatedByUser: one(users, {
+    fields: [tenders.updatedById],
+    references: [users.id],
+    relationName: 'tender_updated_by_user',
+  }),
+}));
