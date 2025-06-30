@@ -83,7 +83,10 @@ export default async function CategoriesPage() {
                       #{category.id}
                     </td> */}
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <CategoryActions categoryName={category.name} />
+                      <CategoryActions
+                        categoryId={category.id}
+                        categoryName={category.name}
+                      />
                     </td>
                   </tr>
                 ))}

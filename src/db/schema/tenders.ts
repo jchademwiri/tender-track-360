@@ -26,7 +26,9 @@ export const tenders = pgTable(
     clientId: uuid('client_id')
       .references(() => clients.id)
       .notNull(),
-    categoryId: uuid('category_id').references(() => tenderCategories.id),
+    categoryId: uuid('category_id').references(() => tenderCategories.id, {
+      onDelete: 'set null',
+    }),
     status: tenderStatusEnum('status').notNull().default('open'),
     publicationDate: date('publication_date'),
     submissionDeadline: timestamp('submission_deadline', {
