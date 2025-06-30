@@ -29,6 +29,7 @@ import {
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { ClientForm } from './client-form';
 import { toast } from 'sonner';
+import { ClientActions } from './ClientActions';
 
 interface Client {
   id: string;
@@ -80,64 +81,32 @@ export function ClientTable({ clients }: ClientTableProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead className="hidden md:table-cell">Type</TableHead>
-              <TableHead className="hidden md:table-cell">
-                Contact Person
-              </TableHead>
-              <TableHead className="hidden md:table-cell">Email</TableHead>
-              <TableHead className="hidden md:table-cell">Phone</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Contact Person</TableHead>
+              <TableHead>Contact Email</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="w-[70px]"></TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {clients.map((client) => (
               <TableRow key={client.id}>
-                <TableCell>{client.name}</TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {client.type}
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {client.contactPerson}
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {client.contactEmail}
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {client.contactPhone}
-                </TableCell>
+                <TableCell className="font-medium">{client.name}</TableCell>
                 <TableCell>
-                  <Badge variant={client.isActive ? 'default' : 'secondary'}>
+                  <Badge variant="outline">{client.type}</Badge>
+                </TableCell>
+                <TableCell>{client.contactPerson}</TableCell>
+                <TableCell>{client.contactEmail}</TableCell>
+                <TableCell>
+                  <Badge variant={client.isActive ? 'default' : 'destructive'}>
                     {client.isActive ? 'Active' : 'Inactive'}
                   </Badge>
                 </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                        <span className="sr-only">Open menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => setEditingClient(client)}
-                      >
-                        <Pencil className="mr-2 h-4 w-4" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-red-600"
-                        onClick={() => {
-                          setDeletingClient(client);
-                          setShowDeleteDialog(true);
-                        }}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                <TableCell className="text-right">
+                  <ClientActions
+                    clientId={client.id}
+                    clientName={client.name}
+                  />
                 </TableCell>
               </TableRow>
             ))}

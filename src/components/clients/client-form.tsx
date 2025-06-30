@@ -1,11 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import {
   Form,
   FormControl,
@@ -15,6 +13,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -22,108 +23,118 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+import { insertClientSchema } from '@/db/schema/zod';
+import { clients } from '@/db/schema';
+import { clientTypeEnum } from '@/db/schema/enums';
 import { toast } from 'sonner';
 
-const formSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  type: z.string().min(1, 'Please select a client type'),
-  contactPerson: z
-    .string()
-    .min(2, 'Contact person must be at least 2 characters'),
-  contactEmail: z.string().email('Please enter a valid email'),
-  contactPhone: z.string().min(10, 'Please enter a valid phone number'),
-  isActive: z.boolean(),
+const formSchema = insertClientSchema.pick({
+  name: true,
+  type: true,
+  contactPerson: true,
+  contactEmail: true,
+  contactPhone: true,
+  address: true,
+  website: true,
+  description: true,
+  isActive: true,
 });
 
-export function ClientForm({
-  client,
-  onSuccess,
-}: {
-  client?: any;
-  onSuccess?: () => void;
-}) {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
+type ClientFormValues = typeof clients.$inferInsert;
 
-  const form = useForm<z.infer<typeof formSchema>>({
+interface ClientFormProps {
+  client?: typeof clients.$inferSelect;
+}
+
+export function ClientForm({ client }: ClientFormProps) {
+  const router = useRouter();
+  const isEditing = !!client;
+
+  const form = useForm<ClientFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: client?.name || '',
-      type: client?.type || '',
+      type: client?.type || 'private',
       contactPerson: client?.contactPerson || '',
       contactEmail: client?.contactEmail || '',
       contactPhone: client?.contactPhone || '',
-      isActive: client?.isActive || true,
+      address: client?.address || '',
+      website: client?.website || '',
+      description: client?.description || '',
+      isActive: client?.isActive ?? true,
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = async (values: ClientFormValues) => {
     try {
-      setLoading(true);
-      const response = await fetch('/api/clients', {
-        method: client ? 'PATCH' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...values,
-          id: client?.id,
-        }),
-      });
+      const response = await fetch(
+        isEditing ? `/api/clients/${client.id}` : '/api/clients',
+        {
+          method: isEditing ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values),
+        }
+      );
 
-      if (!response.ok) throw new Error('Failed to save client');
+      if (!response.ok) {
+        throw new Error(`Failed to ${isEditing ? 'update' : 'create'} client`);
+      }
 
-      toast.success(client ? 'Client updated' : 'Client created');
+      toast.success(
+        `Client ${isEditing ? 'updated' : 'created'} successfully.`
+      );
+      router.push('/dashboard/admin/clients');
       router.refresh();
-      onSuccess?.();
     } catch (error) {
-      toast.error('Something went wrong');
-      console.error(error);
-    } finally {
-      setLoading(false);
+      toast.error(
+        error instanceof Error ? error.message : 'An unknown error occurred.'
+      );
     }
-  }
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+      >
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Client Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter client name" {...field} />
+                <Input placeholder="Acme Inc." {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Type</FormLabel>
+              <FormLabel>Client Type</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select client type" />
+                    <SelectValue placeholder="Select a client type" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="government">Government</SelectItem>
-                  <SelectItem value="corporate">Corporate</SelectItem>
-                  <SelectItem value="ngo">NGO</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  {clientTypeEnum.enumValues.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="contactPerson"
@@ -131,48 +142,109 @@ export function ClientForm({
             <FormItem>
               <FormLabel>Contact Person</FormLabel>
               <FormControl>
-                <Input placeholder="Enter contact person name" {...field} />
+                <Input
+                  placeholder="John Doe"
+                  {...field}
+                  value={field.value ?? ''}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="contactEmail"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Contact Email</FormLabel>
               <FormControl>
-                <Input placeholder="Enter contact email" {...field} />
+                <Input
+                  type="email"
+                  placeholder="john.doe@acme.com"
+                  {...field}
+                  value={field.value ?? ''}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="contactPhone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone</FormLabel>
+              <FormLabel>Contact Phone</FormLabel>
               <FormControl>
-                <Input placeholder="Enter contact phone" {...field} />
+                <Input
+                  placeholder="+1 (234) 567-890"
+                  {...field}
+                  value={field.value ?? ''}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
+        <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <FormItem className="md:col-span-2">
+              <FormLabel>Address</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="123 Main St, Anytown USA"
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="website"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Website</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="https://acme.com"
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem className="md:col-span-2">
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="A brief description of the client."
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="isActive"
           render={({ field }) => (
-            <FormItem className="flex items-center justify-between rounded-lg border p-4">
+            <FormItem className="md:col-span-2 flex flex-row items-center justify-between rounded-lg border p-3">
               <div className="space-y-0.5">
-                <FormLabel className="text-base">Active</FormLabel>
+                <FormLabel>Active</FormLabel>
               </div>
               <FormControl>
                 <Switch
@@ -183,10 +255,22 @@ export function ClientForm({
             </FormItem>
           )}
         />
-
-        <Button type="submit" disabled={loading} className="w-full">
-          {loading ? 'Saving...' : client ? 'Update Client' : 'Create Client'}
-        </Button>
+        <div className="md:col-span-2 flex justify-end gap-2 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push('/dashboard/admin/clients')}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting
+              ? 'Saving...'
+              : isEditing
+              ? 'Save Changes'
+              : 'Create Client'}
+          </Button>
+        </div>
       </form>
     </Form>
   );
