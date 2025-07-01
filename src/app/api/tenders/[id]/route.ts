@@ -26,20 +26,23 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: Request, props: { params: { id: string } }) {
+  const { params } = await props;
   const { id } = params;
+  const data = await request.json();
+
+  // Convert empty string numerics to null
+  if (data.estimatedValue === '') data.estimatedValue = null;
+  if (data.actualValue === '') data.actualValue = null;
+
   // const session = await auth();
   // if (!session?.user?.id) {
   //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   // }
 
   try {
-    const json = await request.json();
     const validatedData = insertTenderSchema.partial().parse({
-      ...json,
+      ...data,
       updatedById: '0514775a-bcea-4021-8feb-74f7d594c2b2', // Placeholder
       // updatedById: session.user.id,
     });
