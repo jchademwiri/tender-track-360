@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Select,
@@ -17,12 +17,14 @@ interface TenderStatusToggleProps {
   tenderId: string;
   currentStatus: keyof typeof tenderStatusEnum.enumValues;
   badgeVariant?: string;
+  icon?: ReactNode;
 }
 
 export function TenderStatusToggle({
   tenderId,
   currentStatus,
   badgeVariant = 'default',
+  icon,
 }: TenderStatusToggleProps) {
   const router = useRouter();
   const [status, setStatus] =
@@ -64,8 +66,12 @@ export function TenderStatusToggle({
       disabled={isUpdating}
     >
       <SelectTrigger
-        className={badgeVariants({ variant: badgeVariant }) + ' w-[120px]'}
+        className={
+          badgeVariants({ variant: badgeVariant }) +
+          ' w-[120px] flex items-center gap-1'
+        }
       >
+        {icon}
         <SelectValue placeholder="Select status" />
       </SelectTrigger>
       <SelectContent>

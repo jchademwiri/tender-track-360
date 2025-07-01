@@ -13,6 +13,16 @@ import { TenderActions } from './TenderActions';
 import Link from 'next/link';
 import { TenderStatusToggle } from './TenderStatusToggle';
 import { Badge } from '@/components/ui/badge';
+import {
+  CheckCircle,
+  Hourglass,
+  Send,
+  XCircle,
+  Lock,
+  FileText,
+  Ban,
+  Circle,
+} from 'lucide-react';
 
 export default function TendersTable({ allTenders }: { allTenders: any[] }) {
   // Map status to badge variant
@@ -21,15 +31,41 @@ export default function TendersTable({ allTenders }: { allTenders: any[] }) {
       case 'open':
         return 'default'; // primary color
       case 'closed':
-        return 'destructive'; // red
+        return 'outline'; // gray
       case 'cancelled':
-        return 'outline'; // neutral/gray
+        return 'outline'; // gray
       case 'rejected':
-        return 'outline';
+        return 'destructive'; // red
       case 'awarded':
-        return 'secondary'; // secondary color
+        return 'success'; // green
+      case 'evaluation':
+        return 'warning'; // green (hopeful)
+      case 'submitted':
+        return 'warning'; // green (hopeful)
       default:
         return 'outline';
+    }
+  };
+
+  // Map status to icon with color
+  const statusIcon = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'awarded':
+        return <CheckCircle className="w-3 h-3 text-green-100" />;
+      case 'evaluation':
+        return <Hourglass className="w-3 h-3 text-green-100" />;
+      case 'submitted':
+        return <Send className="w-3 h-3 text-green-100" />;
+      case 'rejected':
+        return <XCircle className="w-3 h-3 text-red-100" />;
+      case 'closed':
+        return <Lock className="w-3 h-3 text-gray-200" />;
+      case 'cancelled':
+        return <Ban className="w-3 h-3 text-gray-200" />;
+      case 'open':
+        return <Circle className="w-3 h-3 text-blue-100" />;
+      default:
+        return <FileText className="w-3 h-3 text-gray-200" />;
     }
   };
 
@@ -95,6 +131,7 @@ export default function TendersTable({ allTenders }: { allTenders: any[] }) {
                     tenderId={tender.id}
                     currentStatus={tender.status}
                     badgeVariant={statusVariant(tender.status)}
+                    icon={statusIcon(tender.status)}
                   />
                 </TableCell>
                 <TableCell className={deadlineClass}>
