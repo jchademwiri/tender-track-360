@@ -43,9 +43,12 @@ import {
   ChevronDownIcon,
   SearchIcon,
   FilterIcon,
+  PencilIcon,
+  TrashIcon,
 } from 'lucide-react';
 import { Suspense } from 'react';
 import { getProjects } from '@/db/queries/projects';
+import Link from 'next/link';
 
 type TenderStatus =
   | 'in_progress'
@@ -209,14 +212,19 @@ export default async function ProjectsPage() {
         <CardContent>
           <Suspense fallback={<ProjectTableSkeleton />}>
             {projects.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <FileTextIcon className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
+              <div className="flex flex-col items-center justify-center py-16 text-center bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-dashed border-blue-200 dark:border-blue-700">
+                <FileTextIcon className="h-16 w-16 text-blue-300 dark:text-blue-700 mb-4" />
+                <h3 className="text-2xl font-semibold mb-2 text-blue-900 dark:text-blue-200">
                   No projects found
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground mb-4">
                   There are currently no awarded projects to display.
+                  <br />
+                  Start by creating a new project.
                 </p>
+                <Button variant="default" className="mt-2">
+                  Create Project
+                </Button>
               </div>
             ) : (
               <div className="rounded-md border overflow-hidden">
@@ -224,12 +232,15 @@ export default async function ProjectsPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[120px]">Reference</TableHead>
                         <TableHead>Project Title</TableHead>
+                        <TableHead className="w-[120px]">Reference</TableHead>
                         <TableHead>Client</TableHead>
                         <TableHead className="w-[120px]">Award Date</TableHead>
                         <TableHead className="text-right w-[140px]">
                           Estimated Value
+                        </TableHead>
+                        <TableHead className="text-right w-[120px]">
+                          Actions
                         </TableHead>
                       </TableRow>
                     </TableHeader>
@@ -237,8 +248,17 @@ export default async function ProjectsPage() {
                       {projects.map((project) => (
                         <TableRow
                           key={project.id}
-                          className="hover:bg-muted/50"
+                          className="hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors group"
                         >
+                          <TableCell>
+                            <Link
+                              href={`/dashboard/admin/projects/${project.id}`}
+                              className="font-medium hover:text-primary transition-colors"
+                              style={{ textDecoration: 'none' }}
+                            >
+                              {project.title || 'Untitled Project'}
+                            </Link>
+                          </TableCell>
                           <TableCell className="font-mono text-sm">
                             <Badge
                               variant="outline"
@@ -248,32 +268,8 @@ export default async function ProjectsPage() {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <HoverCard>
-                              <HoverCardTrigger className="font-medium hover:text-primary cursor-pointer">
-                                {project.title || 'Untitled Project'}
-                              </HoverCardTrigger>
-                              <HoverCardContent className="w-80">
-                                <div className="space-y-2">
-                                  <h4 className="font-semibold">
-                                    {project.title || 'Untitled Project'}
-                                  </h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    {project.description ||
-                                      'No description available.'}
-                                  </p>
-                                  <div className="flex items-center pt-2">
-                                    <CalendarIcon className="h-4 w-4 text-muted-foreground mr-2" />
-                                    <span className="text-sm text-muted-foreground">
-                                      Awarded {formatDate(project.awardDate)}
-                                    </span>
-                                  </div>
-                                </div>
-                              </HoverCardContent>
-                            </HoverCard>
-                          </TableCell>
-                          <TableCell>
                             <div className="flex items-center gap-2">
-                              <BuildingIcon className="h-4 w-4 text-muted-foreground" />
+                              <BuildingIcon className="h-4 w-4 text-blue-400" />
                               <span className="hover:text-primary">
                                 {project.clientName || 'N/A'}
                               </span>
@@ -281,12 +277,35 @@ export default async function ProjectsPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                              <CalendarIcon className="h-4 w-4 text-green-400" />
                               {formatDate(project.awardDate)}
                             </div>
                           </TableCell>
                           <TableCell className="text-right font-medium">
-                            {formatCurrency(project.estimatedValue)}
+                            <div className="flex items-center justify-end gap-1">
+                              <DollarSignIcon className="h-4 w-4 text-yellow-500" />
+                              {formatCurrency(project.estimatedValue)}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="hover:text-primary"
+                                title="Edit"
+                              >
+                                <PencilIcon className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="hover:text-destructive"
+                                title="Delete"
+                              >
+                                <TrashIcon className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
