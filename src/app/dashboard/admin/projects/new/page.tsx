@@ -5,7 +5,8 @@ import { getTenders } from '@/db/queries/tenders';
 export default async function NewProjectPage() {
   const clients = await getClients();
   const categories = await getCategories();
-  const tenders = (await getTenders()).filter((t) => t.status !== 'awarded');
+  const { allTenders } = await getTenders();
+  const tenders = allTenders.filter((t) => t.status !== 'awarded');
 
   const { default: NewProjectClient } = await import(
     '@/components/projects/NewProjectClient'

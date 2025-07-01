@@ -1,4 +1,17 @@
-import { useState } from 'react';
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,12 +22,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { insertProjectSchema } from '@/db/schema/zod';
+import { projects } from '@/db/schema/projects';
+import { toast } from 'sonner';
+
+const formSchema = insertProjectSchema
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    createdById: true,
+    updatedById: true,
+  })
+  .refine(
+    (data) => !!data.clientId && /^[0-9a-fA-F-]{36}$/.test(data.clientId),
+    { message: 'Please select a client.', path: ['clientId'] }
+  )
+  .refine(
+    (data) => !data.categoryId || /^[0-9a-fA-F-]{36}$/.test(data.categoryId),
+    { message: 'Please select a category.', path: ['categoryId'] }
+  );
+
+type ProjectFormValues = Omit<
+  typeof projects.$inferInsert,
+  'id' | 'createdAt' | 'updatedAt' | 'createdById' | 'updatedById'
+>;
 
 interface ProjectFormProps {
-  initialData?: any;
+  initialData?: typeof projects.$inferSelect;
   clients: { id: string; name: string }[];
   categories: { id: string; name: string }[];
-  onSubmit: (data: any) => Promise<any>;
+  onSubmit: (data: ProjectFormValues) => Promise<any>;
   loading?: boolean;
 }
 
@@ -25,165 +72,291 @@ export function ProjectForm({
   onSubmit,
   loading,
 }: ProjectFormProps) {
-  const [form, setForm] = useState({
-    referenceNumber: initialData?.referenceNumber || '',
-    title: initialData?.title || '',
-    description: initialData?.description || '',
-    clientId: initialData?.clientId || '',
-    categoryId: initialData?.categoryId || '',
-    status: initialData?.status || 'active',
-    awardDate: initialData?.awardDate ? initialData.awardDate.slice(0, 10) : '',
-    estimatedValue: initialData?.estimatedValue || '',
-    department: initialData?.department || '',
-    notes: initialData?.notes || '',
+  const router = useRouter();
+  const isEditing = !!initialData;
+
+  const form = useForm<ProjectFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      referenceNumber: initialData?.referenceNumber || '',
+      title: initialData?.title || '',
+      description: initialData?.description || '',
+      clientId: initialData?.clientId || '',
+      categoryId: initialData?.categoryId || '',
+      status: initialData?.status || 'active',
+      awardDate: initialData?.awardDate || undefined,
+      estimatedValue: initialData?.estimatedValue || '',
+      department: initialData?.department || '',
+      notes: initialData?.notes || '',
+    },
   });
-  const [errors, setErrors] = useState<any>({});
-  const [submitting, setSubmitting] = useState(false);
 
-  const validate = () => {
-    const errs: any = {};
-    if (!form.referenceNumber)
-      errs.referenceNumber = 'Reference number is required';
-    if (!form.title) errs.title = 'Title is required';
-    if (!form.clientId) errs.clientId = 'Client is required';
-    return errs;
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSelect = (name: string, value: string) => {
-    setForm({ ...form, [name]: value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const errs = validate();
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
-    setSubmitting(true);
+  const handleSubmit = async (values: ProjectFormValues) => {
     try {
-      await onSubmit(form);
-    } finally {
-      setSubmitting(false);
+      await onSubmit(values);
+      toast.success(
+        `Project ${isEditing ? 'updated' : 'created'} successfully.`
+      );
+      router.push('/dashboard/admin/projects');
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'An unknown error occurred.'
+      );
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Input
-          name="referenceNumber"
-          placeholder="Reference Number"
-          value={form.referenceNumber}
-          onChange={handleChange}
-          required
-        />
-        {errors.referenceNumber && (
-          <div className="text-red-600 text-xs mt-1">
-            {errors.referenceNumber}
-          </div>
-        )}
-      </div>
-      <div>
-        <Input
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        {/* Title - Full width */}
+        <FormField
+          control={form.control}
           name="title"
-          placeholder="Project Title"
-          value={form.title}
-          onChange={handleChange}
-          required
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g. Construction of New Building"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.title && (
-          <div className="text-red-600 text-xs mt-1">{errors.title}</div>
-        )}
-      </div>
-      <Textarea
-        name="description"
-        placeholder="Description"
-        value={form.description}
-        onChange={handleChange}
-      />
-      <div>
-        <Select
-          value={form.clientId}
-          onValueChange={(v) => handleSelect('clientId', v)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Client" />
-          </SelectTrigger>
-          <SelectContent>
-            {clients.map((client) => (
-              <SelectItem key={client.id} value={client.id}>
-                {client.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {errors.clientId && (
-          <div className="text-red-600 text-xs mt-1">{errors.clientId}</div>
-        )}
-      </div>
-      <Select
-        value={form.categoryId}
-        onValueChange={(v) => handleSelect('categoryId', v)}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select Category" />
-        </SelectTrigger>
-        <SelectContent>
-          {categories.map((cat) => (
-            <SelectItem key={cat.id} value={cat.id}>
-              {cat.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Select
-        value={form.status}
-        onValueChange={(v) => handleSelect('status', v)}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select Status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="active">Active</SelectItem>
-          <SelectItem value="completed">Completed</SelectItem>
-          <SelectItem value="on_hold">On Hold</SelectItem>
-          <SelectItem value="cancelled">Cancelled</SelectItem>
-        </SelectContent>
-      </Select>
-      <Input
-        name="awardDate"
-        type="date"
-        placeholder="Award Date"
-        value={form.awardDate}
-        onChange={handleChange}
-      />
-      <Input
-        name="estimatedValue"
-        type="number"
-        placeholder="Estimated Value"
-        value={form.estimatedValue}
-        onChange={handleChange}
-      />
-      <Input
-        name="department"
-        placeholder="Department"
-        value={form.department}
-        onChange={handleChange}
-      />
-      <Textarea
-        name="notes"
-        placeholder="Notes"
-        value={form.notes}
-        onChange={handleChange}
-      />
-      <Button type="submit" disabled={loading || submitting}>
-        {initialData ? 'Update Project' : 'Create Project'}
-      </Button>
-    </form>
+
+        {/* Reference Number and Status */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="referenceNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Reference Number</FormLabel>
+                <FormControl>
+                  <Input placeholder="PRJ-2024-001" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="on_hold">On Hold</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Client and Category */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="clientId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Client</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a client" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {clients.map((client) => (
+                      <SelectItem key={client.id} value={client.id}>
+                        {client.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value ?? undefined}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Description - Full width */}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Provide a detailed description of the project."
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Award Date and Estimated Value */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="awardDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Award Date</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={'outline'}
+                        className={cn(
+                          'w-full pl-3 text-left font-normal',
+                          !field.value && 'text-muted-foreground'
+                        )}
+                      >
+                        {field.value ? (
+                          format(new Date(field.value), 'PPP')
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) => field.onChange(date?.toISOString())}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="estimatedValue"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Estimated Value</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="100000.00"
+                    {...field}
+                    value={field.value ?? ''}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Department and Notes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="department"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Department</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Department"
+                    {...field}
+                    value={field.value ?? ''}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Internal Notes</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Add any internal notes here."
+                    {...field}
+                    value={field.value ?? ''}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <Button type="submit" disabled={loading || form.formState.isSubmitting}>
+          {form.formState.isSubmitting
+            ? 'Saving...'
+            : isEditing
+            ? 'Update Project'
+            : 'Create Project'}
+        </Button>
+      </form>
+    </Form>
   );
 }
