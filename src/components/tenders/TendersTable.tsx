@@ -12,8 +12,27 @@ import { format } from 'date-fns';
 import { TenderActions } from './TenderActions';
 import Link from 'next/link';
 import { TenderStatusToggle } from './TenderStatusToggle';
+import { Badge } from '@/components/ui/badge';
 
 export default function TendersTable({ allTenders }: { allTenders: any[] }) {
+  // Map status to badge variant
+  const statusVariant = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'open':
+        return 'default'; // primary color
+      case 'closed':
+        return 'destructive'; // red
+      case 'cancelled':
+        return 'outline'; // neutral/gray
+      case 'rejected':
+        return 'outline';
+      case 'awarded':
+        return 'secondary'; // secondary color
+      default:
+        return 'outline';
+    }
+  };
+
   return (
     <div className="border rounded-lg">
       <Table>
@@ -44,6 +63,7 @@ export default function TendersTable({ allTenders }: { allTenders: any[] }) {
                 <TenderStatusToggle
                   tenderId={tender.id}
                   currentStatus={tender.status}
+                  badgeVariant={statusVariant(tender.status)}
                 />
               </TableCell>
               <TableCell>

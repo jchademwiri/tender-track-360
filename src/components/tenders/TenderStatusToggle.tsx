@@ -11,15 +11,18 @@ import {
 } from '@/components/ui/select';
 import { tenderStatusEnum } from '@/db/schema/enums';
 import { toast } from 'sonner';
+import { badgeVariants } from '@/components/ui/badge';
 
 interface TenderStatusToggleProps {
   tenderId: string;
   currentStatus: keyof typeof tenderStatusEnum.enumValues;
+  badgeVariant?: string;
 }
 
 export function TenderStatusToggle({
   tenderId,
   currentStatus,
+  badgeVariant = 'default',
 }: TenderStatusToggleProps) {
   const router = useRouter();
   const [status, setStatus] =
@@ -60,7 +63,9 @@ export function TenderStatusToggle({
       value={status}
       disabled={isUpdating}
     >
-      <SelectTrigger className="w-[120px]">
+      <SelectTrigger
+        className={badgeVariants({ variant: badgeVariant }) + ' w-[120px]'}
+      >
         <SelectValue placeholder="Select status" />
       </SelectTrigger>
       <SelectContent>
