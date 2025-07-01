@@ -45,6 +45,7 @@ import {
   FilterIcon,
   PencilIcon,
   TrashIcon,
+  PlusIcon,
 } from 'lucide-react';
 import { Suspense } from 'react';
 import { getProjects } from '@/db/queries/projects';
@@ -139,6 +140,13 @@ export default async function ProjectsPage() {
           <p className="text-muted-foreground">
             Overview of all awarded projects and their current status
           </p>
+        </div>
+        <div className="flex items-center gap-4">
+          <Link href="/dashboard/admin/projects/new">
+            <Button className="flex items-center gap-2" variant="default">
+              <PlusIcon className="w-4 h-4" /> Create Project
+            </Button>
+          </Link>
         </div>
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative">

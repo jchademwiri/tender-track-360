@@ -13,3 +13,4 @@ export * from './notifications';
 export * from './activity-logs';
 export * from './status-transitions';
 export * from './tender-extensions';
+export * from './projects';
