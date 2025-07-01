@@ -10,16 +10,17 @@ interface EditTenderPageProps {
   };
 }
 
-export default async function EditTenderPage({ params }: EditTenderPageProps) {
-  const tenderData = getTenderById(params.id);
-  const clientsData = getClients();
-  const categoriesData = getCategories();
+export default async function EditTenderPage(props: EditTenderPageProps) {
+  const { params } = await props;
+  const tenderData = await getTenderById(params.id);
+  const clientsData = await getClients();
+  const categoriesData = await getCategories();
 
-  const [tender, clients, categories] = await Promise.all([
+  const [tender, clients, categories] = [
     tenderData,
     clientsData,
     categoriesData,
-  ]);
+  ];
 
   if (!tender) {
     notFound();

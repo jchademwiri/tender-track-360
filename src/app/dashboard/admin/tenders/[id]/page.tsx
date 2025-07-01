@@ -86,11 +86,17 @@ export default async function TenderDetailPage({
           )}
           {detailItem(
             'Estimated Value',
-            <ClientCurrency value={tender.estimatedValue} />
+            <ClientCurrency
+              value={
+                tender.estimatedValue ? parseFloat(tender.estimatedValue) : null
+              }
+            />
           )}
           {detailItem(
             'Actual Value',
-            <ClientCurrency value={tender.actualValue} />
+            <ClientCurrency
+              value={tender.actualValue ? parseFloat(tender.actualValue) : null}
+            />
           )}
           {detailItem('Department', tender.department)}
         </CardContent>
@@ -127,12 +133,12 @@ export default async function TenderDetailPage({
           <CardTitle>Audit Information</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {detailItem('Created By', tender.createdByUser?.name)}
+          {detailItem('Created By', tender.createdByUser?.fullName)}
           {detailItem(
             'Created At',
             format(new Date(tender.createdAt), 'PPP p')
           )}
-          {detailItem('Last Updated By', tender.updatedByUser?.name)}
+          {detailItem('Last Updated By', tender.updatedByUser?.fullName)}
           {detailItem(
             'Last Updated At',
             format(new Date(tender.updatedAt), 'PPP p')

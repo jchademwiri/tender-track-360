@@ -30,6 +30,7 @@ export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const { id } = params;
   // const session = await auth();
   // if (!session?.user?.id) {
   //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -39,16 +40,16 @@ export async function PUT(
     const json = await request.json();
     const validatedData = insertTenderSchema.partial().parse({
       ...json,
-      updatedById: 'user-id-placeholder', // Placeholder
+      updatedById: '0514775a-bcea-4021-8feb-74f7d594c2b2', // Placeholder
       // updatedById: session.user.id,
     });
 
-    const updatedTender = await updateTender(params.id, validatedData);
+    const updatedTender = await updateTender(id, validatedData);
     return NextResponse.json(updatedTender);
   } catch (error) {
-    console.error(`Failed to update tender ${params.id}:`, error);
+    console.error(`Failed to update tender ${id}:`, error);
     return NextResponse.json(
-      { error: `Failed to update tender ${params.id}` },
+      { error: `Failed to update tender ${id}` },
       { status: 500 }
     );
   }
@@ -66,7 +67,7 @@ export async function DELETE(
 
   try {
     // await deleteTender(id, session.user.id);
-    await deleteTender(id, '11111111-1111-1111-1111-111111111111'); // Placeholder
+    await deleteTender(id, '0514775a-bcea-4021-8feb-74f7d594c2b2'); // Placeholder
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error(`Failed to delete tender ${id}:`, error);

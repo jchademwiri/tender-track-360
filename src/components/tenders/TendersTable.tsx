@@ -8,11 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { ClientCurrency } from './ClientCurrency';
 import { TenderActions } from './TenderActions';
 import Link from 'next/link';
+import { TenderStatusToggle } from './TenderStatusToggle';
 
 export default function TendersTable({ allTenders }: { allTenders: any[] }) {
   return (
@@ -25,7 +24,6 @@ export default function TendersTable({ allTenders }: { allTenders: any[] }) {
             <TableHead>Category</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Deadline</TableHead>
-            <TableHead className="text-right">Value</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -43,15 +41,15 @@ export default function TendersTable({ allTenders }: { allTenders: any[] }) {
               <TableCell>{tender.client}</TableCell>
               <TableCell>{tender.category}</TableCell>
               <TableCell>
-                <Badge variant="outline">{tender.status}</Badge>
+                <TenderStatusToggle
+                  tenderId={tender.id}
+                  currentStatus={tender.status}
+                />
               </TableCell>
               <TableCell>
                 {tender.submissionDeadline
                   ? format(new Date(tender.submissionDeadline), 'PPP')
                   : 'N/A'}
-              </TableCell>
-              <TableCell className="text-right">
-                <ClientCurrency value={tender.estimatedValue} />
               </TableCell>
               <TableCell className="text-right">
                 <TenderActions

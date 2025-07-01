@@ -28,8 +28,8 @@ export async function POST(request: Request) {
       ...json,
       // createdById: session.user.id,
       // updatedById: session.user.id,
-      createdById: 'user-id-placeholder', // Placeholder
-      updatedById: 'user-id-placeholder', // Placeholder
+      createdById: '0514775a-bcea-4021-8feb-74f7d594c2b2', // Placeholder
+      updatedById: '0514775a-bcea-4021-8feb-74f7d594c2b2', // Placeholder
     });
 
     const newTender = await createTender(validatedData);

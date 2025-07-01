@@ -15,6 +15,13 @@
       "when": 1751274684307,
       "tag": "0001_outstanding_supernaut",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751355994540,
+      "tag": "0002_icy_gamma_corps",
+      "breakpoints": true
     }
   ]
 }

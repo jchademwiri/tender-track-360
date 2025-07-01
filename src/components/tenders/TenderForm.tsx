@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -37,18 +36,37 @@ import { tenders } from '@/db/schema';
 import { tenderStatusEnum } from '@/db/schema/enums';
 import { toast } from 'sonner';
 
-const formSchema = insertTenderSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  createdById: true,
-  updatedById: true,
-  isDeleted: true,
-  deletedAt: true,
-  deletedById: true,
-});
+const formSchema = insertTenderSchema
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    createdById: true,
+    updatedById: true,
+    isDeleted: true,
+    deletedAt: true,
+    deletedById: true,
+  })
+  .refine(
+    (data) => !!data.clientId && /^[0-9a-fA-F-]{36}$/.test(data.clientId),
+    { message: 'Please select a client.', path: ['clientId'] }
+  )
+  .refine(
+    (data) => !!data.categoryId && /^[0-9a-fA-F-]{36}$/.test(data.categoryId),
+    { message: 'Please select a category.', path: ['categoryId'] }
+  );
 
-type TenderFormValues = z.infer<typeof formSchema>;
+type TenderFormValues = Omit<
+  typeof tenders.$inferInsert,
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'createdById'
+  | 'updatedById'
+  | 'isDeleted'
+  | 'deletedAt'
+  | 'deletedById'
+>;
 
 interface TenderFormProps {
   tender?: typeof tenders.$inferSelect;
@@ -69,24 +87,19 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
       clientId: tender?.clientId || '',
       categoryId: tender?.categoryId || '',
       status: tender?.status || 'open',
-      publicationDate: tender?.publicationDate
-        ? new Date(tender.publicationDate)
-        : undefined,
-      submissionDeadline: tender?.submissionDeadline
-        ? new Date(tender.submissionDeadline)
-        : undefined,
-      evaluationDate: tender?.evaluationDate
-        ? new Date(tender.evaluationDate)
-        : undefined,
-      awardDate: tender?.awardDate ? new Date(tender.awardDate) : undefined,
-      estimatedValue: tender?.estimatedValue?.toString() || '',
-      actualValue: tender?.actualValue?.toString() || '',
+      publicationDate: tender?.publicationDate || undefined,
+      submissionDeadline: tender?.submissionDeadline || undefined,
+      evaluationDate: tender?.evaluationDate || undefined,
+      awardDate: tender?.awardDate || undefined,
+      estimatedValue: tender?.estimatedValue || '',
+      actualValue: tender?.actualValue || '',
       department: tender?.department || '',
       notes: tender?.notes || '',
     },
   });
 
   const onSubmit = async (values: TenderFormValues) => {
+    console.log('Submitting values:', values);
     try {
       const response = await fetch(
         isEditing ? `/api/tenders/${tender.id}` : '/api/tenders',
@@ -239,7 +252,12 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
               <FormItem>
                 <FormLabel>Estimated Value</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="100000.00" {...field} />
+                  <Input
+                    type="number"
+                    placeholder="100000.00"
+                    {...field}
+                    value={field.value ?? ''}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -254,7 +272,7 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                 <FormControl>
                   <Input
                     type="number"
-                    placeholder="120000.00"
+                    placeholder="95000.00"
                     {...field}
                     value={field.value ?? ''}
                   />
@@ -263,12 +281,11 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="publicationDate"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem>
                 <FormLabel>Publication Date</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -281,7 +298,7 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                         )}
                       >
                         {field.value ? (
-                          format(field.value, 'PPP')
+                          format(new Date(field.value), 'PPP')
                         ) : (
                           <span>Pick a date</span>
                         )}
@@ -292,8 +309,8 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) => field.onChange(date?.toISOString())}
                       initialFocus
                     />
                   </PopoverContent>
@@ -302,12 +319,11 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="submissionDeadline"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem>
                 <FormLabel>Submission Deadline</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -320,7 +336,7 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                         )}
                       >
                         {field.value ? (
-                          format(field.value, 'PPP')
+                          format(new Date(field.value), 'PPP')
                         ) : (
                           <span>Pick a date</span>
                         )}
@@ -331,8 +347,9 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) => field.onChange(date?.toISOString())}
+                      initialFocus
                     />
                   </PopoverContent>
                 </Popover>
@@ -340,60 +357,125 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
-            name="description"
+            name="evaluationDate"
             render={({ field }) => (
-              <FormItem className="md:col-span-2">
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Detailed description of the tender requirements..."
-                    {...field}
-                    value={field.value ?? ''}
-                  />
-                </FormControl>
+              <FormItem>
+                <FormLabel>Evaluation Date</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={'outline'}
+                        className={cn(
+                          'w-full pl-3 text-left font-normal',
+                          !field.value && 'text-muted-foreground'
+                        )}
+                      >
+                        {field.value ? (
+                          format(new Date(field.value), 'PPP')
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) => field.onChange(date?.toISOString())}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
-            name="notes"
+            name="awardDate"
             render={({ field }) => (
-              <FormItem className="md:col-span-2">
-                <FormLabel>Internal Notes</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Add any internal notes here..."
-                    {...field}
-                    value={field.value ?? ''}
-                  />
-                </FormControl>
+              <FormItem>
+                <FormLabel>Award Date</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={'outline'}
+                        className={cn(
+                          'w-full pl-3 text-left font-normal',
+                          !field.value && 'text-muted-foreground'
+                        )}
+                      >
+                        {field.value ? (
+                          format(new Date(field.value), 'PPP')
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) => field.onChange(date?.toISOString())}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Provide a detailed description of the tender."
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Internal Notes</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Add any internal notes here."
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="flex justify-end gap-2 pt-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.push('/dashboard/admin/tenders')}
-          >
-            Cancel
-          </Button>
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting
-              ? 'Saving...'
-              : isEditing
-              ? 'Save Changes'
-              : 'Create Tender'}
-          </Button>
-        </div>
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting
+            ? 'Saving...'
+            : isEditing
+            ? 'Save Changes'
+            : 'Create Tender'}
+        </Button>
       </form>
     </Form>
   );

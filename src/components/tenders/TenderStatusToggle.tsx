@@ -1,0 +1,75 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { tenderStatusEnum } from '@/db/schema/enums';
+import { toast } from 'sonner';
+
+interface TenderStatusToggleProps {
+  tenderId: string;
+  currentStatus: keyof typeof tenderStatusEnum.enumValues;
+}
+
+export function TenderStatusToggle({
+  tenderId,
+  currentStatus,
+}: TenderStatusToggleProps) {
+  const router = useRouter();
+  const [status, setStatus] =
+    useState<keyof typeof tenderStatusEnum.enumValues>(currentStatus);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleStatusChange = async (
+    newStatus: keyof typeof tenderStatusEnum.enumValues
+  ) => {
+    setIsUpdating(true);
+    try {
+      const response = await fetch(`/api/tenders/${tenderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update status');
+      }
+
+      setStatus(newStatus);
+      toast.success('Tender status updated successfully.');
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'An unknown error occurred.'
+      );
+      setStatus(currentStatus);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  return (
+    <Select
+      onValueChange={handleStatusChange}
+      value={status}
+      disabled={isUpdating}
+    >
+      <SelectTrigger className="w-[120px]">
+        <SelectValue placeholder="Select status" />
+      </SelectTrigger>
+      <SelectContent>
+        {tenderStatusEnum.enumValues.map((enumValue) => (
+          <SelectItem key={enumValue} value={enumValue}>
+            {enumValue.charAt(0).toUpperCase() + enumValue.slice(1)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}

@@ -1,6 +1,6 @@
 {
-  "id": "6bd17977-c846-4b24-8959-a585bce6a470",
-  "prevId": "25118493-a544-4380-a198-74c4dbc5b7f8",
+  "id": "29067ec3-0c05-4068-93cf-937cc7b6657e",
+  "prevId": "68e45a3e-c322-4f4c-8896-f1b8c500ecb5",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -631,7 +631,8 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "email": {
           "name": "email",
@@ -779,25 +780,25 @@
         },
         "publication_date": {
           "name": "publication_date",
-          "type": "date",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
         "submission_deadline": {
           "name": "submission_deadline",
-          "type": "timestamp with time zone",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
         "evaluation_date": {
           "name": "evaluation_date",
-          "type": "date",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
         "award_date": {
           "name": "award_date",
-          "type": "date",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
@@ -975,7 +976,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "set null",
           "onUpdate": "no action"
         },
         "tenders_created_by_id_users_id_fk": {
