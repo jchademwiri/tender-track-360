@@ -1,6 +1,6 @@
 'use client';
 
-import React, { JSX, useState } from 'react';
+import React, { JSX, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -50,6 +50,20 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const pathname = usePathname();
   const [reportsOpen, setReportsOpen] = useState(false);
+  const [openTenders, setOpenTenders] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function fetchOpenTenders() {
+      try {
+        const res = await fetch('/api/tenders');
+        const data = await res.json();
+        setOpenTenders(data.stats?.open ?? null);
+      } catch (e) {
+        setOpenTenders(null);
+      }
+    }
+    fetchOpenTenders();
+  }, []);
 
   const navItems: NavItem[] = [
     {
@@ -61,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       title: 'Tenders',
       path: '/dashboard/admin/tenders',
       icon: <FileText size={20} />,
-      badge: 12,
+      badge: openTenders !== null ? openTenders : undefined,
     },
     {
       title: 'Projects',
