@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { format } from 'date-fns';
+import { format, isBefore, isAfter, addDays, isWithinInterval } from 'date-fns';
 import { TenderActions } from './TenderActions';
 import Link from 'next/link';
 import { TenderStatusToggle } from './TenderStatusToggle';
@@ -35,6 +35,19 @@ export default function TendersTable({ allTenders }: { allTenders: any[] }) {
 
   return (
     <div className="border rounded-lg">
+      <style jsx>{`
+        .tt360-row-hover:hover {
+          background: #f9fafb;
+        }
+        .tt360-deadline-past {
+          color: #dc2626; /* red-600 */
+          font-weight: bold;
+        }
+        .tt360-deadline-soon {
+          color: #ea580c; /* orange-600 */
+          font-weight: bold;
+        }
+      `}</style>
       <Table>
         <TableHeader>
           <TableRow>
@@ -47,38 +60,57 @@ export default function TendersTable({ allTenders }: { allTenders: any[] }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {allTenders.map((tender) => (
-            <TableRow key={tender.id}>
-              <TableCell className="font-medium">
-                <Link
-                  href={`/dashboard/admin/tenders/${tender.id}`}
-                  className="hover:underline"
-                >
-                  {tender.title}
-                </Link>
-              </TableCell>
-              <TableCell>{tender.client}</TableCell>
-              <TableCell>{tender.category}</TableCell>
-              <TableCell>
-                <TenderStatusToggle
-                  tenderId={tender.id}
-                  currentStatus={tender.status}
-                  badgeVariant={statusVariant(tender.status)}
-                />
-              </TableCell>
-              <TableCell>
-                {tender.submissionDeadline
-                  ? format(new Date(tender.submissionDeadline), 'PPP')
-                  : 'N/A'}
-              </TableCell>
-              <TableCell className="text-right">
-                <TenderActions
-                  tenderId={tender.id}
-                  tenderTitle={tender.title}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
+          {allTenders.map((tender) => {
+            let deadlineClass = '';
+            let deadlineDate = tender.submissionDeadline
+              ? new Date(tender.submissionDeadline)
+              : null;
+            if (deadlineDate) {
+              const now = new Date();
+              if (isBefore(deadlineDate, now)) {
+                deadlineClass = 'tt360-deadline-past';
+              } else if (
+                isWithinInterval(deadlineDate, {
+                  start: now,
+                  end: addDays(now, 7),
+                })
+              ) {
+                deadlineClass = 'tt360-deadline-soon';
+              }
+            }
+            return (
+              <TableRow key={tender.id} className="tt360-row-hover">
+                <TableCell className="font-medium">
+                  <Link
+                    href={`/dashboard/admin/tenders/${tender.id}`}
+                    className="hover:underline"
+                  >
+                    {tender.title}
+                  </Link>
+                </TableCell>
+                <TableCell>{tender.client}</TableCell>
+                <TableCell>{tender.category}</TableCell>
+                <TableCell>
+                  <TenderStatusToggle
+                    tenderId={tender.id}
+                    currentStatus={tender.status}
+                    badgeVariant={statusVariant(tender.status)}
+                  />
+                </TableCell>
+                <TableCell className={deadlineClass}>
+                  {tender.submissionDeadline
+                    ? format(new Date(tender.submissionDeadline), 'PPP')
+                    : 'N/A'}
+                </TableCell>
+                <TableCell className="text-right">
+                  <TenderActions
+                    tenderId={tender.id}
+                    tenderTitle={tender.title}
+                  />
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>
