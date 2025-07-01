@@ -1,11 +1,10 @@
-import { db } from '@/db';
-import { tenderCategories } from '@/db/schema';
 import Link from 'next/link';
-import { PlusIcon, PencilIcon, TrashIcon, FolderIcon } from 'lucide-react';
+import { PlusIcon, FolderIcon } from 'lucide-react';
 import { CategoryActions } from './CategoryActions';
+import { getCategories } from '@/db/queries/categories';
 
 export default async function CategoriesPage() {
-  const allCategories = await db.select().from(tenderCategories);
+  const allCategories = await getCategories();
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -84,7 +83,10 @@ export default async function CategoriesPage() {
                       #{category.id}
                     </td> */}
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <CategoryActions categoryName={category.name} />
+                      <CategoryActions
+                        categoryId={category.id}
+                        categoryName={category.name}
+                      />
                     </td>
                   </tr>
                 ))}

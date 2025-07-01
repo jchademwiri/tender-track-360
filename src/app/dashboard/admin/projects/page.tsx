@@ -1,6 +1,3 @@
-import { db } from '@/db';
-import { tenders, clients } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 import {
   Table,
   TableBody,
@@ -48,6 +45,7 @@ import {
   FilterIcon,
 } from 'lucide-react';
 import { Suspense } from 'react';
+import { getProjects } from '@/db/queries/projects';
 
 type TenderStatus =
   | 'in_progress'
@@ -110,29 +108,7 @@ function StatCard({ title, value, icon: Icon, description }: StatCardProps) {
 }
 
 export default async function ProjectsPage() {
-  const projectsData = await db
-    .select({
-      id: tenders.id,
-      referenceNumber: tenders.referenceNumber,
-      title: tenders.title,
-      awardDate: tenders.awardDate,
-      estimatedValue: tenders.estimatedValue,
-      clientName: clients.name,
-      description: tenders.description,
-      status: tenders.status,
-    })
-    .from(tenders)
-    .leftJoin(clients, eq(tenders.clientId, clients.id))
-    .where(eq(tenders.status, 'awarded'));
-
-  // Convert data to ensure proper types
-  const projects: Project[] = projectsData.map((project) => ({
-    ...project,
-    awardDate: project.awardDate ? new Date(project.awardDate) : null,
-    estimatedValue: project.estimatedValue
-      ? Number(project.estimatedValue)
-      : null,
-  }));
+  const { projects, stats } = await getProjects();
 
   const formatCurrency = (value: number | null) => {
     if (!value) return 'N/A';
@@ -150,15 +126,6 @@ export default async function ProjectsPage() {
       day: 'numeric',
     }).format(date);
   };
-
-  const totalValue = projects.reduce(
-    (sum, project) => sum + (project.estimatedValue || 0),
-    0
-  );
-
-  const uniqueClients = new Set(
-    projects.map((p) => p.clientName).filter(Boolean)
-  ).size;
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -199,19 +166,19 @@ export default async function ProjectsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard
           title="Total Projects"
-          value={projects.length}
+          value={stats.totalProjects}
           icon={FileTextIcon}
           description="Active awarded projects"
         />
         <StatCard
           title="Total Value"
-          value={formatCurrency(totalValue)}
+          value={formatCurrency(stats.totalValue)}
           icon={DollarSignIcon}
           description="Combined project value"
         />
         <StatCard
           title="Unique Clients"
-          value={uniqueClients}
+          value={stats.uniqueClients}
           icon={BuildingIcon}
           description="Active client relationships"
         />

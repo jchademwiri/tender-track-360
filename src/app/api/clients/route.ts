@@ -1,15 +1,28 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/db';
-import { clients } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { getClients, createClient, updateClient } from '@/db/queries/clients';
+import { insertClientSchema } from '@/db/schema/zod';
 
-export async function POST(req: Request) {
+export async function GET() {
   try {
-    const data = await req.json();
-    await db.insert(clients).values(data);
-    return NextResponse.json({ message: 'Client created' });
+    const clients = await getClients();
+    return NextResponse.json(clients);
   } catch (error) {
-    console.error('Error creating client:', error);
+    console.error('Failed to get clients:', error);
+    return NextResponse.json(
+      { error: 'Failed to get clients' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const json = await request.json();
+    const validatedData = insertClientSchema.parse(json);
+    const newClient = await createClient(validatedData);
+    return NextResponse.json(newClient, { status: 201 });
+  } catch (error) {
+    console.error('Failed to create client:', error);
     return NextResponse.json(
       { error: 'Failed to create client' },
       { status: 500 }
@@ -22,7 +35,7 @@ export async function PATCH(req: Request) {
     const data = await req.json();
     const { id, ...updateData } = data;
 
-    await db.update(clients).set(updateData).where(eq(clients.id, id));
+    await updateClient(id, updateData);
 
     return NextResponse.json({ message: 'Client updated' });
   } catch (error) {

@@ -1,5 +1,6 @@
 'use client';
 
+import React, { JSX, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -14,6 +15,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -33,19 +35,47 @@ interface SidebarProps {
   isMobile: boolean;
 }
 
+interface NavItem {
+  title: string;
+  path: string;
+  icon: JSX.Element;
+  badge?: number;
+  submenu?: { title: string; path: string }[];
+}
+
 const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   toggleSidebar,
   isMobile,
 }) => {
   const pathname = usePathname();
-  const navItems = [
-    { title: 'Dashboard', path: '/dashboard/admin', icon: <Home size={20} /> },
+  const [reportsOpen, setReportsOpen] = useState(false);
+  const [openTenders, setOpenTenders] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function fetchOpenTenders() {
+      try {
+        const res = await fetch('/api/tenders');
+        const data = await res.json();
+        setOpenTenders(data.stats?.open ?? null);
+      } catch (e) {
+        setOpenTenders(null);
+      }
+    }
+    fetchOpenTenders();
+  }, []);
+
+  const navItems: NavItem[] = [
+    {
+      title: 'Dashboard',
+      path: '/dashboard/admin',
+      icon: <Home size={20} />,
+    },
     {
       title: 'Tenders',
       path: '/dashboard/admin/tenders',
       icon: <FileText size={20} />,
-      badge: 12,
+      badge: openTenders !== null ? openTenders : undefined,
     },
     {
       title: 'Projects',
@@ -66,6 +96,11 @@ const Sidebar: React.FC<SidebarProps> = ({
       title: 'Reports',
       path: '/dashboard/admin/reports',
       icon: <BarChart3 size={20} />,
+      submenu: [
+        { title: 'Analytics', path: '/dashboard/admin/reports/analytics' },
+        { title: 'Financial', path: '/dashboard/admin/reports/financial' },
+        { title: 'Performance', path: '/dashboard/admin/reports/performance' },
+      ],
     },
     {
       title: 'Categories',
@@ -78,6 +113,92 @@ const Sidebar: React.FC<SidebarProps> = ({
       icon: <Settings size={20} />,
     },
   ];
+
+  const NavLink = ({ item }: { item: NavItem }) => {
+    const isActive = pathname === item.path;
+    const hasSubmenu = item.submenu && item.submenu.length > 0;
+    const isSubmenuOpen = hasSubmenu && reportsOpen;
+    const isSubmenuActive =
+      hasSubmenu && item.submenu?.some((subItem) => pathname === subItem.path);
+
+    const handleItemClick = () => {
+      if (hasSubmenu) {
+        setReportsOpen(!reportsOpen);
+      } else if (isMobile) {
+        toggleSidebar();
+      }
+    };
+
+    const itemContent = (
+      <div
+        className={cn(
+          'flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer',
+          isActive || isSubmenuActive
+            ? 'bg-primary text-primary-foreground'
+            : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+        )}
+        onClick={handleItemClick}
+      >
+        <span className="mr-3">{item.icon}</span>
+        {(isOpen || isMobile) && (
+          <div className="flex items-center justify-between flex-1">
+            <span>{item.title}</span>
+            <div className="flex items-center">
+              {item.badge && (
+                <Badge
+                  variant="destructive"
+                  className="ml-2 text-xs bg-red-500"
+                >
+                  {item.badge}
+                </Badge>
+              )}
+              {hasSubmenu && (
+                <ChevronDown
+                  size={16}
+                  className={cn(
+                    'ml-2 transition-transform',
+                    isSubmenuOpen && 'transform rotate-180'
+                  )}
+                />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+
+    return (
+      <>
+        {hasSubmenu ? (
+          itemContent
+        ) : (
+          <Link href={item.path} passHref>
+            {itemContent}
+          </Link>
+        )}
+        {hasSubmenu && isSubmenuOpen && (isOpen || isMobile) && (
+          <div className="ml-8 space-y-1">
+            {item.submenu?.map((subItem) => (
+              <Link
+                key={subItem.path}
+                href={subItem.path}
+                className={cn(
+                  'flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors',
+                  pathname === subItem.path
+                    ? 'text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                onClick={isMobile ? toggleSidebar : undefined}
+              >
+                {subItem.title}
+              </Link>
+            ))}
+          </div>
+        )}
+      </>
+    );
+  };
+
   return (
     <>
       {isMobile ? (
@@ -97,27 +218,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               <ScrollArea className="flex-1 py-4">
                 <nav className="space-y-1 px-2">
                   {navItems.map((item) => (
-                    <Link
-                      key={item.path}
-                      href={item.path}
-                      className={cn(
-                        'flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors',
-                        pathname === item.path
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-                      )}
-                      onClick={isMobile ? toggleSidebar : undefined}
-                    >
-                      <span className="mr-3">{item.icon}</span>
-                      <div className="flex items-center justify-between flex-1">
-                        <span>{item.title}</span>
-                        {item.badge && (
-                          <Badge variant="destructive" className="ml-2 text-xs">
-                            {item.badge}
-                          </Badge>
-                        )}
-                      </div>
-                    </Link>
+                    <NavLink key={item.path} item={item} />
                   ))}
                 </nav>
               </ScrollArea>
@@ -160,28 +261,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <ScrollArea className="flex-1 py-4">
             <nav className="space-y-1 px-2">
               {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  href={item.path}
-                  className={cn(
-                    'flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors',
-                    pathname === item.path
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-                  )}
-                >
-                  <span className="mr-3">{item.icon}</span>
-                  {isOpen && (
-                    <div className="flex items-center justify-between flex-1">
-                      <span>{item.title}</span>
-                      {item.badge && (
-                        <Badge variant="destructive" className="ml-2 text-xs">
-                          {item.badge}
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-                </Link>
+                <NavLink key={item.path} item={item} />
               ))}
             </nav>
           </ScrollArea>

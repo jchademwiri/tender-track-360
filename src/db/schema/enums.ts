@@ -8,12 +8,13 @@ export const userRoleEnum = pgEnum('user_role', [
 ]);
 
 export const tenderStatusEnum = pgEnum('tender_status', [
-  'in_progress',
+  'open',
+  'closed',
   'submitted',
   'evaluation',
   'awarded',
-  'rejected',
   'cancelled',
+  'rejected',
 ]);
 
 export const documentCategoryEnum = pgEnum('document_category', [
