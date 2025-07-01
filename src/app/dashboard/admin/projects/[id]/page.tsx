@@ -106,6 +106,7 @@ export default async function ProjectDetailPage({
               {project.clientName || 'N/A'}
             </span>
           )}
+          {detailItem('Category', project.category || 'N/A')}
           {detailItem(
             'Award Date',
             <span className="flex items-center gap-2">
@@ -120,6 +121,7 @@ export default async function ProjectDetailPage({
               {formatCurrency(project.estimatedValue)}
             </span>
           )}
+          {detailItem('Department', project.department || 'N/A')}
         </CardContent>
       </Card>
 
@@ -131,6 +133,19 @@ export default async function ProjectDetailPage({
           <CardContent>
             <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
               {project.description}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {project.notes && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Notes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+              {project.notes}
             </p>
           </CardContent>
         </Card>

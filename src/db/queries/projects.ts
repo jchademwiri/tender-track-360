@@ -1,5 +1,6 @@
 import { db } from '@/db';
 import { tenders, clients } from '@/db/schema';
+import { tenderCategories } from '@/db/schema/categories';
 import { eq } from 'drizzle-orm';
 
 export async function getProjects() {
@@ -13,9 +14,13 @@ export async function getProjects() {
       clientName: clients.name,
       description: tenders.description,
       status: tenders.status,
+      category: tenderCategories.name,
+      department: tenders.department,
+      notes: tenders.notes,
     })
     .from(tenders)
     .leftJoin(clients, eq(tenders.clientId, clients.id))
+    .leftJoin(tenderCategories, eq(tenders.categoryId, tenderCategories.id))
     .where(eq(tenders.status, 'awarded'));
 
   const projects = projectsData.map((project) => ({
