@@ -69,6 +69,20 @@ export default function TendersTable({ allTenders }: { allTenders: any[] }) {
     }
   };
 
+  // Sort tenders: all open tenders at the top (by closing date), then others (by closing date)
+  const sortedTenders = [...allTenders].sort((a, b) => {
+    const aOpen = a.status && a.status.toLowerCase() === 'open' ? 0 : 1;
+    const bOpen = b.status && b.status.toLowerCase() === 'open' ? 0 : 1;
+    if (aOpen !== bOpen) return aOpen - bOpen;
+    const aDate = a.submissionDeadline
+      ? new Date(a.submissionDeadline).getTime()
+      : Infinity;
+    const bDate = b.submissionDeadline
+      ? new Date(b.submissionDeadline).getTime()
+      : Infinity;
+    return aDate - bDate;
+  });
+
   return (
     <div className="border rounded-lg">
       <style jsx>{`
@@ -96,7 +110,7 @@ export default function TendersTable({ allTenders }: { allTenders: any[] }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {allTenders.map((tender) => {
+          {sortedTenders.map((tender) => {
             let deadlineClass = '';
             let deadlineDate = tender.submissionDeadline
               ? new Date(tender.submissionDeadline)
