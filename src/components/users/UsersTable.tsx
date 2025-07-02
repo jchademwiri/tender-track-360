@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/select';
 import { Search, Plus, Users, UserCheck, Shield, Eye } from 'lucide-react';
 import { users } from '@/db/schema';
+import { Button } from '@/components/ui/button';
 
 type User = typeof users.$inferSelect;
 
@@ -231,15 +232,15 @@ export default function UsersTable({ allUsers }: UsersTableProps) {
                   </td>
                   <td className="px-6 py-4 text-right text-sm font-medium">
                     <div className="flex justify-end space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                      <Button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                         View
-                      </button>
-                      <button className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300">
+                      </Button>
+                      <Button className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300">
                         Edit
-                      </button>
-                      <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                      </Button>
+                      <Button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                         Delete
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>

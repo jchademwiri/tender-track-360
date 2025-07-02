@@ -12,6 +12,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { getAdminStats } from '@/db/queries/dashboard';
+import { Button } from '@/components/ui/button';
 
 // Function to calculate growth percentage (mock calculation)
 function calculateGrowth(): string {
@@ -187,13 +188,13 @@ export default async function AdminPage() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+          <Button className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
             <Eye className="w-4 h-4 inline mr-2" />
             View Site
-          </button>
-          <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+          </Button>
+          <Button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
             Generate Report
-          </button>
+          </Button>
         </div>
       </div>
 

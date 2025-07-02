@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useAuth } from '@/auth/AuthProvider';
+import { Button } from '@/components/ui/button';
 
 export default function AddUserForm() {
   const { role } = useAuth();
@@ -86,9 +87,9 @@ export default function AddUserForm() {
         <option value="tender_specialist">Specialist</option>
         <option value="viewer">Viewer</option>
       </select>
-      <button type="submit" disabled={loading}>
+      <Button type="submit" disabled={loading}>
         {loading ? 'Creating...' : 'Create User'}
-      </button>
+      </Button>
       {error && <div style={{ color: 'red' }}>{error}</div>}
       {success && <div style={{ color: 'green' }}>User created!</div>}
     </form>
