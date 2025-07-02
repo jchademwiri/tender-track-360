@@ -50,6 +50,7 @@ import {
 import { Suspense } from 'react';
 import { getProjects } from '@/db/queries/projects';
 import Link from 'next/link';
+import EmptyState from '@/components/ui/EmptyState';
 
 type TenderStatus =
   | 'in_progress'
@@ -220,20 +221,20 @@ export default async function ProjectsPage() {
         <CardContent>
           <Suspense fallback={<ProjectTableSkeleton />}>
             {projects.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-dashed border-blue-200 dark:border-blue-700">
-                <FileTextIcon className="h-16 w-16 text-blue-300 dark:text-blue-700 mb-4" />
-                <h3 className="text-2xl font-semibold mb-2 text-blue-900 dark:text-blue-200">
-                  No projects found
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  There are currently no awarded projects to display.
-                  <br />
-                  Start by creating a new project.
-                </p>
-                <Button variant="default" className="mt-2">
-                  Create Project
-                </Button>
-              </div>
+              <EmptyState
+                icon={<FileTextIcon className="h-16 w-16 text-blue-300 dark:text-blue-700 mb-4" />}
+                title="No projects found"
+                description={
+                  <>There are currently no awarded projects to display.<br />Start by creating a new project.</>
+                }
+                action={
+                  <Link href="/dashboard/admin/projects/new">
+                    <Button variant="default" className="mt-2">
+                      Create Project
+                    </Button>
+                  </Link>
+                }
+              />
             ) : (
               <div className="rounded-md border overflow-hidden">
                 <div className="overflow-x-auto">

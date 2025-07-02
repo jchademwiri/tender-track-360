@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button';
-import { Plus, Calendar, DollarSign, Building } from 'lucide-react';
+import { Plus, Calendar, DollarSign, Building, FileText } from 'lucide-react';
 import TendersTable from '@/components/tenders/TendersTable';
 import { getTenders } from '@/db/queries/tenders';
 import { ClientCurrency } from '@/components/tenders/ClientCurrency';
 import Link from 'next/link';
+import EmptyState from '@/components/ui/EmptyState';
 
 // Define Tender type for this file
 interface Tender {
@@ -112,8 +113,25 @@ export default async function TendersPage() {
         </div>
       </div>
 
-      {/* Filters, Search, and Table */}
-      <TendersTable allTenders={allTenders} />
+      {/* Table or Empty State */}
+      <div className="mt-6">
+        {allTenders.length === 0 ? (
+          <EmptyState
+            icon={<FileText className="w-12 h-12 text-blue-400" />}
+            title="No tenders found"
+            description="There are currently no tenders to display. Start by creating a new tender."
+            action={
+              <Link href="/dashboard/admin/tenders/new">
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold mt-4">
+                  Create Tender
+                </Button>
+              </Link>
+            }
+          />
+        ) : (
+          <TendersTable allTenders={allTenders} />
+        )}
+      </div>
     </div>
   );
 }

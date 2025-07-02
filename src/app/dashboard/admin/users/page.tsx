@@ -11,6 +11,7 @@ import UsersTable from '@/components/users/UsersTable';
 import { getUsers } from '@/db/queries/users';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import EmptyState from '@/components/ui/EmptyState';
 
 export default async function UsersPage() {
   const { allUsers, stats } = await getUsers();
@@ -105,7 +106,25 @@ export default async function UsersPage() {
         </div>
       </div>
 
-      <UsersTable allUsers={allUsers} />
+      {/* Table or Empty State */}
+      <div className="mt-6">
+        {allUsers.length === 0 ? (
+          <EmptyState
+            icon={<Users className="w-12 h-12 text-blue-400" />}
+            title="No users found"
+            description="There are currently no users to display. Start by adding a new user."
+            action={
+              <Link href="/dashboard/admin/users/new">
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold mt-4">
+                  Add User
+                </Button>
+              </Link>
+            }
+          />
+        ) : (
+          <UsersTable allUsers={allUsers} />
+        )}
+      </div>
     </div>
   );
 }
