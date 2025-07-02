@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getTenders, createTender } from '@/db/queries/tenders';
 import { insertTenderSchema } from '@/db/schema/zod';
+import { DEV_ADMIN_ID } from '@/lib/devUser';
 // import { auth } from '@/lib/auth'; // Assuming you have an auth setup
 
 export async function GET() {
@@ -28,8 +29,8 @@ export async function POST(request: Request) {
       ...json,
       // createdById: session.user.id,
       // updatedById: session.user.id,
-      createdById: '0514775a-bcea-4021-8feb-74f7d594c2b2', // Placeholder
-      updatedById: '0514775a-bcea-4021-8feb-74f7d594c2b2', // Placeholder
+      createdById: DEV_ADMIN_ID,
+      updatedById: DEV_ADMIN_ID,
     });
 
     const newTender = await createTender(validatedData);

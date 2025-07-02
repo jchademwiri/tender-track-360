@@ -12,7 +12,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:reset": "drizzle-kit drop --out supabase/migrations && drizzle-kit generate:pg && drizzle-kit push:pg",
-    "db:seed": "tsx scripts/seed.ts"
+    "db:seed": "tsx scripts/seed.ts",
+    "db:seed:admin": "tsx scripts/seed-dev-admin.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",

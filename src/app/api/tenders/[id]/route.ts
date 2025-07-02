@@ -5,6 +5,7 @@ import {
   deleteTender,
 } from '@/db/queries/tenders';
 import { insertTenderSchema } from '@/db/schema/zod';
+import { DEV_ADMIN_ID } from '@/lib/devUser';
 // import { auth } from '@/lib/auth'; // Assuming you have an auth setup
 
 export async function GET(
@@ -40,12 +41,12 @@ export async function PUT(request: Request, props: { params: { id: string } }) {
   //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   // }
 
-  try {
-    const validatedData = insertTenderSchema.partial().parse({
-      ...data,
-      updatedById: '0514775a-bcea-4021-8feb-74f7d594c2b2', // Placeholder
-      // updatedById: session.user.id,
-    });
+    try {
+      const validatedData = insertTenderSchema.partial().parse({
+        ...data,
+        updatedById: DEV_ADMIN_ID, // Placeholder
+        // updatedById: session.user.id,
+      });
 
     const updatedTender = await updateTender(id, validatedData);
     return NextResponse.json(updatedTender);
@@ -70,7 +71,7 @@ export async function DELETE(
 
   try {
     // await deleteTender(id, session.user.id);
-    await deleteTender(id, '0514775a-bcea-4021-8feb-74f7d594c2b2'); // Placeholder
+    await deleteTender(id, DEV_ADMIN_ID); // Use DEV_ADMIN_ID in dev
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error(`Failed to delete tender ${id}:`, error);

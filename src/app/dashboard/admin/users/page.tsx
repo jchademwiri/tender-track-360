@@ -9,6 +9,8 @@ import {
 import { Search, Plus, Users, UserCheck, Shield, Eye } from 'lucide-react';
 import UsersTable from '@/components/users/UsersTable';
 import { getUsers } from '@/db/queries/users';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default async function UsersPage() {
   const { allUsers, stats } = await getUsers();
@@ -25,10 +27,15 @@ export default async function UsersPage() {
             Manage user accounts and permissions
           </p>
         </div>
-        <button className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
-          <Plus className="w-4 h-4 mr-2" />
-          Add User
-        </button>
+        <Button asChild>
+          <Link
+            href="/dashboard/admin/users/new"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add User
+          </Link>
+        </Button>
       </div>
 
       {/* Stats Cards */}

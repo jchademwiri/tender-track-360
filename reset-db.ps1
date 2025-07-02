@@ -21,3 +21,8 @@ Write-Host "Applying new migration..."
 pnpm db:migrate
 
 Write-Host "Database and migrations have been reset!"
+
+# 5. Push Database
+pnpm db:push
+Write-Host "Database have been pushed to the server"
+
