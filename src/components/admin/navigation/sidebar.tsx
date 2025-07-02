@@ -97,6 +97,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       path: '/dashboard/admin/reports',
       icon: <BarChart3 size={20} />,
       submenu: [
+        { title: 'Overview', path: '/dashboard/admin/reports' },
         { title: 'Analytics', path: '/dashboard/admin/reports/analytics' },
         { title: 'Financial', path: '/dashboard/admin/reports/financial' },
         { title: 'Performance', path: '/dashboard/admin/reports/performance' },

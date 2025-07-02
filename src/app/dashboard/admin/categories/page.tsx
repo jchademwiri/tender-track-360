@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { PlusIcon, FolderIcon } from 'lucide-react';
 import { CategoryActions } from './CategoryActions';
 import { getCategories } from '@/db/queries/categories';
+import EmptyState from '@/components/ui/EmptyState';
 
 export default async function CategoriesPage() {
   const allCategories = await getCategories();
@@ -30,22 +31,20 @@ export default async function CategoriesPage() {
 
       {/* Categories Grid/Table */}
       {allCategories.length === 0 ? (
-        <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-          <FolderIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            No categories yet
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Get started by creating your first tender category.
-          </p>
-          <Link
-            href="/dashboard/admin/categories/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-          >
-            <PlusIcon className="w-4 h-4" />
-            Create Category
-          </Link>
-        </div>
+        <EmptyState
+          icon={<FolderIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />}
+          title="No categories yet"
+          description="Get started by creating your first tender category."
+          action={
+            <Link
+              href="/dashboard/admin/categories/new"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            >
+              <PlusIcon className="w-4 h-4" />
+              Create Category
+            </Link>
+          }
+        />
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
