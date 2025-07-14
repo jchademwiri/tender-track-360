@@ -121,6 +121,21 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
       awardDate: fixDate(values.awardDate),
     };
 
+    // Convert date fields to ISO strings if they are Date objects
+    const toISOStringOrNull = (d: any) =>
+      d instanceof Date && !Number.isNaN(d.getTime())
+        ? d.toISOString()
+        : d || undefined;
+
+    fixedValues.publicationDate = toISOStringOrNull(
+      fixedValues.publicationDate
+    );
+    fixedValues.submissionDeadline = toISOStringOrNull(
+      fixedValues.submissionDeadline
+    );
+    fixedValues.evaluationDate = toISOStringOrNull(fixedValues.evaluationDate);
+    fixedValues.awardDate = toISOStringOrNull(fixedValues.awardDate);
+
     // Final cleanup: forcibly remove problematic fields
     delete fixedValues.createdAt;
     delete fixedValues.updatedAt;
