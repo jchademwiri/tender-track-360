@@ -1,6 +1,20 @@
+import { ArrowLeftIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+
 export default function ClientEngagementReportPage() {
   return (
     <div className="p-8">
+      <div className="mb-4">
+        <Link href="/dashboard/admin/reports">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 cursor-pointer"
+          >
+            <ArrowLeftIcon className="h-4 w-4" /> Back to Reports Overview
+          </Button>
+        </Link>
+      </div>
       <h1 className="text-2xl font-bold mb-4">Client Engagement Report</h1>
       <p className="text-muted-foreground mb-2">
         Most active clients, awarded tenders

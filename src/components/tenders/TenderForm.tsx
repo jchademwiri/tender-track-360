@@ -99,21 +99,75 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
   });
 
   const onSubmit = async (values: TenderFormValues) => {
-    console.log('Submitting values:', values);
+    // Convert date fields to Date objects if they are strings
+    const fixDate = (val: any) => {
+      if (!val) return undefined;
+      if (val instanceof Date) return val;
+      // If it's an ISO string, parse to Date
+      const d = new Date(val);
+      if (!isNaN(d.getTime())) return d;
+      // Try Date.parse for display strings
+      if (typeof val === 'string') {
+        const parsed = Date.parse(val);
+        if (!isNaN(parsed)) return new Date(parsed);
+      }
+      return undefined;
+    };
+    const fixedValues: Record<string, any> = {
+      ...values,
+      publicationDate: fixDate(values.publicationDate),
+      submissionDeadline: fixDate(values.submissionDeadline),
+      evaluationDate: fixDate(values.evaluationDate),
+      awardDate: fixDate(values.awardDate),
+    };
+
+    // Final cleanup: forcibly remove problematic fields
+    delete fixedValues.createdAt;
+    delete fixedValues.updatedAt;
+
+    // If these are still numbers, forcibly convert to string or remove
+    if (typeof fixedValues.estimatedValue === 'number') {
+      fixedValues.estimatedValue = String(fixedValues.estimatedValue);
+    }
+    if (typeof fixedValues.actualValue === 'number') {
+      fixedValues.actualValue = String(fixedValues.actualValue);
+    }
+
+    // Log the payload for debugging
+    console.log('Tender payload:', fixedValues);
+
     try {
       const response = await fetch(
         isEditing ? `/api/tenders/${tender.id}` : '/api/tenders',
         {
           method: isEditing ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(values),
+          body: JSON.stringify(fixedValues),
         }
       );
-
       if (!response.ok) {
-        throw new Error(`Failed to ${isEditing ? 'update' : 'create'} tender`);
+        let errorMsg = `Failed to ${isEditing ? 'update' : 'create'} tender`;
+        try {
+          const errorData = await response.json();
+          if (errorData?.error) {
+            errorMsg = errorData.error;
+            if (errorData.details) {
+              if (Array.isArray(errorData.details)) {
+                errorMsg +=
+                  ': ' +
+                  errorData.details.map((d: any) => d.message || d).join(', ');
+              } else {
+                errorMsg += ': ' + errorData.details;
+              }
+            }
+          }
+        } catch (err) {
+          // If response is not JSON, keep the default errorMsg
+        }
+        toast.error(errorMsg);
+        console.error('Tender API error:', errorMsg);
+        return;
       }
-
       toast.success(
         `Tender ${isEditing ? 'updated' : 'created'} successfully.`
       );
@@ -123,6 +177,7 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
       toast.error(
         error instanceof Error ? error.message : 'An unknown error occurred.'
       );
+      console.error('Tender form submission error:', error);
     }
   };
 
@@ -298,7 +353,7 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                         )}
                       >
                         {field.value ? (
-                          format(new Date(field.value), 'PPP')
+                          format(field.value, 'PPP')
                         ) : (
                           <span>Pick a date</span>
                         )}
@@ -309,8 +364,8 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={field.value ? new Date(field.value) : undefined}
-                      onSelect={(date) => field.onChange(date?.toISOString())}
+                      selected={field.value ?? undefined}
+                      onSelect={(date) => field.onChange(date)}
                       initialFocus
                     />
                   </PopoverContent>
@@ -336,7 +391,7 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                         )}
                       >
                         {field.value ? (
-                          format(new Date(field.value), 'PPP')
+                          format(field.value, 'PPP')
                         ) : (
                           <span>Pick a date</span>
                         )}
@@ -347,8 +402,8 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={field.value ? new Date(field.value) : undefined}
-                      onSelect={(date) => field.onChange(date?.toISOString())}
+                      selected={field.value ?? undefined}
+                      onSelect={(date) => field.onChange(date)}
                       initialFocus
                     />
                   </PopoverContent>
@@ -374,7 +429,7 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                         )}
                       >
                         {field.value ? (
-                          format(new Date(field.value), 'PPP')
+                          format(field.value, 'PPP')
                         ) : (
                           <span>Pick a date</span>
                         )}
@@ -385,8 +440,8 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={field.value ? new Date(field.value) : undefined}
-                      onSelect={(date) => field.onChange(date?.toISOString())}
+                      selected={field.value ?? undefined}
+                      onSelect={(date) => field.onChange(date)}
                       initialFocus
                     />
                   </PopoverContent>
@@ -412,7 +467,7 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                         )}
                       >
                         {field.value ? (
-                          format(new Date(field.value), 'PPP')
+                          format(field.value, 'PPP')
                         ) : (
                           <span>Pick a date</span>
                         )}
@@ -423,8 +478,8 @@ export function TenderForm({ tender, clients, categories }: TenderFormProps) {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={field.value ? new Date(field.value) : undefined}
-                      onSelect={(date) => field.onChange(date?.toISOString())}
+                      selected={field.value ?? undefined}
+                      onSelect={(date) => field.onChange(date)}
                       initialFocus
                     />
                   </PopoverContent>

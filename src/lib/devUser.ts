@@ -1,2 +1,1 @@
-export const DEV_ADMIN_ID =
-  process.env.DEV_ADMIN_ID || '724c621b-f718-4d08-b743-8ef356019769';
+export const DEV_ADMIN_ID = '1fc135f2-12b1-4af0-8ca2-9e31947f9770';

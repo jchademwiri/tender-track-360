@@ -41,13 +41,12 @@ export async function PUT(request: Request, props: { params: { id: string } }) {
   //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   // }
 
-    try {
-      const validatedData = insertTenderSchema.partial().parse({
-        ...data,
-        updatedById: DEV_ADMIN_ID, // Placeholder
-        // updatedById: session.user.id,
-      });
-
+  try {
+    const validatedData = insertTenderSchema.partial().parse({
+      ...data,
+      updatedById: DEV_ADMIN_ID, // Placeholder
+      // updatedById: session.user.id,
+    });
     const updatedTender = await updateTender(id, validatedData);
     return NextResponse.json(updatedTender);
   } catch (error) {
