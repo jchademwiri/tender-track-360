@@ -13,6 +13,7 @@ import {
 import { db } from '@/db';
 import { tenders, tasks, clients, activityLogs } from '@/db/schema';
 import { count, eq, and, desc, sql, gte, lte } from 'drizzle-orm';
+import { redirect } from 'next/navigation';
 
 // Data fetching functions
 async function getDashboardStats() {
@@ -152,6 +153,13 @@ function getRelativeTime(date: Date): string {
 }
 
 export default async function DashboardPage() {
+  // Check if any users exist
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/users/exists`, { cache: 'no-store' });
+  const { exists } = await res.json();
+  if (!exists) {
+    redirect('/dashboard/setup-admin');
+  }
   // Fetch all dashboard data
   const [dashboardStats, recentActivity, upcomingDeadlines] = await Promise.all(
     [getDashboardStats(), getRecentActivity(), getUpcomingDeadlines()]
