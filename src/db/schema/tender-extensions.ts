@@ -10,7 +10,7 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 import { pgEnum } from 'drizzle-orm/pg-core';
-import { users } from './users';
+
 import { tenders } from './tenders';
 import { documents } from './documents';
 import { sql } from 'drizzle-orm';
@@ -84,16 +84,14 @@ export const tenderExtensions = pgTable(
     expiresAt: timestamp('expires_at', { withTimezone: true }), // When this extension expires
 
     // User tracking
-    receivedById: uuid('received_by_id')
-      .references(() => users.id)
-      .notNull(), // Who logged the extension
-    processedById: uuid('processed_by_id').references(() => users.id), // Tender specialist who processed
-    sentById: uuid('sent_by_id').references(() => users.id), // Who sent it back
+    receivedById: text('received_by_id').notNull(), // References Better Auth user.id - Who logged the extension
+    processedById: text('processed_by_id'), // References Better Auth user.id - Tender specialist who processed
+    sentById: text('sent_by_id'), // References Better Auth user.id - Who sent it back
 
     // Soft delete
     isDeleted: boolean('is_deleted').notNull().default(false),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
-    deletedById: uuid('deleted_by_id').references(() => users.id),
+    deletedById: text('deleted_by_id'), // References Better Auth user.id
 
     // Audit
     createdAt: timestamp('created_at', { withTimezone: true })
@@ -152,9 +150,7 @@ export const extensionHistory = pgTable(
       .notNull(),
     previousStatus: extensionStatusEnum('previous_status'),
     newStatus: extensionStatusEnum('new_status').notNull(),
-    changedById: uuid('changed_by_id')
-      .references(() => users.id)
-      .notNull(),
+    changedById: text('changed_by_id').notNull(), // References Better Auth user.id
     changeReason: text('change_reason'),
     changedAt: timestamp('changed_at', { withTimezone: true })
       .notNull()
