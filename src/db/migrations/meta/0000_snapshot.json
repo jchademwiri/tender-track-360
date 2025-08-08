@@ -1,5 +1,5 @@
 {
-  "id": "4b046b66-8a93-416f-825f-daa17d7a8343",
+  "id": "de0fcede-8461-4780-b649-d605f7a8a675",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -870,8 +870,8 @@
         }
       },
       "indexes": {
-        "idx_clients_organization": {
-          "name": "idx_clients_organization",
+        "idx_clients_organization_id": {
+          "name": "idx_clients_organization_id",
           "columns": [
             {
               "expression": "organization_id",
@@ -1892,7 +1892,38 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_reminder_rules_active": {
+          "name": "idx_reminder_rules_active",
+          "columns": [
+            {
+              "expression": "is_active",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_reminder_rules_days_before": {
+          "name": "idx_reminder_rules_days_before",
+          "columns": [
+            {
+              "expression": "days_before",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -2599,6 +2630,7 @@
       "schema": "public",
       "values": [
         "tender_notice",
+        "tender_document",
         "technical_specifications",
         "financial_proposal",
         "legal_documents",
@@ -2623,7 +2655,6 @@
       "values": [
         "in_progress",
         "submitted",
-        "evaluation",
         "awarded",
         "rejected",
         "cancelled"

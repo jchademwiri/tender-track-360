@@ -1,7 +1,7 @@
 CREATE TYPE "public"."client_type" AS ENUM('government', 'parastatal', 'private', 'ngo', 'international', 'other');--> statement-breakpoint
-CREATE TYPE "public"."document_category" AS ENUM('tender_notice', 'technical_specifications', 'financial_proposal', 'legal_documents', 'correspondence', 'other');--> statement-breakpoint
+CREATE TYPE "public"."document_category" AS ENUM('tender_notice', 'tender_document', 'technical_specifications', 'financial_proposal', 'legal_documents', 'correspondence', 'other');--> statement-breakpoint
 CREATE TYPE "public"."notification_type" AS ENUM('deadline', 'status_change', 'task_assignment', 'document_update', 'custom');--> statement-breakpoint
-CREATE TYPE "public"."tender_status" AS ENUM('in_progress', 'submitted', 'evaluation', 'awarded', 'rejected', 'cancelled');--> statement-breakpoint
+CREATE TYPE "public"."tender_status" AS ENUM('in_progress', 'submitted', 'awarded', 'rejected', 'cancelled');--> statement-breakpoint
 CREATE TYPE "public"."user_role" AS ENUM('admin', 'tender_manager', 'tender_specialist', 'viewer');--> statement-breakpoint
 CREATE TYPE "public"."extension_status" AS ENUM('received', 'in_progress', 'completed', 'sent_to_client', 'acknowledged', 'expired');--> statement-breakpoint
 CREATE TYPE "public"."extension_type" AS ENUM('evaluation', 'award', 'both');--> statement-breakpoint
@@ -324,7 +324,7 @@ CREATE INDEX "idx_activity_logs_action" ON "activity_logs" USING btree ("action"
 CREATE INDEX "idx_categories_organization" ON "tender_categories" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "idx_categories_system" ON "tender_categories" USING btree ("is_system_default");--> statement-breakpoint
 CREATE INDEX "idx_categories_name" ON "tender_categories" USING btree ("name");--> statement-breakpoint
-CREATE INDEX "idx_clients_organization" ON "clients" USING btree ("organization_id");--> statement-breakpoint
+CREATE INDEX "idx_clients_organization_id" ON "clients" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "idx_clients_name" ON "clients" USING btree ("name");--> statement-breakpoint
 CREATE INDEX "idx_clients_type" ON "clients" USING btree ("type");--> statement-breakpoint
 CREATE INDEX "idx_documents_tender_category" ON "documents" USING btree ("tender_id","category");--> statement-breakpoint
@@ -342,6 +342,8 @@ CREATE INDEX "idx_tenders_organization" ON "tenders" USING btree ("organization_
 CREATE INDEX "idx_tasks_assigned_due" ON "tasks" USING btree ("assigned_to_id","due_date","is_completed");--> statement-breakpoint
 CREATE INDEX "idx_tasks_tender" ON "tasks" USING btree ("tender_id");--> statement-breakpoint
 CREATE INDEX "idx_tasks_status" ON "tasks" USING btree ("is_completed","due_date");--> statement-breakpoint
+CREATE INDEX "idx_reminder_rules_active" ON "reminder_rules" USING btree ("is_active");--> statement-breakpoint
+CREATE INDEX "idx_reminder_rules_days_before" ON "reminder_rules" USING btree ("days_before");--> statement-breakpoint
 CREATE INDEX "idx_notifications_user_unread" ON "notifications" USING btree ("user_id","is_read","created_at");--> statement-breakpoint
 CREATE INDEX "idx_notifications_type" ON "notifications" USING btree ("type");--> statement-breakpoint
 CREATE INDEX "idx_status_transitions" ON "allowed_status_transitions" USING btree ("from_status","to_status");--> statement-breakpoint
