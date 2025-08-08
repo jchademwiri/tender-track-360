@@ -8,7 +8,7 @@ export * from './enums';
 export * from './auth-schema';
 
 // Business Extension Tables
-export * from './users';
+export * from './user-preferences';
 export * from './user-profiles';
 export * from './clients';
 export * from './categories';
