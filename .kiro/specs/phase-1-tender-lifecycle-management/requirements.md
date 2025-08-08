@@ -12,7 +12,7 @@ The Tender Lifecycle Management feature is the core MVP functionality of Tender 
 
 #### Acceptance Criteria
 
-1. WHEN a user creates a new tender record THEN the system SHALL capture tender reference number, title, issuing authority, publication date, and submission deadline
+1. WHEN a user creates a new tender record THEN the system SHALL capture tender reference number, title, issuing authority, and submission deadline
 2. WHEN a user updates tender information THEN the system SHALL save changes with basic timestamp tracking
 3. WHEN a tender record is created THEN the system SHALL automatically assign a unique internal tracking ID
 4. IF a tender reference number already exists THEN the system SHALL prevent duplicate entries and display an error message
@@ -23,8 +23,8 @@ The Tender Lifecycle Management feature is the core MVP functionality of Tender 
 
 #### Acceptance Criteria
 
-1. WHEN a tender is created THEN the system SHALL set the initial status to "draft"
-2. WHEN a user updates tender status THEN the system SHALL allow transitions between: draft → in_progress → submitted → awarded/rejected
+1. WHEN a tender is created THEN the system SHALL set the initial status to "in_progress"
+2. WHEN a user updates tender status THEN the system SHALL allow transitions between: in_progress → submitted → awarded/rejected
 3. WHEN tender status changes THEN the system SHALL automatically timestamp the change
 4. WHEN viewing tenders THEN the system SHALL display current status with visual indicators
 
@@ -34,21 +34,18 @@ The Tender Lifecycle Management feature is the core MVP functionality of Tender 
 
 #### Acceptance Criteria
 
-1. WHEN a user views a tender record THEN the system SHALL display tender reference, title, issuing authority, key dates, and estimated value
+1. WHEN a user views a tender record THEN the system SHALL display tender reference, title, issuing authority, key dates (closing date), and estimated value if available
 2. WHEN viewing tender details THEN the system SHALL show current status and basic tender information
 3. WHEN a tender has uploaded documents THEN the system SHALL show a list of attached files
 4. WHEN viewing tender lists THEN the system SHALL display key information in a sortable table format
 
-### Requirement 4 (MVP Simplified)
+### Requirement 4 (MVP Simplified) - to be updated
 
 **User Story:** As a tender officer, I want to assign a primary owner to tender opportunities, so that accountability is clear.
 
-#### Acceptance Criteria
+#### to be updated
 
-1. WHEN creating or editing a tender THEN the system SHALL allow assignment of one primary owner from active users
-2. WHEN a tender is assigned THEN the assigned user SHALL see it in their personal tender list
-3. WHEN viewing tenders THEN users SHALL see all tenders based on their role permissions
-4. WHEN a tender assignment changes THEN the system SHALL update the assignment immediately
+so far we will not assign a tender to a specific user, but any user who makes changes to a tender we need to log the changes they made to track who was responsibole for that change
 
 ### Requirement 5 (MVP Basic)
 

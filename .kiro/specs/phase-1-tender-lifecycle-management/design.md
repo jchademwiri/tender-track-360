@@ -10,8 +10,12 @@ The Tender Lifecycle Management feature serves as the core MVP functionality of 
 
 The MVP follows a simplified layered architecture:
 
-- **Presentation Layer**: Next.js React components with Tailwind CSS styling
-- **Authentication Layer**: Better Auth for user management and sessions
+- **Presentation Layer**: Next.js React and shadcn ui components with Tailwind CSS styling
+- **Authentication Layer**: Better Auth for user management and sessions, with role-based access control and organisations,
+  (
+  when a user signs up, they are assigned a role and an organisation, they automaticaly becomes the admin of their organisation,
+  when they create their account, an onboarding email is sent to them with a link to complete their profile, they will have to setup their organisation details, --- let me know if there is any aditional flow that may need to be added
+  )
 - **API Layer**: Next.js Server Actions for server-side operations
 - **Business Logic Layer**: Simplified service classes for core tender operations
 - **Data Access Layer**: Drizzle ORM with PostgreSQL (local) / Neon (production)
@@ -80,14 +84,14 @@ interface StatusTransitionService {
 
 ### React Components
 
-#### TenderForm
+#### TenderForm - shadcn forms
 
 - Handles creation and editing of tender records
 - Implements form validation using react-hook-form and Zod
 - Supports file upload for tender documents
 - Provides real-time validation feedback
 
-#### TenderList
+#### TenderList - shadcn tables
 
 - Displays paginated list of tenders with filtering and sorting
 - Implements search functionality across multiple fields
@@ -101,7 +105,7 @@ interface StatusTransitionService {
 - Shows assigned team members and their roles
 - Provides quick actions for status updates and assignments
 
-#### StatusBadge
+#### StatusBadge - shadcn badge
 
 - Visual representation of tender status
 - Color-coded based on status type and urgency
@@ -120,37 +124,19 @@ interface Tender {
   clientId: string;
   categoryId?: string;
   status: TenderStatus;
-  publicationDate?: Date;
-  submissionDeadline?: Date;
-  evaluationDate?: Date;
-  awardDate?: Date;
+  closingDate?: Date;
+  evaluationDate?: Date; // by default 90 days after closing date
+  awardDate?: Date; // will be added when tender is awarded only
   estimatedValue?: number;
-  actualValue?: number;
-  isSuccessful?: boolean;
   department?: string;
   notes?: string;
   tags: string[];
-  assignedUsers: TenderAssignment[];
   documents: TenderDocument[];
   statusHistory: StatusTransition[];
   createdAt: Date;
   updatedAt: Date;
   createdBy: User;
   updatedBy: User;
-}
-```
-
-### TenderAssignment Model
-
-```typescript
-interface TenderAssignment {
-  id: string;
-  tenderId: string;
-  userId: string;
-  role: AssignmentRole;
-  assignedAt: Date;
-  assignedBy: string;
-  isActive: boolean;
 }
 ```
 
@@ -191,36 +177,6 @@ interface StatusTransition {
 - Transaction rollback for failed operations
 - Constraint violation handling with user-friendly messages
 - Optimistic locking for concurrent updates
-
-## Testing Strategy
-
-### Unit Testing
-
-- Service layer methods with mocked dependencies
-- Utility functions for date calculations and validations
-- Status transition logic validation
-- Data transformation functions
-
-### Integration Testing
-
-- Database operations with test database
-- API endpoints with request/response validation
-- File upload and document management
-- Email notification system
-
-### Component Testing
-
-- React component rendering with various props
-- Form submission and validation flows
-- User interaction scenarios
-- Responsive design across device sizes
-
-### End-to-End Testing
-
-- Complete tender lifecycle workflows
-- User permission and role-based access
-- Multi-user collaboration scenarios
-- Deadline notification and reminder systems
 
 ## Performance Considerations
 
