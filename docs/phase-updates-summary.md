@@ -63,7 +63,7 @@
 
 #### ✅ **Schema Integration:**
 
-- Updated `schema v2.ts` to include organizations export
+- Updated `schema/index.ts` to include all schema exports
 - All tables now properly reference organizations for multi-tenancy
 - Enhanced foreign key relationships
 - Optimized indexes for organization-based queries
