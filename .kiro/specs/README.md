@@ -6,6 +6,19 @@ This directory contains the phase-based specifications for Tender Track 360, org
 
 ## Phase Structure
 
+### Phase 0: Database Design (Week 0) - FOUNDATION 🏗️
+
+**Folder**: `phase-0-database-design`
+**Goal**: Establish solid database foundation with Better Auth integration
+
+**Key Features:**
+
+- Better Auth integration with Drizzle
+- Organization-based multi-tenancy
+- Comprehensive audit trails
+- Optimized schema design
+- UploadThing integration preparation
+
 ### Phase 1: Core Foundation (Week 1-2) - SHIP FIRST 🚀
 
 **Folder**: `phase-1-tender-lifecycle-management`
@@ -94,8 +107,10 @@ Each phase contains:
 
 ## Getting Started
 
-1. Begin with Phase 1: Core Foundation
-2. Open `phase-1-tender-lifecycle-management/tasks.md`
-3. Start with task 1: Set up Better Auth and core database schema
-4. Work through tasks sequentially
-5. Move to Phase 2 only after Phase 1 is complete and deployed
+1. **Start with Phase 0**: Database Design - Establish the foundation
+2. Open `phase-0-database-design/tasks.md`
+3. Set up Better Auth, organizations, and core schema
+4. **Then move to Phase 1**: Core Foundation
+5. Open `phase-1-tender-lifecycle-management/tasks.md`
+6. Build the core tender management features
+7. Work through phases sequentially - each builds on the previous

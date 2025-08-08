@@ -8,18 +8,17 @@ import {
   numeric,
   boolean,
   index,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { tenderStatusEnum } from './enums';
-import { users } from './users';
 import { clients } from './clients';
 import { tenderCategories } from './categories';
-import { sql } from 'drizzle-orm';
-import { check } from 'drizzle-orm/gel-core';
 
 export const tenders = pgTable(
   'tenders',
   {
     id: uuid('id').primaryKey().defaultRandom(),
+    organizationId: text('organization_id').notNull(), // References Better Auth organization.id
     referenceNumber: varchar('reference_number', { length: 100 }).notNull(),
     title: varchar('title', { length: 255 }).notNull(),
     description: text('description'),
@@ -28,26 +27,20 @@ export const tenders = pgTable(
       .notNull(),
     categoryId: uuid('category_id').references(() => tenderCategories.id),
     status: tenderStatusEnum('status').notNull().default('in_progress'),
-    submissionDeadline: timestamp('submission_deadline', {
-      withTimezone: true,
-    }),
-    evaluationDate: date('evaluation_date'),
-    awardDate: date('award_date'),
+    closingDate: timestamp('closing_date', { withTimezone: true }),
+    evaluationDate: date('evaluation_date'), // Auto-calculated: closingDate + 90 days
+    awardDate: date('award_date'), // Only set when awarded
     estimatedValue: numeric('estimated_value', { precision: 15, scale: 2 }),
     actualValue: numeric('actual_value', { precision: 15, scale: 2 }),
     isSuccessful: boolean('is_successful'),
     department: varchar('department', { length: 100 }),
     notes: text('notes'),
-    encryptedNotes: text('encrypted_notes'),
+    tags: text('tags').array(), // PostgreSQL array for tags
     isDeleted: boolean('is_deleted').notNull().default(false),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
-    deletedById: uuid('deleted_by_id'),
-    createdById: uuid('created_by_id')
-      .references(() => users.id)
-      .notNull(),
-    updatedById: uuid('updated_by_id')
-      .references(() => users.id)
-      .notNull(),
+    deletedById: text('deleted_by_id'), // References Better Auth user.id
+    createdById: text('created_by_id').notNull(), // References Better Auth user.id
+    updatedById: text('updated_by_id').notNull(), // References Better Auth user.id
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -56,16 +49,18 @@ export const tenders = pgTable(
       .defaultNow(),
   },
   (table) => ({
-    statusDeadlineIdx: index('idx_tenders_status_deadline').on(
+    // Composite unique constraint for reference number within organization
+    orgReferenceIdx: uniqueIndex('idx_tenders_org_reference').on(
+      table.organizationId,
+      table.referenceNumber
+    ),
+    statusClosingIdx: index('idx_tenders_status_closing').on(
       table.status,
-      table.submissionDeadline
+      table.closingDate
     ),
     clientIdx: index('idx_tenders_client').on(table.clientId),
     categoryIdx: index('idx_tenders_category').on(table.categoryId),
     createdByIdx: index('idx_tenders_created_by').on(table.createdById),
-    deadlineAfterPublication: check(
-      'chk_deadline_after_publication',
-      sql`submission_deadline > publication_date::timestamp`
-    ),
+    organizationIdx: index('idx_tenders_organization').on(table.organizationId),
   })
 );

@@ -14,12 +14,12 @@
   - Create user roles (admin, tender_manager, tender_specialist, viewer)
   - Implement basic user session management
   - Add role-based route protection middleware
-  - _Requirements: 4.1, 4.3_
+  - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
 - [ ] 3. Create core tender service layer
 
   - Build TenderService class with basic CRUD operations
-  - Implement simple status validation (draft → in_progress → submitted → awarded/rejected)
+  - Implement simple status validation (in_progress → submitted → awarded/rejected)
   - Add basic tender creation and update functionality
   - Create simple tender listing with filtering by status and category
   - _Requirements: 1.1, 1.2, 2.1, 2.2_

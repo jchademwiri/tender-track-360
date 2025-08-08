@@ -12,7 +12,7 @@ The Tender Lifecycle Management feature is the core MVP functionality of Tender 
 
 #### Acceptance Criteria
 
-1. WHEN a user creates a new tender record THEN the system SHALL capture tender reference number, title, issuing authority, and submission deadline
+1. WHEN a user creates a new tender record THEN the system SHALL capture tender reference number, title, issuing authority, and closing date
 2. WHEN a user updates tender information THEN the system SHALL save changes with basic timestamp tracking
 3. WHEN a tender record is created THEN the system SHALL automatically assign a unique internal tracking ID
 4. IF a tender reference number already exists THEN the system SHALL prevent duplicate entries and display an error message
@@ -34,18 +34,21 @@ The Tender Lifecycle Management feature is the core MVP functionality of Tender 
 
 #### Acceptance Criteria
 
-1. WHEN a user views a tender record THEN the system SHALL display tender reference, title, issuing authority, key dates (closing date), and estimated value if available
+1. WHEN a user views a tender record THEN the system SHALL display tender reference, title, issuing authority, closing date, and estimated value if available
 2. WHEN viewing tender details THEN the system SHALL show current status and basic tender information
 3. WHEN a tender has uploaded documents THEN the system SHALL show a list of attached files
 4. WHEN viewing tender lists THEN the system SHALL display key information in a sortable table format
 
-### Requirement 4 (MVP Simplified) - to be updated
+### Requirement 4 (MVP Simplified)
 
-**User Story:** As a tender officer, I want to assign a primary owner to tender opportunities, so that accountability is clear.
+**User Story:** As a tender manager, I want to track who makes changes to tenders, so that I can maintain accountability and audit trails.
 
-#### to be updated
+#### Acceptance Criteria
 
-so far we will not assign a tender to a specific user, but any user who makes changes to a tender we need to log the changes they made to track who was responsibole for that change
+1. WHEN a user creates a tender THEN the system SHALL record the user who created it with timestamp
+2. WHEN a user updates tender information THEN the system SHALL log the change with user ID, timestamp, and what was changed
+3. WHEN viewing tender history THEN users SHALL see who made each change and when
+4. WHEN auditing tenders THEN managers SHALL be able to see complete change history for accountability
 
 ### Requirement 5 (MVP Basic)
 
