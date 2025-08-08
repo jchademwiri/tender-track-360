@@ -10,7 +10,6 @@ export const userRoleEnum = pgEnum('user_role', [
 export const tenderStatusEnum = pgEnum('tender_status', [
   'in_progress',
   'submitted',
-  'evaluation',
   'awarded',
   'rejected',
   'cancelled',
@@ -18,6 +17,7 @@ export const tenderStatusEnum = pgEnum('tender_status', [
 
 export const documentCategoryEnum = pgEnum('document_category', [
   'tender_notice',
+  'tender_document',
   'technical_specifications',
   'financial_proposal',
   'legal_documents',

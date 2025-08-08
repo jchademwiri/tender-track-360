@@ -24,11 +24,9 @@ export const tenderCategories = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => ({
-    organizationIdx: index('idx_categories_organization').on(
-      table.organizationId
-    ),
-    systemDefaultIdx: index('idx_categories_system').on(table.isSystemDefault),
-    nameIdx: index('idx_categories_name').on(table.name),
-  })
+  (t) => [
+    index('idx_categories_organization').on(t.organizationId),
+    index('idx_categories_system').on(t.isSystemDefault),
+    index('idx_categories_name').on(t.name),
+  ]
 );

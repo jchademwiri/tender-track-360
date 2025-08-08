@@ -34,9 +34,9 @@ export const clients = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => ({
-    organizationIdx: index('idx_clients_organization').on(table.organizationId),
-    nameIdx: index('idx_clients_name').on(table.name),
-    typeIdx: index('idx_clients_type').on(table.type),
-  })
+  (t) => [
+    index('idx_clients_organization_id').on(t.organizationId),
+    index('idx_clients_name').on(t.name),
+    index('idx_clients_type').on(t.type),
+  ]
 );

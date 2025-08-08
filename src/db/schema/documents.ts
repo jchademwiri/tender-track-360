@@ -41,15 +41,9 @@ export const documents = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => ({
-    tenderCategoryIdx: index('idx_documents_tender_category').on(
-      table.tenderId,
-      table.category
-    ),
-    versionIdx: index('idx_documents_version').on(
-      table.parentDocumentId,
-      table.version
-    ),
-    uploadedByIdx: index('idx_documents_uploaded_by').on(table.uploadedById),
-  })
+  (t) => [
+    index('idx_documents_tender_category').on(t.tenderId, t.category),
+    index('idx_documents_version').on(t.parentDocumentId, t.version),
+    index('idx_documents_uploaded_by').on(t.uploadedById),
+  ]
 );

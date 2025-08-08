@@ -9,8 +9,9 @@ import {
   index,
   check,
 } from 'drizzle-orm/pg-core';
-import { tenders } from './tenders';
 import { sql } from 'drizzle-orm';
+
+import { tenders } from './tenders';
 
 export const tasks = pgTable(
   'tasks',
@@ -37,17 +38,17 @@ export const tasks = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => ({
-    assignedDueIdx: index('idx_tasks_assigned_due').on(
-      table.assignedToId,
-      table.dueDate,
-      table.isCompleted
+  (t) => [
+    index('idx_tasks_assigned_due').on(
+      t.assignedToId,
+      t.dueDate,
+      t.isCompleted
     ),
-    tenderIdx: index('idx_tasks_tender').on(table.tenderId),
-    statusIdx: index('idx_tasks_status').on(table.isCompleted, table.dueDate),
-    completedTaskTimestamp: check(
+    index('idx_tasks_tender').on(t.tenderId),
+    index('idx_tasks_status').on(t.isCompleted, t.dueDate),
+    check(
       'chk_completed_task_timestamp',
       sql`(is_completed = false) OR (is_completed = true AND completed_at IS NOT NULL)`
     ),
-  })
+  ]
 );

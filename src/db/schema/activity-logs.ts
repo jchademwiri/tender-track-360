@@ -20,12 +20,9 @@ export const activityLogs = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => ({
-    tenderIdx: index('idx_activity_logs_tender').on(
-      table.tenderId,
-      table.createdAt
-    ),
-    userIdx: index('idx_activity_logs_user').on(table.userId, table.createdAt),
-    actionIdx: index('idx_activity_logs_action').on(table.action),
-  })
+  (t) => [
+    index('idx_activity_logs_tender').on(t.tenderId, t.createdAt),
+    index('idx_activity_logs_user').on(t.userId, t.createdAt),
+    index('idx_activity_logs_action').on(t.action),
+  ]
 );

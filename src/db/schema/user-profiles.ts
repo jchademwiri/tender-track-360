@@ -39,11 +39,9 @@ export const userProfiles = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => ({
-    organizationIdx: index('idx_user_profiles_organization').on(
-      table.organizationId
-    ),
-    userIdx: index('idx_user_profiles_user').on(table.userId),
-    roleIdx: index('idx_user_profiles_role').on(table.role),
-  })
+  (t) => [
+    index('idx_user_profiles_organization').on(t.organizationId),
+    index('idx_user_profiles_user').on(t.userId),
+    index('idx_user_profiles_role').on(t.role),
+  ]
 );
