@@ -103,7 +103,7 @@ export const auth = betterAuth({
   // Email verification configuration (separate from emailAndPassword)
   emailVerification: {
     sendOnSignUp: true, // Automatically send verification email after signup
-    autoSignInAfterVerification: false, // Don't auto sign in - redirect to login instead
+    autoSignInAfterVerification: false, // Don't auto sign in - redirect to onboarding instead
     expiresIn: 3600, // 1 hour expiry for verification tokens
     sendVerificationEmail: async ({
       user,
@@ -168,10 +168,14 @@ export const auth = betterAuth({
       organizationLimit: 1, // Each user can only own 1 organization
 
       // Define roles for Better Auth organization plugin
-      // Using simple role strings for now to avoid TypeScript complexity
-      roles: {},
+      roles: {
+        admin: {},
+        tender_manager: {},
+        tender_specialist: {},
+        viewer: {},
+      },
 
-      defaultRole: 'viewer', // New members join as viewer
+      defaultRole: 'admin', // User creating organization becomes admin
 
       // Custom email invitation handler
       sendInvitationEmail: async (data: InvitationData) => {

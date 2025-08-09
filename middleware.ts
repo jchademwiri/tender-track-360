@@ -28,6 +28,7 @@ export default async function authMiddleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/sign-up') ||
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/verify-email') ||
+    request.nextUrl.pathname.startsWith('/onboarding') ||
     request.nextUrl.pathname.startsWith('/forgot-password') ||
     request.nextUrl.pathname === '/' ||
     request.nextUrl.pathname.startsWith('/debug') // Allow debug page for testing
@@ -50,6 +51,18 @@ export default async function authMiddleware(request: NextRequest) {
       '📧 Middleware - Email not verified, redirecting to verify-email'
     );
     return NextResponse.redirect(new URL('/verify-email', request.url));
+  }
+
+  // Redirect verified users without organization to onboarding (except if already on onboarding)
+  if (
+    session.user.emailVerified &&
+    !request.nextUrl.pathname.startsWith('/onboarding') &&
+    !session.activeOrganizationId
+  ) {
+    console.log(
+      '🏢 Middleware - No organization setup, redirecting to onboarding'
+    );
+    return NextResponse.redirect(new URL('/onboarding', request.url));
   }
 
   return NextResponse.next();

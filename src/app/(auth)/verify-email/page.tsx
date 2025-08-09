@@ -34,9 +34,11 @@ export default function VerifyEmailPage() {
   // Check if user is already verified and redirect
   useEffect(() => {
     if (session?.user?.emailVerified && !isVerifying) {
-      console.log('✅ User already verified, redirecting to login');
-      toast.success('Email verified successfully! Please sign in.');
-      router.push('/login');
+      console.log('✅ User already verified, redirecting to onboarding');
+      toast.success(
+        'Email verified successfully! Setting up your organization...'
+      );
+      router.push('/onboarding');
     }
   }, [session, router, isVerifying]);
 
@@ -65,11 +67,13 @@ export default function VerifyEmailPage() {
       }
 
       console.log('✅ Email verification successful:', data);
-      toast.success('Email verified successfully! Redirecting to login...');
+      toast.success(
+        'Email verified successfully! Setting up your organization...'
+      );
 
       // Small delay to show success message before redirect
       setTimeout(() => {
-        router.push(callbackUrl || '/login');
+        router.push(callbackUrl || '/onboarding');
       }, 1500);
     } catch (error) {
       console.error('❌ Unexpected verification error:', error);
