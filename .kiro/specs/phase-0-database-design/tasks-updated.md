@@ -16,12 +16,14 @@
   - Set up foreign key references to Better Auth tables (using text IDs)
   - _Requirements: 1.2, 1.3, 1.4_
 
-- [ ] 3. Design core tender management schema with Better Auth references
+- [x] 3. Design core tender management schema with Better Auth references
   - Update tenders table to reference Better Auth organization.id and user.id
   - Add composite unique constraint for reference numbers within organizations
   - Create proper foreign key relationships to clients and categories
   - Add tags array field for flexible categorization
   - _Requirements: 2.1, 2.2, 2.3_
+
+- [x] 4. Update client and category management tables for Better Auth
 
 - [ ] 4. Update client and category management tables for Better Auth
   - Update clients table with Better Auth organization and user references
@@ -37,15 +39,23 @@
   - Implement change detection and logging utilities
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
+-
+
 - [ ] 6. Design document management schema for UploadThing with Better Auth
   - Create enhanced documents table with UploadThing URL and key fields
   - Add document versioning support with parent-child relationships
-  - Implement Better Auth organization-based document isolation
-  - Add document metadata fields for search and categorization
-  - _Requirements: 4.1, 4.2, 4.3, 4.4_
+  - Implement Better Auth organization-based document isolatio
 
-- [ ] 7. Create performance optimization indexes for Better Auth integration
-  - Add composite indexes for common query patterns with text-based IDs
+n
+
+- Add document metadata fields for search and categorization
+- _Requirements: 4.1, 4.2, 4.3, 4.4_
+-
+
+- [ ] 7. Create performance optimization indexes for Bett
+     er Auth integration
+  - Add composite indexes for common query patterns with
+    text-based IDs
   - Create organization-based indexes for multi-tenant queries
   - Add time-based indexes for audit and activity queries
   - Optimize indexes for tender search and filtering with Better Auth context
@@ -53,21 +63,27 @@
 
 - [ ] 8. Implement database constraints and validation for Better Auth
   - Add check constraints for business rule enforcement
-  - Create unique constraints for reference number uniqueness within organizations
+  - Create unique constraints for reference number uniqueness within o
+    rganizations
   - Add foreign key constraints with proper cascade rules for text IDs
-  - Implement soft delete constraints and validation
+  - Implement soft delete constra
+    ints and validation
+
   - _Requirements: 2.3, 3.1, 5.4_
 
 - [ ] 9. Set up database migrations and seeding with Better Auth schema
   - Create Drizzle migration files for all business schema changes
-  - Implement database seeding for default categories and system data
+  - _Rmqeiremen a:a5.4_
+    eeding for default categories and system data
   - Create migration rollback procedures
+
   - Set up database backup and restore procedures
   - _Requirements: 5.4_
 
 - [ ] 10. Create Better Auth integration utilities and helpers
   - Build organization context utilities for queries using Better Auth session
-  - Create audit logging helper functions with Better Auth user context
+  - Create audit logging helper functions with Better A
+    uth user context
   - Implement database connection pooling configuration
   - Add database health check and monitoring utilities
   - _Requirements: 1.4, 3.4, 5.3, 5.4_

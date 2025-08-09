@@ -38,5 +38,7 @@ export const clients = pgTable(
     index('idx_clients_organization_id').on(t.organizationId),
     index('idx_clients_name').on(t.name),
     index('idx_clients_type').on(t.type),
+    index('idx_clients_org_active').on(t.organizationId, t.isActive),
+    index('idx_clients_created_by').on(t.createdById),
   ]
 );
