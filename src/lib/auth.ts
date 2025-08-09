@@ -103,7 +103,7 @@ export const auth = betterAuth({
   // Email verification configuration (separate from emailAndPassword)
   emailVerification: {
     sendOnSignUp: true, // Automatically send verification email after signup
-    autoSignInAfterVerification: true, // Auto sign in after verification
+    autoSignInAfterVerification: false, // Don't auto sign in - redirect to login instead
     expiresIn: 3600, // 1 hour expiry for verification tokens
     sendVerificationEmail: async ({
       user,

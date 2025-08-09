@@ -22,14 +22,15 @@ export default async function authMiddleware(request: NextRequest) {
     timestamp: new Date().toISOString(),
   });
 
-  // Allow access to auth pages and API routes
+  // Allow access to auth pages, API routes, and public pages
   if (
     request.nextUrl.pathname.startsWith('/api/auth') ||
     request.nextUrl.pathname.startsWith('/sign-up') ||
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/verify-email') ||
     request.nextUrl.pathname.startsWith('/forgot-password') ||
-    request.nextUrl.pathname === '/'
+    request.nextUrl.pathname === '/' ||
+    request.nextUrl.pathname.startsWith('/debug') // Allow debug page for testing
   ) {
     return NextResponse.next();
   }
@@ -40,8 +41,11 @@ export default async function authMiddleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Redirect unverified users to verification page
-  if (!session.user.emailVerified) {
+  // Redirect unverified users to verification page (except if already on verify-email)
+  if (
+    !session.user.emailVerified &&
+    !request.nextUrl.pathname.startsWith('/verify-email')
+  ) {
     console.log(
       '📧 Middleware - Email not verified, redirecting to verify-email'
     );

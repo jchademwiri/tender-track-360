@@ -1,7 +1,6 @@
 import { requireAuth } from '@/server/auth-utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { SignOutButton } from '@/components/sign-out-button';
 
 export default async function DashboardPage() {
   const session = await requireAuth();
@@ -11,9 +10,7 @@ export default async function DashboardPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <Button asChild>
-            <Link href="/api/auth/sign-out">Sign Out</Link>
-          </Button>
+          <SignOutButton />
         </div>
 
         <Card>

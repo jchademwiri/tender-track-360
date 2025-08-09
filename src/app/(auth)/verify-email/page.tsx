@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-import { authClient } from '@/lib/auth-client';
+import { authClient, useSession } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { resendVerificationEmail } from './actions';
 
@@ -14,6 +15,69 @@ export default function VerifyEmailPage() {
   const [isResending, setIsResending] = useState(false);
   const [showEmailInput, setShowEmailInput] = useState(false);
   const [email, setEmail] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
+
+  // Handle email verification from URL params
+  useEffect(() => {
+    const token = searchParams.get('token');
+    const callbackUrl = searchParams.get('callbackUrl');
+
+    if (token) {
+      handleEmailVerification(token, callbackUrl);
+    }
+  }, [searchParams]);
+
+  // Check if user is already verified and redirect
+  useEffect(() => {
+    if (session?.user?.emailVerified && !isVerifying) {
+      console.log('✅ User already verified, redirecting to login');
+      toast.success('Email verified successfully! Please sign in.');
+      router.push('/login');
+    }
+  }, [session, router, isVerifying]);
+
+  const handleEmailVerification = async (
+    token: string,
+    callbackUrl: string | null
+  ) => {
+    setIsVerifying(true);
+
+    try {
+      console.log(
+        '🔐 Verifying email with token:',
+        token.substring(0, 8) + '...'
+      );
+
+      const { data, error } = await authClient.verifyEmail({
+        query: { token },
+      });
+
+      if (error) {
+        console.error('❌ Email verification failed:', error);
+        toast.error(
+          'Invalid or expired verification link. Please request a new one.'
+        );
+        return;
+      }
+
+      console.log('✅ Email verification successful:', data);
+      toast.success('Email verified successfully! Redirecting to login...');
+
+      // Small delay to show success message before redirect
+      setTimeout(() => {
+        router.push(callbackUrl || '/login');
+      }, 1500);
+    } catch (error) {
+      console.error('❌ Unexpected verification error:', error);
+      toast.error('Verification failed. Please try again.');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   const handleResendVerification = async () => {
     if (!email.trim()) {
@@ -46,6 +110,46 @@ export default function VerifyEmailPage() {
       setIsResending(false);
     }
   };
+
+  // Show loading state while checking session
+  if (isPending) {
+    return (
+      <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
+        <div className="w-full max-w-md">
+          <Card>
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl">Loading...</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-muted-foreground">
+                Checking verification status...
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Show verification in progress
+  if (isVerifying) {
+    return (
+      <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
+        <div className="w-full max-w-md">
+          <Card>
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl">Verifying email...</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p className="text-muted-foreground">
+                Please wait while we verify your email address.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
