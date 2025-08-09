@@ -36,6 +36,7 @@ export const {
   signOut,
   useSession,
   getSession,
+  sendVerificationEmail,
   organization: {
     create: createOrganization,
     getFullOrganization,

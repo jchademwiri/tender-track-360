@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
-
+import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
+import { resendVerificationEmail } from './actions';
 
 export default function VerifyEmailPage() {
   const [isResending, setIsResending] = useState(false);
@@ -25,37 +26,16 @@ export default function VerifyEmailPage() {
     try {
       console.log('🔄 Resending verification email for:', email);
 
-      // Call Better Auth to resend verification email
-      const response = await fetch('/api/auth/send-verification-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email.trim(),
-          callbackURL: '/verify-email',
-        }),
-      });
+      // Use server action for resending verification email
+      const result = await resendVerificationEmail(email.trim());
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        console.error('❌ Failed to resend verification email:', result);
-
-        let errorMessage = 'Failed to resend verification email';
-        if (response.status === 404) {
-          errorMessage = 'No account found with this email address';
-        } else if (response.status === 400) {
-          errorMessage = 'Invalid email address';
-        } else if (result.message) {
-          errorMessage = result.message;
-        }
-
-        toast.error(errorMessage);
+      if (!result.success) {
+        console.error('❌ Failed to resend verification email:', result.error);
+        toast.error(result.error || 'Failed to send verification email');
         return;
       }
 
-      console.log('✅ Verification email resent successfully');
+      console.log('✅ Verification email sent successfully');
       toast.success('Verification email sent! Please check your inbox.');
       setShowEmailInput(false);
       setEmail('');

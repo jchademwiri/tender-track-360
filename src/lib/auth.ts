@@ -60,17 +60,9 @@ export const auth = betterAuth({
 
   // Enable email & password authentication
   emailAndPassword: {
-    enabled: true, // Allow sign-in/sign-up via email and password
-    requireEmailVerification: true, // Users must verify email before logging in
-
-    // Custom email verification handler
-    sendVerificationEmail: async ({
-      user,
-      url,
-    }: {
-      user: User;
-      url: string;
-    }) => {
+    enabled: true,
+    requireEmailVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
       console.log('🔔 BETTER AUTH TRIGGERED: Verification email request:', {
         userId: user.id,
         email: user.email,
@@ -83,9 +75,9 @@ export const auth = betterAuth({
       try {
         console.log('📧 Calling sendVerificationEmail function...');
         await sendVerificationEmail({
-          email: user.email, // Recipient email
-          verificationUrl: url, // Verification link
-          name: user.name, // Recipient name
+          email: user.email,
+          verificationUrl: url,
+          name: user.name,
         });
         console.log('✅ BETTER AUTH: Verification email sent successfully:', {
           userId: user.id,
@@ -101,9 +93,7 @@ export const auth = betterAuth({
         throw error;
       }
     },
-
-    // Custom password reset handler
-    sendResetPassword: async ({ user, url }: { user: User; url: string }) => {
+    sendResetPassword: async ({ user, url }) => {
       console.log('🔔 BETTER AUTH TRIGGERED: Password reset email request:', {
         userId: user.id,
         email: user.email,
@@ -115,9 +105,9 @@ export const auth = betterAuth({
       try {
         console.log('🔐 Calling sendPasswordResetEmail function...');
         await sendPasswordResetEmail({
-          email: user.email, // Recipient email
-          resetUrl: url, // Password reset link
-          name: user.name, // Recipient name
+          email: user.email,
+          resetUrl: url,
+          name: user.name,
         });
         console.log('✅ BETTER AUTH: Password reset email sent successfully:', {
           userId: user.id,
@@ -148,12 +138,7 @@ export const auth = betterAuth({
       organizationLimit: 1, // Each user can only own 1 organization
 
       // Define roles for Better Auth organization plugin
-      roles: [
-        { id: 'admin', name: 'Admin' },
-        { id: 'tender_manager', name: 'Tender Manager' },
-        { id: 'tender_specialist', name: 'Tender Specialist' },
-        { id: 'viewer', name: 'Viewer' },
-      ],
+      roles: ['admin', 'tender_manager', 'tender_specialist', 'viewer'],
 
       defaultRole: 'viewer', // New members join as viewer
 

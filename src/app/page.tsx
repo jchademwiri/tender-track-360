@@ -39,7 +39,7 @@ export default async function Home() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="text-lg px-8 py-3">
-              <Link href="/signup">Get Started</Link>
+              <Link href="/sign-up">Get Started</Link>
             </Button>
             <Button
               asChild
