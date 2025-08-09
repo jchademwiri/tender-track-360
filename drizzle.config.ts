@@ -1,5 +1,7 @@
+import { config } from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
 
+config({ path: '.env.local' }); // or .env.local
 export default defineConfig({
   schema: './src/db/schema',
   out: './src/db/migrations',
