@@ -1,9 +1,6 @@
 'use server';
 
-import { db } from '@/db';
-import { user } from '@/db/schema/auth';
-import { eq } from 'drizzle-orm';
-import { sendVerificationEmail } from '@/server/email';
+import { auth } from '@/lib/auth';
 
 export async function resendVerificationEmail(email: string) {
   console.log('🔄 Server Action - Resending verification email for:', email);
@@ -16,47 +13,30 @@ export async function resendVerificationEmail(email: string) {
       };
     }
 
-    // Find the user in the database
-    const [existingUser] = await db
-      .select()
-      .from(user)
-      .where(eq(user.email, email.toLowerCase().trim()));
+    console.log('📧 Using Better Auth API to send verification email:', email);
 
-    if (!existingUser) {
-      console.warn('❌ User not found for email:', email);
+    // Use Better Auth's built-in sendVerificationEmail method
+    // This will properly generate verification tokens and handle the email sending
+    const result = await auth.api.sendVerificationEmail({
+      body: {
+        email: email.toLowerCase().trim(),
+      },
+    });
+
+    if (!result) {
+      console.error(
+        '❌ Better Auth sendVerificationEmail returned null/undefined'
+      );
       return {
         success: false,
-        error: 'No account found with this email address',
+        error:
+          'Failed to send verification email - no response from auth service',
       };
     }
 
-    // Check if user is already verified
-    if (existingUser.emailVerified) {
-      console.log('ℹ️ User already verified:', email);
-      return {
-        success: true,
-        message: 'Email is already verified',
-      };
-    }
-
-    // Generate verification URL using Better Auth's format
-    const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
-    const verificationUrl = `${baseUrl}/api/auth/verify-email?token=${existingUser.id}&email=${encodeURIComponent(email)}`;
-
-    console.log('📧 Sending verification email via server action:', {
-      userId: existingUser.id,
-      email: existingUser.email,
-      name: existingUser.name,
-    });
-
-    // Send verification email directly
-    await sendVerificationEmail({
-      email: existingUser.email,
-      verificationUrl,
-      name: existingUser.name,
-    });
-
-    console.log('✅ Server Action - Verification email sent successfully');
+    console.log(
+      '✅ Server Action - Verification email sent successfully via Better Auth'
+    );
 
     return {
       success: true,
@@ -68,9 +48,24 @@ export async function resendVerificationEmail(email: string) {
       error
     );
 
+    // Provide more specific error messages
+    let errorMessage = 'Failed to send verification email';
+
+    if (error instanceof Error) {
+      if (error.message.includes('User not found')) {
+        errorMessage = 'No account found with this email address';
+      } else if (error.message.includes('already verified')) {
+        errorMessage = 'Email is already verified';
+      } else if (error.message.includes('rate limit')) {
+        errorMessage = 'Too many attempts. Please try again later';
+      } else {
+        errorMessage = error.message;
+      }
+    }
+
     return {
       success: false,
-      error: 'Failed to send verification email',
+      error: errorMessage,
     };
   }
 }

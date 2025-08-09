@@ -102,7 +102,7 @@ export default async function Home() {
           <div className="mt-16 pt-8 border-t border-gray-200">
             <p className="text-gray-500">
               Ready to streamline your tender management process?{' '}
-              <Link href="/signup" className="text-blue-600 hover:underline">
+              <Link href="/sign-up" className="text-blue-600 hover:underline">
                 Create your account today
               </Link>
             </p>
