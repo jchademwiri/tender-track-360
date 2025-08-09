@@ -82,7 +82,7 @@ export const auth = betterAuth({
 
       try {
         console.log('📧 Calling sendVerificationEmail function...');
-        const result = await sendVerificationEmail({
+        await sendVerificationEmail({
           email: user.email, // Recipient email
           verificationUrl: url, // Verification link
           name: user.name, // Recipient name
@@ -90,9 +90,7 @@ export const auth = betterAuth({
         console.log('✅ BETTER AUTH: Verification email sent successfully:', {
           userId: user.id,
           email: user.email,
-          result,
         });
-        return result;
       } catch (error) {
         console.error('❌ BETTER AUTH: Failed to send verification email:', {
           userId: user.id,
@@ -116,7 +114,7 @@ export const auth = betterAuth({
 
       try {
         console.log('🔐 Calling sendPasswordResetEmail function...');
-        const result = await sendPasswordResetEmail({
+        await sendPasswordResetEmail({
           email: user.email, // Recipient email
           resetUrl: url, // Password reset link
           name: user.name, // Recipient name
@@ -124,9 +122,7 @@ export const auth = betterAuth({
         console.log('✅ BETTER AUTH: Password reset email sent successfully:', {
           userId: user.id,
           email: user.email,
-          result,
         });
-        return result;
       } catch (error) {
         console.error('❌ BETTER AUTH: Failed to send password reset email:', {
           userId: user.id,
@@ -151,22 +147,8 @@ export const auth = betterAuth({
       allowUserToCreateOrganization: true, // Users can create organizations
       organizationLimit: 1, // Each user can only own 1 organization
 
-      // Define roles using Better Auth role objects (fix the type issues)
-      roles: {
-        admin: {
-          description: 'Full system access with administrative privileges',
-        },
-        tender_manager: {
-          description:
-            'Manage tenders, team members, and organizational settings',
-        },
-        tender_specialist: {
-          description: 'Create, edit, and manage tender processes',
-        },
-        viewer: {
-          description: 'Read-only access to view tenders and reports',
-        },
-      },
+      // Define roles for Better Auth organization plugin
+      roles: ['admin', 'tender_manager', 'tender_specialist', 'viewer'],
 
       defaultRole: 'viewer', // New members join as viewer
 
@@ -189,7 +171,7 @@ export const auth = betterAuth({
 
         try {
           console.log('📨 Calling sendInvitationEmail function...');
-          const result = await sendInvitationEmail({
+          await sendInvitationEmail({
             email: data.email, // Invitee email
             organizationName: data.organization.name, // Org name in email
             role: data.role, // Role assigned upon joining
@@ -200,9 +182,7 @@ export const auth = betterAuth({
             invitationId: data.invitation.id,
             email: data.email,
             organizationName: data.organization.name,
-            result,
           });
-          return result;
         } catch (error) {
           console.error('❌ BETTER AUTH: Failed to send invitation email:', {
             invitationId: data.invitation.id,
@@ -236,7 +216,9 @@ export const auth = betterAuth({
 
   // Add advanced configuration for debugging
   advanced: {
-    generateId: () => crypto.randomUUID(),
+    database: {
+      generateId: () => crypto.randomUUID(),
+    },
     crossSubDomainCookies: {
       enabled: false,
     },
