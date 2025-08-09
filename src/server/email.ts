@@ -2,7 +2,6 @@ import { Resend } from 'resend';
 import VerificationEmail from '../../emails/verification-email';
 import InvitationEmail from '../../emails/invitation-email';
 import PasswordResetEmail from '../../emails/password-reset-email';
-import { addEmailLog } from '@/app/api/recent-emails/route';
 
 // Initialize Resend lazily to ensure environment variables are loaded
 let resend: Resend | null = null;
@@ -96,10 +95,6 @@ export async function sendInvitationEmail({
       emailSent: true,
       resendResponse: {
         id: data?.id,
-        from: data?.from,
-        to: data?.to,
-        created_at: data?.created_at,
-        subject: data?.subject,
       },
     });
 
@@ -187,10 +182,6 @@ export async function sendVerificationEmail({
       emailSent: true,
       resendResponse: {
         id: data?.id,
-        from: data?.from,
-        to: data?.to,
-        created_at: data?.created_at,
-        subject: data?.subject,
       },
     });
 
@@ -277,10 +268,6 @@ export async function sendPasswordResetEmail({
       emailSent: true,
       resendResponse: {
         id: data?.id,
-        from: data?.from,
-        to: data?.to,
-        created_at: data?.created_at,
-        subject: data?.subject,
       },
     });
 

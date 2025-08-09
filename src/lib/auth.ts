@@ -148,7 +148,12 @@ export const auth = betterAuth({
       organizationLimit: 1, // Each user can only own 1 organization
 
       // Define roles for Better Auth organization plugin
-      roles: ['admin', 'tender_manager', 'tender_specialist', 'viewer'],
+      roles: [
+        { id: 'admin', name: 'Admin' },
+        { id: 'tender_manager', name: 'Tender Manager' },
+        { id: 'tender_specialist', name: 'Tender Specialist' },
+        { id: 'viewer', name: 'Viewer' },
+      ],
 
       defaultRole: 'viewer', // New members join as viewer
 
