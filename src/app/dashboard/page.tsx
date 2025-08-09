@@ -15,7 +15,7 @@ export default async function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Welcome back!</CardTitle>
+            <CardTitle>Welcome back, {session.user.name.slice(0, 5)}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -24,13 +24,6 @@ export default async function DashboardPage() {
               </p>
               <p>
                 <strong>Email:</strong> {session.user.email}
-              </p>
-              <p>
-                <strong>Email Verified:</strong>{' '}
-                {session.user.emailVerified ? 'Yes' : 'No'}
-              </p>
-              <p>
-                <strong>User ID:</strong> {session.user.id}
               </p>
             </div>
           </CardContent>
