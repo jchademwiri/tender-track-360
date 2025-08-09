@@ -34,7 +34,7 @@ export async function sendInvitationEmail({
 }: SendInvitationEmailParams) {
   const emailDetails = {
     type: 'INVITATION_EMAIL',
-    from: 'Tender Track 360 <noreply@resend.dev>',
+    from: 'Tender Track 360 <welcome@updates.jacobc.co.za>',
     to: email,
     subject: `You've been invited to join ${organizationName} - Tender Track 360`,
     organizationName,
@@ -127,7 +127,7 @@ export async function sendVerificationEmail({
 }: SendVerificationEmailParams) {
   const emailDetails = {
     type: 'VERIFICATION_EMAIL',
-    from: 'Tender Track 360 <noreply@resend.dev>',
+    from: 'Tender Track 360 <welcome@updates.jacobc.co.za>',
     to: email,
     subject: 'Verify your email address - Tender Track 360',
     recipientName: name,
@@ -214,7 +214,7 @@ export async function sendPasswordResetEmail({
 }: SendPasswordResetEmailParams) {
   const emailDetails = {
     type: 'PASSWORD_RESET_EMAIL',
-    from: 'Tender Track 360 <noreply@resend.dev>',
+    from: 'Tender Track 360 <welcome@updates.jacobc.co.za>',
     to: email,
     subject: 'Reset your password - Tender Track 360',
     recipientName: name,
