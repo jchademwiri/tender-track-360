@@ -9,18 +9,19 @@ import {
   index,
 } from 'drizzle-orm/pg-core';
 import { userRoleEnum } from './enums';
-
-// Import Better Auth tables (these will be auto-generated)
-// We'll reference them by name since they're auto-generated
-// export const user = pgTable("user", { ... }) - from Better Auth
-// export const organization = pgTable("organization", { ... }) - from Better Auth
+import { user, organization } from './auth';
 
 export const userProfiles = pgTable(
   'user_profiles',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    userId: text('user_id').notNull().unique(), // References Better Auth user.id
-    organizationId: text('organization_id').notNull(), // References Better Auth organization.id
+    userId: text('user_id')
+      .notNull()
+      .unique()
+      .references(() => user.id, { onDelete: 'cascade' }), // References Better Auth user.id
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }), // References Better Auth organization.id
     role: userRoleEnum('role').notNull().default('viewer'), // Business roles
     department: varchar('department', { length: 100 }),
     isActive: boolean('is_active').notNull().default(true),
@@ -31,7 +32,7 @@ export const userProfiles = pgTable(
     preferences: jsonb('preferences'), // User preferences as JSON
     isDeleted: boolean('is_deleted').notNull().default(false),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
-    deletedById: text('deleted_by_id'),
+    deletedById: text('deleted_by_id').references(() => user.id),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -39,11 +40,11 @@ export const userProfiles = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => ({
-    organizationIdx: index('idx_user_profiles_organization').on(
-      table.organizationId
-    ),
-    userIdx: index('idx_user_profiles_user').on(table.userId),
-    roleIdx: index('idx_user_profiles_role').on(table.role),
-  })
+  (t) => [
+    index('idx_user_profiles_organization').on(t.organizationId),
+    index('idx_user_profiles_user').on(t.userId),
+    index('idx_user_profiles_role').on(t.role),
+    index('idx_user_profiles_active').on(t.isActive, t.organizationId),
+    index('idx_user_profiles_department').on(t.department, t.organizationId),
+  ]
 );
