@@ -18,10 +18,7 @@ export const tenderStatusEnum = pgEnum('tender_status', [
 export const documentCategoryEnum = pgEnum('document_category', [
   'tender_notice',
   'tender_document',
-  'technical_specifications',
-  'financial_proposal',
-  'legal_documents',
-  'correspondence',
+  'pricing',
   'other',
 ]);
 
@@ -30,14 +27,7 @@ export const notificationTypeEnum = pgEnum('notification_type', [
   'status_change',
   'task_assignment',
   'document_update',
-  'custom',
-]);
-
-export const clientTypeEnum = pgEnum('client_type', [
-  'government',
-  'parastatal',
-  'private',
-  'ngo',
-  'international',
   'other',
 ]);
+
+export const clientTypeEnum = pgEnum('client_type', ['government', 'private']);

@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1754684769028,
-      "tag": "0000_concerned_kat_farrell",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1754720748221,
-      "tag": "0001_puzzling_vector",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1754724764742,
-      "tag": "0002_unknown_thanos",
+      "when": 1754792002458,
+      "tag": "0000_special_terror",
       "breakpoints": true
     }
   ]
