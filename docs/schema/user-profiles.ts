@@ -9,7 +9,8 @@ import {
   index,
 } from 'drizzle-orm/pg-core';
 import { userRoleEnum } from './enums';
-import { user, organization } from './auth';
+import { organization, user } from './auth';
+
 
 export const userProfiles = pgTable(
   'user_profiles',
