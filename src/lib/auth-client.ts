@@ -1,4 +1,5 @@
 import { createAuthClient } from 'better-auth/react';
+
 export const authClient = createAuthClient({
   baseURL:
     process.env.NODE_ENV === 'production'
@@ -11,4 +12,8 @@ export const signInWithGoogle = async () => {
     provider: 'google',
     callbackURL: '/dashboard',
   });
+};
+
+export const signOut = async () => {
+  await authClient.signOut();
 };
