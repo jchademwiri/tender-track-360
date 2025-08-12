@@ -22,7 +22,7 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Loader } from 'lucide-react';
-import { authClient } from '@/lib/auth-client';
+import { authClient, signInWithGoogle } from '@/lib/auth-client';
 import Image from 'next/image';
 
 const loginFormSchema = z.object({
@@ -45,12 +45,7 @@ export function LoginForm({
     },
   });
 
-  const signInWithGoogle = async () => {
-    await authClient.signIn.social({
-      provider: 'google',
-      callbackURL: '/dashboard',
-    });
-  };
+
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof loginFormSchema>) {
