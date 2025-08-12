@@ -23,6 +23,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Loader } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
+import Image from 'next/image';
 
 const loginFormSchema = z.object({
   email: z.string().email(),
@@ -172,8 +173,10 @@ export function LoginForm({
             </form>
           </Form>
           <div className="bg-muted relative hidden md:block">
-            <img
+            <Image
               src="/placeholder.svg"
+              width={500}
+              height={600}
               alt="Image"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />
