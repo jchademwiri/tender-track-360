@@ -40,7 +40,7 @@ export default function NotFound() {
               </Button>
               <Button
                 variant="outline"
-                className="flex-1"
+                className="flex-1 cursor-pointer"
                 onClick={() => window.history.back()}
               >
                 <ArrowLeftIcon className="mr-2 h-4 w-4" />

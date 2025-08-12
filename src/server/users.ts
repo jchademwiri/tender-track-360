@@ -23,7 +23,7 @@ export const signIn = async (email: string, password: string) => {
   }
 };
 
-// https://youtu.be/gzYTDGToYcw?list=PLb3Vtl4F8GHTUJ_RmNINhE6GxB97otFzS&t=1332
+// https://youtu.be/gzYTDGToYcw?list=PLb3Vtl4F8GHTUJ_RmNINhE6GxB97otFzS&t=1916
 
 export const signUp = async () => {
   await auth.api.signUpEmail({
