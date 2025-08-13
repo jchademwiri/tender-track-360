@@ -105,7 +105,7 @@ export function LoginForm({
                             />
                           </FormControl>
                           <Link
-                            href="#"
+                            href="/forgot-password"
                             className="ml-auto text-sm underline-offset-2 hover:underline"
                           >
                             Forgot your password?
