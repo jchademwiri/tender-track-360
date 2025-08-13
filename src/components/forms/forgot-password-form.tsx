@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
-import { signIn } from '@/server';
 import Link from 'next/link';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,8 +21,7 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Loader } from 'lucide-react';
-import { authClient, signInWithGoogle } from '@/lib/auth-client';
-import Image from 'next/image';
+import { authClient } from '@/lib/auth-client';
 
 const forgotPasswordFormSchema = z.object({
   email: z.string().email(),

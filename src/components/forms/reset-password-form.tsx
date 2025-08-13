@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/form';
 import { toast } from 'sonner';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import {
   Loader,
   ArrowLeft,
@@ -28,7 +28,6 @@ import {
   Shield,
 } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
-import Image from 'next/image';
 
 const resetPasswordFormSchema = z
   .object({
@@ -43,7 +42,7 @@ const resetPasswordFormSchema = z
     path: ['confirmPassword'],
   });
 
-export function ResetPasswordForm({
+function ResetPasswordFormContent({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
@@ -73,7 +72,7 @@ export function ResetPasswordForm({
 
     setIsLoading(true);
     try {
-      const { data, error } = await authClient.resetPassword({
+      const { error } = await authClient.resetPassword({
         newPassword: values.password,
         token: token,
       });
@@ -84,7 +83,8 @@ export function ResetPasswordForm({
         setPasswordReset(true);
         toast.success('Password has been reset successfully!');
       }
-    } catch (error) {
+    } catch (err) {
+      console.error('Password reset error:', err);
       toast.error('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
@@ -143,13 +143,6 @@ export function ResetPasswordForm({
                 </div>
               </div>
               <div className="bg-background relative hidden md:block">
-                {/* <Image
-                  src="/placeholder.svg"
-                  width={500}
-                  height={600}
-                  alt="Reset Password"
-                  className="absolute inset-0 h-full w-full object-cover opacity-20"
-                /> */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center text-foreground space-y-4 p-8">
                     <Shield className="w-16 h-16 mx-auto opacity-80" />
@@ -210,13 +203,6 @@ export function ResetPasswordForm({
                 </div>
               </div>
               <div className="bg-background relative hidden md:block">
-                {/* <Image
-                  src="/placeholder.svg"
-                  width={500}
-                  height={600}
-                  alt="Success"
-                  className="absolute inset-0 h-full w-full object-cover opacity-20"
-                /> */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center text-foreground space-y-4 p-8">
                     <CheckCircle className="w-16 h-16 mx-auto opacity-80 text-green-600" />
@@ -356,13 +342,6 @@ export function ResetPasswordForm({
               </div>
             </div>
             <div className="bg-background relative hidden md:block">
-              {/* <Image
-                src="/placeholder.svg"
-                width={500}
-                height={600}
-                alt="Reset Password"
-                className="absolute inset-0 h-full w-full object-cover opacity-20"
-              /> */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center text-foreground space-y-6 p-8">
                   <Shield className="w-20 h-20 mx-auto opacity-80" />
@@ -414,5 +393,60 @@ export function ResetPasswordForm({
         </div>
       </div>
     </div>
+  );
+}
+
+// Loading fallback component
+function ResetPasswordFormFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+      <div className="w-full max-w-4xl">
+        <Card className="shadow-xl border-0 overflow-hidden">
+          <CardContent className="grid p-0 md:grid-cols-2 min-h-[600px]">
+            <div className="flex items-center justify-center p-8 md:p-12">
+              <div className="w-full max-w-sm space-y-8">
+                <div className="text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Loader className="w-8 h-8 text-blue-600 animate-spin" />
+                  </div>
+                  <div className="space-y-2">
+                    <h1 className="text-3xl font-bold tracking-tight">
+                      Loading...
+                    </h1>
+                    <p className="text-muted-foreground text-lg">
+                      Please wait while we verify your reset token.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-background relative hidden md:block">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center text-foreground space-y-4 p-8">
+                  <Shield className="w-16 h-16 mx-auto opacity-80" />
+                  <h2 className="text-2xl font-bold">Secure Password Reset</h2>
+                  <p className="text-primary text-lg">
+                    Your security is our priority. We use industry-standard
+                    encryption to protect your account.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// Main component with Suspense wrapper
+export function ResetPasswordForm({
+  className,
+  ...props
+}: React.ComponentProps<'div'>) {
+  return (
+    <Suspense fallback={<ResetPasswordFormFallback />}>
+      <ResetPasswordFormContent className={className} {...props} />
+    </Suspense>
   );
 }
