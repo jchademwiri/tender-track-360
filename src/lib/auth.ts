@@ -5,6 +5,7 @@ import { nextCookies } from 'better-auth/next-js';
 import { db } from '@/db';
 import { Resend } from 'resend';
 import ResetPasswordEmail from '@/emails/reset-password-email';
+import VerifyEmail from '@/emails/verify-email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -17,6 +18,21 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      await resend.emails.send({
+        from: 'Tender Track <verify-email@updates.jacobc.co.za>',
+        to: user.email,
+        subject: 'Verify your email address',
+        react: VerifyEmail({
+          username: user.name,
+          verificationUrl: url,
+        }),
+      });
+    },
+    sendOnSignUp: true,
+    expiresIn: 3600, // 1 hour
   },
   emailAndPassword: {
     enabled: true,
@@ -32,7 +48,6 @@ export const auth = betterAuth({
             userEmail: user.email,
           }),
         });
-
         if (error) {
           console.error('Error sending reset password email:', error);
           throw error;
@@ -47,9 +62,7 @@ export const auth = betterAuth({
         throw error;
       }
     },
-    // onPasswordReset: async ({ email }) => {
-    //   console.log(`Password for user ${email} has been reset.`);
-    // },
+    requireEmailVerification: true,
   },
 
   plugins: [nextCookies()],
