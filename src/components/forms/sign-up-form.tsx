@@ -20,7 +20,7 @@ import {
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Loader, LoaderIcon } from 'lucide-react';
+import { Loader } from 'lucide-react';
 import { signInWithGoogle } from '@/lib/auth-client';
 
 const signUpFormSchema = z.object({
@@ -54,8 +54,10 @@ export function SignUpForm({
       values.password
     );
     if (success) {
-      toast.success(message as string);
-      router.push('/dashboard');
+      toast.success(`
+        ${message as string}, Please check your email to verify your account.
+      `);
+      router.push('/onboarding');
     } else {
       toast.error(message as string);
     }

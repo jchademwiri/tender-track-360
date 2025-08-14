@@ -1,15 +1,14 @@
 'use client';
-import { authClient } from '@/lib/auth-client';
-import { useRouter } from 'next/navigation';
-import { Button } from './ui/button';
+import { signOut } from '@/lib/auth-client';
+import { Button } from './button';
 import { LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function Logout() {
   const router = useRouter();
-
   const handleLogout = async () => {
-    await authClient.signOut();
-    router.push('/login'); // Redirect to login page after logout
+    await signOut();
+    router.push('/login');
   };
 
   return (
