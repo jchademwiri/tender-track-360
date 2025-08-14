@@ -22,7 +22,7 @@ export const auth = betterAuth({
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
       await resend.emails.send({
-        from: 'Tender Track <verify-email@updates.jacobc.co.za>',
+        from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
         to: user.email,
         subject: 'Verify your email address',
         react: VerifyEmail({
@@ -33,13 +33,14 @@ export const auth = betterAuth({
     },
     sendOnSignUp: true,
     expiresIn: 3600, // 1 hour
+    autoSignInAfterVerification: true,
   },
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
       try {
         const { data, error } = await resend.emails.send({
-          from: 'Tender Track <reset-password@updates.jacobc.co.za>',
+          from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
           to: user.email,
           subject: 'Reset your password',
           react: ResetPasswordEmail({
