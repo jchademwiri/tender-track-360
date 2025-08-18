@@ -6,14 +6,14 @@ import { db } from '@/db';
 import { Resend } from 'resend';
 import ResetPasswordEmail from '@/emails/reset-password-email';
 import VerifyEmail from '@/emails/verify-email';
-import { schema } from '@/db/schema';
+// import { schema } from '@/db/schema';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg', // or "mysql", "sqlite"
-    schema,
+    // schema,
   }),
   socialProviders: {
     google: {
