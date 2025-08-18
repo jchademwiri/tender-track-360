@@ -8,17 +8,28 @@ This design addresses the email verification database issues in Tender Track 360
 
 ### Current State Analysis
 
-- Better Auth is configured with Drizzle adapter but missing proper schema mapping
-- Middleware uses basic cookie checking instead of Better Auth session validation
-- Verification table exists but may not be properly integrated with Better Auth
-- Email verification is enabled but tokens aren't being saved to database
+- Better Auth is configured with Drizzle adapter using `schema` object from `src/db/schema/auth.ts`
+- The verification table exists in the database and schema definition
+- Email verification is enabled and emails are being sent successfully
+- However, verification tokens are not being saved to the database during the signup process
+
+### Root Cause Analysis
+
+The issue is likely in how the schema is being passed to the Drizzle adapter. The current configuration uses:
+
+```typescript
+database: drizzleAdapter(db, {
+  provider: 'pg',
+  schema, // This might not be mapping correctly to Better Auth's expectations
+});
+```
 
 ### Target State
 
-- Properly configured Better Auth with correct database adapter settings
-- Enhanced middleware using Better Auth's recommended session management
-- Validated database schema matching Better Auth requirements
-- Comprehensive logging for debugging and monitoring
+- Better Auth Drizzle adapter properly configured with explicit table mapping
+- Verification tokens successfully saved to and retrieved from the database
+- Comprehensive logging to confirm database operations are working
+- Simple test utilities to validate the fix
 
 ## Components and Interfaces
 
@@ -26,14 +37,15 @@ This design addresses the email verification database issues in Tender Track 360
 
 **Current Issues:**
 
-- Organization plugin commented out but may be needed
-- Missing explicit schema mapping for verification table
-- Insufficient logging for debugging
+- The schema object being passed to drizzleAdapter might not be properly recognized by Better Auth
+- Missing explicit import and mapping of individual table schemas
+- Insufficient logging for debugging verification token operations
 
 **Design Changes:**
 
 ```typescript
-// Enhanced configuration with proper schema mapping
+import { user, session, account, verification } from '@/db/schema/auth';
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
@@ -41,68 +53,89 @@ export const auth = betterAuth({
       user,
       session,
       account,
-      verification, // Explicit mapping
+      verification, // Explicit individual table mapping
     },
   }),
-  // Add debug logging
-  logger: {
-    level: 'debug',
-    disabled: false,
-  },
-  // Enhanced email verification config
   emailVerification: {
     sendVerificationEmail: async ({ user, url, token }) => {
-      console.log(`Creating verification token for user ${user.id}: ${token}`);
-      // existing email sending logic
+      console.log(`[VERIFICATION] Creating token for user ${user.id}:`, {
+        tokenPreview: token?.substring(0, 8) + '...',
+        userEmail: user.email,
+        timestamp: new Date().toISOString(),
+      });
+
+      await resend.emails.send({
+        from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
+        to: user.email,
+        subject: 'Verify your email address',
+        react: VerifyEmail({
+          username: user.name,
+          verificationUrl: url,
+        }),
+      });
+
+      console.log(`[VERIFICATION] Email sent successfully to ${user.email}`);
     },
     sendOnSignUp: true,
     expiresIn: 3600,
     autoSignInAfterVerification: true,
   },
+  // ... rest of configuration
 });
 ```
 
-### 2. Enhanced Middleware (`src/middleware.ts`)
+### 2. Database Testing and Validation Utilities
 
-**Current Issues:**
-
-- Uses `getSessionCookie` instead of proper Better Auth session validation
-- Doesn't handle email verification status
-- Missing comprehensive logging
+**Purpose:** Create simple utilities to test and validate that verification tokens are being saved correctly.
 
 **Design Changes:**
 
 ```typescript
-import { betterFetch } from '@better-fetch/fetch';
+// Create a test utility file: src/lib/verification-test.ts
+import { db } from '@/db';
+import { verification } from '@/db/schema/auth';
+import { eq } from 'drizzle-orm';
 
-export async function middleware(request: NextRequest) {
+export async function testVerificationTokenOperations() {
+  console.log('[TEST] Starting verification token database tests...');
+
+  // Test 1: Insert a test token
+  const testToken = {
+    id: 'test-' + Date.now(),
+    identifier: 'test@example.com',
+    value: 'test-token-' + Math.random().toString(36).substring(7),
+    expiresAt: new Date(Date.now() + 3600000), // 1 hour from now
+  };
+
   try {
-    // Use Better Auth's recommended session validation
-    const session = await betterFetch('/api/auth/session', {
-      baseURL: request.nextUrl.origin,
-      headers: {
-        cookie: request.headers.get('cookie') || '',
-      },
-    });
-
-    if (!session.data) {
-      console.log('No session found, redirecting to login');
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
-
-    // Check email verification status
-    if (!session.data.user.emailVerified) {
-      console.log(
-        `User ${session.data.user.id} not verified, redirecting to verify-email`
-      );
-      return NextResponse.redirect(new URL('/verify-email', request.url));
-    }
-
-    return NextResponse.next();
+    await db.insert(verification).values(testToken);
+    console.log('[TEST] ✅ Token insertion successful:', testToken.id);
   } catch (error) {
-    console.error('Middleware error:', error);
-    return NextResponse.redirect(new URL('/login', request.url));
+    console.error('[TEST] ❌ Token insertion failed:', error);
+    return false;
   }
+
+  // Test 2: Query the token back
+  try {
+    const retrieved = await db
+      .select()
+      .from(verification)
+      .where(eq(verification.id, testToken.id));
+    console.log('[TEST] ✅ Token retrieval successful:', retrieved[0]);
+  } catch (error) {
+    console.error('[TEST] ❌ Token retrieval failed:', error);
+    return false;
+  }
+
+  // Test 3: Clean up test token
+  try {
+    await db.delete(verification).where(eq(verification.id, testToken.id));
+    console.log('[TEST] ✅ Token cleanup successful');
+  } catch (error) {
+    console.error('[TEST] ❌ Token cleanup failed:', error);
+  }
+
+  return true;
 }
 ```
 
