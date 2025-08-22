@@ -12,8 +12,13 @@ export default function Logout() {
   };
 
   return (
-    <Button size={'lg'} onClick={handleLogout} className="cursor-pointer">
-      Logout <LogOut className="size-4" />
+    <Button
+      variant={'link'}
+      onClick={handleLogout}
+      className="cursor-pointer hover:no-underline"
+    >
+      <LogOut className="size-4" />
+      Log out
     </Button>
   );
 }
