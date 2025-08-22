@@ -10,7 +10,7 @@ export default function DashboardLayout({
       <Header />
 
       {children}
-      <footer>Footer</footer>
+      <footer className=" py-4 text-center">Footer</footer>
     </>
   );
 }

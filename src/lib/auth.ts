@@ -37,6 +37,21 @@ export const auth = betterAuth({
     expiresIn: 3600, // 1 hour
     autoSignInAfterVerification: true,
   },
+  // databaseHooks: {
+  //   session: {
+  //     create: {
+  //       before: async (session) => {
+  //         const organization = await getActiveOrganization(session.userId);
+  //         return {
+  //           data: {
+  //             ...session,
+  //             activeOrganizationId: organization?.id,
+  //           },
+  //         };
+  //       },
+  //     },
+  //   },
+  // },
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
