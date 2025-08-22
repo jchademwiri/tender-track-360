@@ -1,4 +1,4 @@
-import { createAuthClient } from 'better-auth/client';
+import { createAuthClient } from 'better-auth/react';
 import { organizationClient } from 'better-auth/client/plugins';
 
 export const authClient = createAuthClient({
@@ -16,8 +16,6 @@ export const signInWithGoogle = async () => {
     callbackURL: '/dashboard',
   });
 };
-
-
 
 export const signOut = async () => {
   await authClient.signOut();
