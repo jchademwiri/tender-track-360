@@ -7,10 +7,26 @@ import { schema } from '@/db/schema';
 import { Resend } from 'resend';
 import ResetPasswordEmail from '@/emails/reset-password-email';
 import VerifyEmail from '@/emails/verify-email';
+import { getActiveOrganization } from '@/server';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (session) => {
+          const organization = await getActiveOrganization(session.userId);
+          return {
+            data: {
+              ...session,
+              activeOrganizationId: organization?.id,
+            },
+          };
+        },
+      },
+    },
+  },
   database: drizzleAdapter(db, {
     provider: 'pg', // or "mysql", "sqlite"
     schema,
@@ -37,21 +53,7 @@ export const auth = betterAuth({
     expiresIn: 3600, // 1 hour
     autoSignInAfterVerification: true,
   },
-  // databaseHooks: {
-  //   session: {
-  //     create: {
-  //       before: async (session) => {
-  //         const organization = await getActiveOrganization(session.userId);
-  //         return {
-  //           data: {
-  //             ...session,
-  //             activeOrganizationId: organization?.id,
-  //           },
-  //         };
-  //       },
-  //     },
-  //   },
-  // },
+
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {

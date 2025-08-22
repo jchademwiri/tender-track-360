@@ -12,29 +12,15 @@ import {
 import { getCurrentUser, getOrganisations } from '@/server';
 
 export default async function Dashboard() {
-  const organisations = await getOrganisations();
-  const currentUser = await getCurrentUser();
   return (
     <section className="grid place-items-center min-h-[600px] text-center">
       <div>
-        <div>
-          {currentUser && (
-            <div>
-              <h2 className="text-2xl font-bold">
-                Organisations for {currentUser.user.name}
-              </h2>
-              {organisations.map((org) => (
-                <div key={org.id}>{org.name}</div>
-              ))}
-            </div>
-          )}
-        </div>
         <hr className="my-6" />
         <div>
           <h1 className="text-4xl font-bold">Tender Track 360</h1>
           <p className="mt-4 text-lg">Welcome to Tender Track 360!</p>
         </div>
-        <section>
+        <section className="my-4">
           <Dialog>
             <DialogTrigger asChild>
               <Button variant={'outline'} className="cursor-pointer">

@@ -44,7 +44,7 @@ export function OrganizationSwitcher({
       onValueChange={handleChangeOrganization}
       value={activeOrganization?.id}
     >
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="min-w-[180px]">
         <SelectValue placeholder="Organization" />
       </SelectTrigger>
       <SelectContent>
