@@ -1,17 +1,35 @@
 import { betterAuth } from 'better-auth';
-// import { organization } from 'better-auth/plugins';
+import { organization } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 import { db } from '@/db';
+import { schema } from '@/db/schema';
 import { Resend } from 'resend';
 import ResetPasswordEmail from '@/emails/reset-password-email';
 import VerifyEmail from '@/emails/verify-email';
+import { getActiveOrganization } from '@/server';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (session) => {
+          const organization = await getActiveOrganization(session.userId);
+          return {
+            data: {
+              ...session,
+              activeOrganizationId: organization?.id,
+            },
+          };
+        },
+      },
+    },
+  },
   database: drizzleAdapter(db, {
     provider: 'pg', // or "mysql", "sqlite"
+    schema,
   }),
   socialProviders: {
     google: {
@@ -35,6 +53,7 @@ export const auth = betterAuth({
     expiresIn: 3600, // 1 hour
     autoSignInAfterVerification: true,
   },
+
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
@@ -66,5 +85,5 @@ export const auth = betterAuth({
     requireEmailVerification: true,
   },
 
-  plugins: [nextCookies()],
+  plugins: [organization(), nextCookies()],
 });
