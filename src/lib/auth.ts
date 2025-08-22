@@ -1,19 +1,19 @@
 import { betterAuth } from 'better-auth';
-// import { organization } from 'better-auth/plugins';
+import { organization } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 import { db } from '@/db';
+import { schema } from '@/db/schema';
 import { Resend } from 'resend';
 import ResetPasswordEmail from '@/emails/reset-password-email';
 import VerifyEmail from '@/emails/verify-email';
-// import { schema } from '@/db/schema';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg', // or "mysql", "sqlite"
-    // schema,
+    schema,
   }),
   socialProviders: {
     google: {
@@ -68,5 +68,5 @@ export const auth = betterAuth({
     requireEmailVerification: true,
   },
 
-  plugins: [nextCookies()],
+  plugins: [organization(), nextCookies()],
 });

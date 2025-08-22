@@ -1,4 +1,4 @@
-import Logout from '@/components/ui/logout';
+import Header from '@/components/header';
 
 export default function DashboardLayout({
   children,
@@ -7,7 +7,8 @@ export default function DashboardLayout({
 }) {
   return (
     <>
-      <Logout />
+      <Header />
+
       {children}
       <footer>Footer</footer>
     </>
