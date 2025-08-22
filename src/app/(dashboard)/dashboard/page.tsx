@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { getCurrentUser, getOrganisations } from '@/server';
+
 
 export default async function Dashboard() {
   return (

@@ -18,7 +18,7 @@ import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { useState, useRef } from 'react';
 import { Loader } from 'lucide-react';
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const createOrganisationFormSchema = z.object({
   name: z.string().min(2).max(50),
@@ -30,7 +30,7 @@ export function CreateOrganisationForm() {
   const [slugManuallyChanged, setSlugManuallyChanged] = useState(false);
   const [slugEditable, setSlugEditable] = useState(false);
   const nameRef = useRef('');
-  // const router = useRouter();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof createOrganisationFormSchema>>({
     resolver: zodResolver(createOrganisationFormSchema),
@@ -58,18 +58,16 @@ export function CreateOrganisationForm() {
       await authClient.organization.create({
         name: values.name, // required
         slug: values.slug, // required
-        logo: 'https://example.com/logo.png',
-        keepCurrentActiveOrganization: false,
       });
+
       toast.success('Organisation created successfully!');
-      // router.refresh();
+      router.refresh();
     } catch (error) {
       console.error(error);
       toast.error('Failed to create organisation.');
     } finally {
       setIsLoading(false);
     }
-    // console.log(values);
   }
 
   return (
