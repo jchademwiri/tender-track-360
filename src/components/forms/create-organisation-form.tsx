@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Loader } from 'lucide-react';
 
 const createOrganisationFormSchema = z.object({
@@ -26,6 +26,10 @@ const createOrganisationFormSchema = z.object({
 
 export function CreateOrganisationForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [slugManuallyChanged, setSlugManuallyChanged] = useState(false);
+  const [slugEditable, setSlugEditable] = useState(false);
+  const nameRef = useRef('');
+
   const form = useForm<z.infer<typeof createOrganisationFormSchema>>({
     resolver: zodResolver(createOrganisationFormSchema),
     defaultValues: {
@@ -33,6 +37,16 @@ export function CreateOrganisationForm() {
       slug: '',
     },
   });
+
+  // Slugify helper
+  function slugify(text: string) {
+    return text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
 
   async function onSubmit(
     values: z.infer<typeof createOrganisationFormSchema>
@@ -65,9 +79,20 @@ export function CreateOrganisationForm() {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder="My Organisation" {...field} />
+                <Input
+                  placeholder="My Organisation"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    nameRef.current = e.target.value;
+                    if (!slugManuallyChanged) {
+                      form.setValue('slug', slugify(e.target.value), {
+                        shouldValidate: true,
+                      });
+                    }
+                  }}
+                />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
@@ -78,10 +103,31 @@ export function CreateOrganisationForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Slug</FormLabel>
-              <FormControl>
-                <Input placeholder="my-organisation" {...field} />
-              </FormControl>
-
+              <div className="flex items-center gap-2">
+                <FormControl>
+                  <Input
+                    placeholder="my-organisation"
+                    {...field}
+                    disabled={!slugEditable}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      setSlugManuallyChanged(
+                        e.target.value !== slugify(nameRef.current)
+                      );
+                    }}
+                  />
+                </FormControl>
+                {!slugEditable && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSlugEditable(true)}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
               <FormMessage />
             </FormItem>
           )}
