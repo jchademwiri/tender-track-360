@@ -9,13 +9,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-
+import { getOrganisations } from '@/server';
+import Link from 'next/link';
 
 export default async function Dashboard() {
+  const organizations = await getOrganisations();
   return (
     <section className="grid place-items-center min-h-[600px] text-center">
       <div>
-        <hr className="my-6" />
         <div>
           <h1 className="text-4xl font-bold">Tender Track 360</h1>
           <p className="mt-4 text-lg">Welcome to Tender Track 360!</p>
@@ -37,6 +38,19 @@ export default async function Dashboard() {
               <CreateOrganisationForm />
             </DialogContent>
           </Dialog>
+          <hr className="my-6" />
+          <section className="">
+            <h2 className="text-2xl py-2 font-bold">Your Organisations</h2>
+            <div className="grid grid-cols-1 gap-4">
+              {organizations.map((org) => (
+                <Button key={org.id} asChild variant={'outline'}>
+                  <Link href={`/dashboard/organization/${org.slug}`}>
+                    {org.name}
+                  </Link>
+                </Button>
+              ))}
+            </div>
+          </section>
         </section>
       </div>
     </section>
