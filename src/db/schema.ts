@@ -86,7 +86,7 @@ export const organizationRelations = relations(organization, ({ many }) => ({
 }));
 // export organization type
 export type Organization = typeof organization.$inferSelect;
-export const role = pgEnum('role', ['owner', 'admin', 'member']);
+export const role = pgEnum('role', ['owner', 'admin', 'member', 'manager']);
 
 export type Role = (typeof role.enumValues)[number];
 

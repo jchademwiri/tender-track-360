@@ -15,5 +15,8 @@ const admin = ac.newRole({
 const member = ac.newRole({
   project: ['create'],
 });
+const manager = ac.newRole({
+  project: ['create', 'update'],
+});
 
-export { owner, admin, member, ac, statement };
+export { owner, admin, member, manager, ac, statement };
