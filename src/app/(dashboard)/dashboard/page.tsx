@@ -9,17 +9,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { getorganizations } from '@/server';
+
+import { getCurrentUser, getorganizations } from '@/server';
 import Link from 'next/link';
 
 export default async function Dashboard() {
   const organizations = await getorganizations();
+  const user = await getCurrentUser();
   return (
     <section className="grid place-items-center min-h-[600px] text-center">
       <div>
         <div>
           <h1 className="text-4xl font-bold">Tender Track 360</h1>
           <p className="mt-4 text-lg">Welcome to Tender Track 360!</p>
+          <p className="mt-4 text-lg ">
+            Your email is:{' '}
+            <span className="text-green-300">{user.currentUser.email}</span>
+          </p>
         </div>
         <section className="my-4">
           <Dialog>
