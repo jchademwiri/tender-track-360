@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
 
 // User table
 export const user = pgTable('user', {
@@ -55,7 +55,6 @@ export const account = pgTable('account', {
   updatedAt: timestamp('updated_at').notNull(),
 });
 
-
 // Verification table
 export const verification = pgTable('verification', {
   id: text('id').primaryKey(),
@@ -87,6 +86,9 @@ export const organizationRelations = relations(organization, ({ many }) => ({
 }));
 // export organization type
 export type Organization = typeof organization.$inferSelect;
+export const role = pgEnum('role', ['owner', 'admin', 'member']);
+
+export type Role = (typeof role.enumValues)[number];
 
 // Member table
 export const member = pgTable('member', {
