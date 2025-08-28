@@ -13,11 +13,17 @@ export default function MembersTableAction({ memberId }: { memberId: string }) {
   const handleRemove = async () => {
     try {
       setIsLoading(true);
-      await removeMember(memberId);
+      const { success, error } = await removeMember(memberId);
+
+      if (!success) {
+        toast.error(error || 'Failed to remove member');
+        return;
+      }
+
       toast.success('Member removed successfully');
       router.refresh();
     } catch (error) {
-      toast.error('Failed to remove member');
+      toast.error('Failed to remove member from organization');
     } finally {
       setIsLoading(false);
     }
@@ -33,3 +39,5 @@ export default function MembersTableAction({ memberId }: { memberId: string }) {
     </Button>
   );
 }
+
+// https://youtu.be/QN2ljJ5MjV4?list=PLb3Vtl4F8GHTUJ_RmNINhE6GxB97otFzS&t=1992
