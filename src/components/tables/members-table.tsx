@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Member } from '@/db/schema';
-import { Button } from '../ui/button';
+import MembersTableAction from '@/components/members-table-action';
 
 interface MembersTableProps {
   members: Member[];
@@ -33,9 +33,7 @@ export function MembersTable({ members }: MembersTableProps) {
             <TableCell>{member.user.email}</TableCell>
             <TableCell>{member.role}</TableCell>
             <TableCell className="text-right">
-              <Button variant={'destructive'} className="text-sm">
-                Remove
-              </Button>
+              <MembersTableAction memberId={member.id} />
             </TableCell>
           </TableRow>
         ))}

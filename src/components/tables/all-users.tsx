@@ -22,7 +22,6 @@ export function AllUsers({ users, organizationId }: AllUsersProps) {
     try {
       setIsLoading(true);
       await addMember(organizationId, userId, 'member');
-      setIsLoading(false);
       toast.success('User added to organization');
       router.refresh();
     } catch (error) {
@@ -37,7 +36,7 @@ export function AllUsers({ users, organizationId }: AllUsersProps) {
       <h2 className="text-2xl font-bold mb-4">All Users</h2>
       <div>
         {users.map((user) => (
-          <div key={user.id} className="flex justify-between">
+          <div key={user.id} className="flex justify-between py-2">
             <span>
               {user.name} - {user.email}
             </span>
