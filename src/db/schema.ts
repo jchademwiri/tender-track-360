@@ -1,5 +1,7 @@
+import { relations } from 'drizzle-orm';
 import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core';
 
+// User table
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
@@ -16,6 +18,10 @@ export const user = pgTable('user', {
     .notNull(),
 });
 
+// export user type
+export type User = typeof user.$inferSelect;
+
+// Session table
 export const session = pgTable('session', {
   id: text('id').primaryKey(),
   expiresAt: timestamp('expires_at').notNull(),
@@ -30,6 +36,7 @@ export const session = pgTable('session', {
   activeOrganizationId: text('active_organization_id'),
 });
 
+// Account table
 export const account = pgTable('account', {
   id: text('id').primaryKey(),
   accountId: text('account_id').notNull(),
@@ -48,6 +55,8 @@ export const account = pgTable('account', {
   updatedAt: timestamp('updated_at').notNull(),
 });
 
+
+// Verification table
 export const verification = pgTable('verification', {
   id: text('id').primaryKey(),
   identifier: text('identifier').notNull(),
@@ -61,6 +70,7 @@ export const verification = pgTable('verification', {
   ),
 });
 
+// Organization table
 export const organization = pgTable('organization', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
@@ -70,8 +80,15 @@ export const organization = pgTable('organization', {
   metadata: text('metadata'),
 });
 
+// Organization relations
+export const organizationRelations = relations(organization, ({ many }) => ({
+  members: many(member),
+  // invitations: many(invitation),
+}));
+// export organization type
 export type Organization = typeof organization.$inferSelect;
 
+// Member table
 export const member = pgTable('member', {
   id: text('id').primaryKey(),
   organizationId: text('organization_id')
@@ -84,6 +101,24 @@ export const member = pgTable('member', {
   createdAt: timestamp('created_at').notNull(),
 });
 
+// export member type
+export type Member = typeof member.$inferSelect & {
+  user: typeof user.$inferSelect;
+};
+
+// export member relations
+export const memberRelations = relations(member, ({ one }) => ({
+  organization: one(organization, {
+    fields: [member.organizationId],
+    references: [organization.id],
+  }),
+  user: one(user, {
+    fields: [member.userId],
+    references: [user.id],
+  }),
+}));
+
+// Invitation table
 export const invitation = pgTable('invitation', {
   id: text('id').primaryKey(),
   organizationId: text('organization_id')
@@ -98,6 +133,7 @@ export const invitation = pgTable('invitation', {
     .references(() => user.id, { onDelete: 'cascade' }),
 });
 
+// Export schema type
 export const schema = {
   user,
   session,
@@ -106,4 +142,6 @@ export const schema = {
   organization,
   member,
   invitation,
+  organizationRelations,
+  memberRelations,
 };

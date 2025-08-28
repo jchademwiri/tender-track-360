@@ -11,10 +11,10 @@ The Tender Lifecycle Management feature serves as the core MVP functionality of 
 The MVP follows a simplified layered architecture:
 
 - **Presentation Layer**: Next.js React and shadcn ui components with Tailwind CSS styling
-- **Authentication Layer**: Better Auth for user management and sessions, with role-based access control and organisations,
+- **Authentication Layer**: Better Auth for user management and sessions, with role-based access control and organizations,
   (
-  when a user signs up, they are assigned a role and an organisation, they automaticaly becomes the admin of their organisation,
-  when they create their account, an onboarding email is sent to them with a link to complete their profile, they will have to setup their organisation details, --- let me know if there is any aditional flow that may need to be added
+  when a user signs up, they are assigned a role and an organization, they automaticaly becomes the admin of their organization,
+  when they create their account, an onboarding email is sent to them with a link to complete their profile, they will have to setup their organization details, --- let me know if there is any aditional flow that may need to be added
   )
 - **API Layer**: Next.js Server Actions for server-side operations
 - **Business Logic Layer**: Simplified service classes for core tender operations

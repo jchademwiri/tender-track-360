@@ -1,4 +1,4 @@
-import { CreateOrganisationForm } from '@/components/forms';
+import { CreateorganizationForm } from '@/components/forms';
 import { Button } from '@/components/ui/button';
 
 import {
@@ -9,11 +9,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { getOrganisations } from '@/server';
+import { getorganizations } from '@/server';
 import Link from 'next/link';
 
 export default async function Dashboard() {
-  const organizations = await getOrganisations();
+  const organizations = await getorganizations();
   return (
     <section className="grid place-items-center min-h-[600px] text-center">
       <div>
@@ -25,22 +25,22 @@ export default async function Dashboard() {
           <Dialog>
             <DialogTrigger asChild>
               <Button variant={'outline'} className="cursor-pointer">
-                Create Organisation
+                Create organization
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create Organisation</DialogTitle>
+                <DialogTitle>Create organization</DialogTitle>
                 <DialogDescription>
-                  Please fill in the details to create a new organisation.
+                  Please fill in the details to create a new organization.
                 </DialogDescription>
               </DialogHeader>
-              <CreateOrganisationForm />
+              <CreateorganizationForm />
             </DialogContent>
           </Dialog>
           <hr className="my-6" />
           <section className="">
-            <h2 className="text-2xl py-2 font-bold">Your Organisations</h2>
+            <h2 className="text-2xl py-2 font-bold">Your organizations</h2>
             <div className="grid grid-cols-1 gap-4">
               {organizations.map((org) => (
                 <Button key={org.id} asChild variant={'outline'}>

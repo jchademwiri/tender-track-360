@@ -1,2 +1,2 @@
 export * from '@/server/users';
-export * from '@/server/organisations';
+export * from '@/server/organizations';
