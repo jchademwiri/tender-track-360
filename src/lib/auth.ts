@@ -4,11 +4,12 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 import { db } from '@/db';
 import { schema } from '@/db/schema';
-import { ac, admin, member, owner, manager } from '@/lib/auth/permissions';
+import { ac, admin, member, owner } from '@/lib/auth/permissions';
 import { Resend } from 'resend';
 import ResetPasswordEmail from '@/emails/reset-password-email';
 import VerifyEmail from '@/emails/verify-email';
 import { getActiveOrganization } from '@/server';
+import OrganizationInvitation from '@/emails/organization-invitation';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -88,12 +89,26 @@ export const auth = betterAuth({
 
   plugins: [
     organization({
+      async sendInvitationEmail(data) {
+        const inviteLink = `${process.env.NEXT_PUBLIC_URL}/api/accept-invitation/${data.id}`;
+        await resend.emails.send({
+          from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
+          to: data.email,
+          subject: `You're invited to join ${data.organization.name}`,
+          react: OrganizationInvitation({
+            email: data.email,
+            invitedByUsername: data.inviter.user.name,
+            invitedByEmail: data.inviter.user.email,
+            teamName: data.organization.name,
+            inviteLink,
+          }),
+        });
+      },
       ac,
       roles: {
         owner,
         admin,
         member,
-        manager,
       },
     }),
     nextCookies(),

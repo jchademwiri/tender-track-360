@@ -1,11 +1,12 @@
 'use client';
-import { User } from '@/db/schema';
+import { user, User } from '@/db/schema';
 import { Button } from '@/components/ui/button';
 import { addMember } from '@/server';
 import { useState } from 'react';
 import { Loader } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth-client';
 
 interface AllUsersProps {
   users: User[];
@@ -16,16 +17,28 @@ export function AllUsers({ users, organizationId }: AllUsersProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleAddMember = async (userId: string) => {
-    if (!organizationId || !userId) return;
+  const handleInviteMember = async (user: User) => {
+    if (!organizationId || !user.id) return;
 
     try {
       setIsLoading(true);
-      await addMember(organizationId, userId, 'member');
-      toast.success('User added to organization');
+      const { error } = await authClient.organization.inviteMember({
+        email: user.email,
+        role: 'member',
+        organizationId,
+        resend: true,
+      });
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      toast.success('User invited to organization');
       router.refresh();
     } catch (error) {
-      toast.error('Failed to add user to organization');
+      toast.error('Failed to invite user to organization');
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -42,13 +55,13 @@ export function AllUsers({ users, organizationId }: AllUsersProps) {
             </span>
             <Button
               className="cursor-pointer"
-              onClick={() => handleAddMember(user.id)}
+              onClick={() => handleInviteMember(user)}
               disabled={isLoading}
             >
               {isLoading ? (
                 <Loader className="size-4 animate-spin" />
               ) : (
-                'Add to organization'
+                `Invite ${user.name} to organization`
               )}
             </Button>
           </div>
