@@ -7,7 +7,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { invitationId: string } }
 ) {
-  const { invitationId } = params;
+  const { invitationId } = await params;
 
   try {
     const data = await auth.api.acceptInvitation({
