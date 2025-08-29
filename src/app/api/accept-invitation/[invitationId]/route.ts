@@ -5,8 +5,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { invitationId: string } }
+  { params }: { params: Promise<{ invitationId: string }> }
 ) {
+  // Await the params Promise in Next.js 15
   const { invitationId } = await params;
 
   try {
