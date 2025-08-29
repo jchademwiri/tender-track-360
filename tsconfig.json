@@ -23,6 +23,6 @@
       "@/emails/*": ["./emails/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "eslint-rules/no-unescaped-autofix.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "no-unescaped-autofix.js"],
   "exclude": ["node_modules"]
 }

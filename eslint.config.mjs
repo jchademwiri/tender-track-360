@@ -1,7 +1,7 @@
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { FlatCompat } from '@eslint/eslintrc';
-import noUnescapedAutofix from './eslint-rules/no-unescaped-autofix.js';
+import noUnescapedAutofix from './no-unescaped-autofix.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
