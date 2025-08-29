@@ -50,9 +50,7 @@ export default async function Dashboard() {
             <div className="grid grid-cols-1 gap-4">
               {organizations.map((org) => (
                 <Button key={org.id} asChild variant={'outline'}>
-                  <Link href={`/dashboard/organization/${org.slug}`}>
-                    {org.name}
-                  </Link>
+                  <Link href={`/organization/${org.slug}`}>{org.name}</Link>
                 </Button>
               ))}
             </div>
