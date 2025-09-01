@@ -1,4 +1,4 @@
-import { CreateOrganisationForm } from '@/components/forms';
+import { CreateorganizationForm } from '@/components/forms';
 import { Button } from '@/components/ui/button';
 
 import {
@@ -10,33 +10,51 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
+import { getCurrentUser, getorganizations } from '@/server';
+import Link from 'next/link';
 
 export default async function Dashboard() {
+  const organizations = await getorganizations();
+  const user = await getCurrentUser();
   return (
     <section className="grid place-items-center min-h-[600px] text-center">
       <div>
-        <hr className="my-6" />
         <div>
           <h1 className="text-4xl font-bold">Tender Track 360</h1>
           <p className="mt-4 text-lg">Welcome to Tender Track 360!</p>
+          <p className="mt-4 text-lg ">
+            Your email is:{' '}
+            <span className="text-green-300">{user.currentUser.email}</span>
+          </p>
         </div>
         <section className="my-4">
           <Dialog>
             <DialogTrigger asChild>
               <Button variant={'outline'} className="cursor-pointer">
-                Create Organisation
+                Create organization
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create Organisation</DialogTitle>
+                <DialogTitle>Create organization</DialogTitle>
                 <DialogDescription>
-                  Please fill in the details to create a new organisation.
+                  Please fill in the details to create a new organization.
                 </DialogDescription>
               </DialogHeader>
-              <CreateOrganisationForm />
+              <CreateorganizationForm />
             </DialogContent>
           </Dialog>
+          <hr className="my-6" />
+          <section className="">
+            <h2 className="text-2xl py-2 font-bold">Your organizations</h2>
+            <div className="grid grid-cols-1 gap-4">
+              {organizations.map((org) => (
+                <Button key={org.id} asChild variant={'outline'}>
+                  <Link href={`/organization/${org.slug}`}>{org.name}</Link>
+                </Button>
+              ))}
+            </div>
+          </section>
         </section>
       </div>
     </section>

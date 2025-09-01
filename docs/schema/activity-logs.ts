@@ -8,7 +8,6 @@ import {
 } from 'drizzle-orm/pg-core';
 import { tenders } from './tenders';
 
-
 export const activityLogs = pgTable(
   'activity_logs',
   {

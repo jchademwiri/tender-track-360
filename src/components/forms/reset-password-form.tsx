@@ -377,14 +377,14 @@ function ResetPasswordFormContent({
         <div className="text-center mt-8">
           <div className="text-muted-foreground text-sm">
             <Link
-              href="/terms-of-service"
+              href="/"
               className="hover:text-primary underline underline-offset-4 transition-colors"
             >
               Terms of Service
             </Link>
             <span className="mx-2">•</span>
             <Link
-              href="/privacy-policy"
+              href="/"
               className="hover:text-primary underline underline-offset-4 transition-colors"
             >
               Privacy Policy

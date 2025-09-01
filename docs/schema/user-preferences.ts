@@ -10,7 +10,6 @@ import {
 } from 'drizzle-orm/pg-core';
 import { user } from './auth';
 
-
 export const userPreferences = pgTable(
   'user_preferences',
   {
