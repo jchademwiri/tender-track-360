@@ -53,7 +53,7 @@ export default function NotFound() {
               <p className="text-sm text-muted-foreground">
                 Need help? Try checking the URL or{' '}
                 <Link
-                  href="/contact"
+                  href="/"
                   className="text-primary hover:underline font-medium"
                 >
                   contact support

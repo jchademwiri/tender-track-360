@@ -11,7 +11,6 @@ import {
 import { userRoleEnum } from './enums';
 import { organization, user } from './auth';
 
-
 export const userProfiles = pgTable(
   'user_profiles',
   {

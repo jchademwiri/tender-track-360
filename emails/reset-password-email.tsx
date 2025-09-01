@@ -105,8 +105,8 @@ const ResetPasswordEmail = (props: ResetPasswordEmailProps) => {
                 Need assistance?
               </Text>
               <Text className="text-[14px] text-gray-600 leading-[20px]">
-                If you're having trouble with your account or didn't request
-                this reset, please contact our support team at
+                If you&apos;re having trouble with your account or didn&apos;t
+                request this reset, please contact our support team at
                 support@tendertrack360.com
               </Text>
             </Section>
