@@ -39,7 +39,7 @@ interface ProfileFormProps {
   };
   onSubmit: (
     data: ProfileFormData
-  ) => Promise<{ success: boolean; message: string; data?: any }>;
+  ) => Promise<{ success: boolean; message: string; data?: unknown }>;
 }
 
 export function ProfileForm({ user, onSubmit }: ProfileFormProps) {

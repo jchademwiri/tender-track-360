@@ -5,7 +5,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ProfileForm } from './components/profile-form';
 import { EmailSettings } from './components/email-settings';
-import { updateProfile, resendVerificationEmail } from './actions';
+import { PasswordForm } from './components/password-form';
+import {
+  updateProfile,
+  resendVerificationEmail,
+  changePassword,
+} from './actions';
 
 import { CalendarDays, Mail, Building2, Shield } from 'lucide-react';
 
@@ -193,6 +198,14 @@ export default async function ProfilePage() {
             if (!result.success) {
               throw new Error(result.message);
             }
+          }}
+        />
+
+        {/* Password Management */}
+        <PasswordForm
+          onSubmit={async (data) => {
+            'use server';
+            return await changePassword(data);
           }}
         />
       </div>
