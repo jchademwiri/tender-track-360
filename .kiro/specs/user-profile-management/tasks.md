@@ -19,22 +19,22 @@
     - Add email verification status indicator
     - _Requirements: 1.1, 1.2, 1.3, 5.1_
 
-- [-] 3. Implement profile information editing
-  - [-] 3.1 Create profile form component with validation
+- [x] 3. Implement profile information editing
+  - [x] 3.1 Create profile form component with validation
     - Build ProfileForm component using react-hook-form and zod
     - Add form validation for name field (2-50 characters)
     - Implement real-time validation feedback with proper error states
     - Create edit mode toggle for the profile information section
     - _Requirements: 2.1, 2.2, 2.4_
 
-  - [ ] 3.2 Add profile update server action
+  - [x] 3.2 Add profile update server action
     - Create server action in src/app/profile/actions.ts for profile updates
     - Implement input validation on server side using zod
     - Add error handling and success responses
     - Integrate with Better Auth user update API
     - _Requirements: 2.1, 2.3_
 
-  - [ ] 3.3 Implement optimistic UI updates
+  - [x] 3.3 Implement optimistic UI updates
     - Add optimistic updates for better user experience
     - Handle loading states during form submission
     - Display success/error messages with toast notifications using sonner

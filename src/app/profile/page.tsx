@@ -1,12 +1,20 @@
 import { getCurrentUser } from '@/server';
+import { getActiveOrganization } from '@/server/organizations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { ProfileForm } from './components/profile-form';
+import { updateProfile } from './actions';
 
 import { CalendarDays, Mail, Building2, Shield } from 'lucide-react';
 
 export default async function ProfilePage() {
   const { session, currentUser } = await getCurrentUser();
+
+  // Get active organization details if user has one
+  const activeOrganization = session.activeOrganizationId
+    ? await getActiveOrganization(currentUser.id)
+    : null;
 
   // Get user initials for avatar fallback
   const getInitials = (name: string) => {
@@ -80,7 +88,18 @@ export default async function ProfilePage() {
 
       {/* Profile Sections */}
       <div className="grid gap-6">
-        {/* Account Information */}
+        {/* Profile Form - Editable Profile Information */}
+        <ProfileForm
+          user={{
+            id: currentUser.id,
+            name: currentUser.name,
+            email: currentUser.email,
+            image: currentUser.image,
+          }}
+          onSubmit={updateProfile}
+        />
+
+        {/* Account Information - Read-only details */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -92,13 +111,7 @@ export default async function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-muted-foreground">
-                  Full Name
-                </label>
-                <p className="mt-1">{currentUser.name}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Email Address
+                  Email Verification Status
                 </label>
                 <div className="flex items-center space-x-2 mt-1">
                   <p>{currentUser.email}</p>
@@ -139,14 +152,30 @@ export default async function ProfilePage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">
                     Current Organization
                   </label>
-                  <p className="mt-1">
-                    Organization ID: {session.activeOrganizationId}
-                  </p>
+                  <div className="mt-1">
+                    {activeOrganization ? (
+                      <div className="space-y-1">
+                        <p className="font-medium">{activeOrganization.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          ID: {session.activeOrganizationId}
+                        </p>
+                        {activeOrganization.slug && (
+                          <p className="text-sm text-muted-foreground">
+                            Slug: {activeOrganization.slug}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">
+                        Organization ID: {session.activeOrganizationId}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardContent>
