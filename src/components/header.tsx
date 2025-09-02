@@ -11,6 +11,7 @@ export default async function Header() {
       <OrganizationSwitcher organizations={organizations} />
       <div className="flex items-center gap-2">
         <Link href="/dashboard">Dashboard</Link>
+        <Link href="/profile">Profile</Link>
         <Logout />
         <ThemeSwitcher />
       </div>

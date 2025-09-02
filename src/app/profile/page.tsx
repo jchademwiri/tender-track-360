@@ -1,12 +1,171 @@
-import Link from 'next/link';
+import { getCurrentUser } from '@/server';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
-function Profile() {
+import { CalendarDays, Mail, Building2, Shield } from 'lucide-react';
+
+export default async function ProfilePage() {
+  const { session, currentUser } = await getCurrentUser();
+
+  // Get user initials for avatar fallback
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Format date for display
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(new Date(date));
+  };
+
   return (
-    <div>
-      <h1>User Profile</h1>
-      <Link href="/profile/edit">Edit Profile</Link>
+    <div className="container mx-auto py-8 px-4 max-w-4xl">
+      {/* Page Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">Profile</h1>
+        <p className="text-muted-foreground">
+          Manage your account settings and preferences
+        </p>
+      </div>
+
+      {/* Profile Header Card */}
+      <Card className="mb-8">
+        <CardHeader>
+          <div className="flex items-center space-x-4">
+            <Avatar className="h-20 w-20">
+              <AvatarImage
+                src={currentUser.image || ''}
+                alt={currentUser.name}
+              />
+              <AvatarFallback className="text-lg">
+                {getInitials(currentUser.name)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <CardTitle className="text-2xl">{currentUser.name}</CardTitle>
+              <div className="flex items-center space-x-2 mt-2">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">
+                  {currentUser.email}
+                </span>
+                {currentUser.emailVerified ? (
+                  <Badge variant="secondary" className="text-xs">
+                    Verified
+                  </Badge>
+                ) : (
+                  <Badge variant="destructive" className="text-xs">
+                    Unverified
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center space-x-2 mt-1">
+                <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  Member since {formatDate(currentUser.createdAt)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Profile Sections */}
+      <div className="grid gap-6">
+        {/* Account Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Shield className="h-5 w-5" />
+              <span>Account Information</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">
+                  Full Name
+                </label>
+                <p className="mt-1">{currentUser.name}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">
+                  Email Address
+                </label>
+                <div className="flex items-center space-x-2 mt-1">
+                  <p>{currentUser.email}</p>
+                  {currentUser.emailVerified ? (
+                    <Badge variant="secondary" className="text-xs">
+                      Verified
+                    </Badge>
+                  ) : (
+                    <Badge variant="destructive" className="text-xs">
+                      Unverified
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">
+                  Account Created
+                </label>
+                <p className="mt-1">{formatDate(currentUser.createdAt)}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">
+                  Last Updated
+                </label>
+                <p className="mt-1">{formatDate(currentUser.updatedAt)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Organization Information */}
+        {session.activeOrganizationId && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Building2 className="h-5 w-5" />
+                <span>Organization</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Current Organization
+                  </label>
+                  <p className="mt-1">
+                    Organization ID: {session.activeOrganizationId}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-sm text-muted-foreground">
+              Profile management features will be available here in upcoming
+              updates.
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
-
-export default Profile;
