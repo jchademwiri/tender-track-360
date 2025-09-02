@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ProfileForm } from './components/profile-form';
-import { updateProfile } from './actions';
+import { EmailSettings } from './components/email-settings';
+import { updateProfile, resendVerificationEmail } from './actions';
 
 import { CalendarDays, Mail, Building2, Shield } from 'lucide-react';
 
@@ -182,18 +183,18 @@ export default async function ProfilePage() {
           </Card>
         )}
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-sm text-muted-foreground">
-              Profile management features will be available here in upcoming
-              updates.
-            </div>
-          </CardContent>
-        </Card>
+        {/* Email Settings */}
+        <EmailSettings
+          email={currentUser.email}
+          emailVerified={currentUser.emailVerified}
+          onResendVerification={async () => {
+            'use server';
+            const result = await resendVerificationEmail();
+            if (!result.success) {
+              throw new Error(result.message);
+            }
+          }}
+        />
       </div>
     </div>
   );

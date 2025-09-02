@@ -1,5 +1,6 @@
 import { CreateorganizationForm } from '@/components/forms';
 import { Button } from '@/components/ui/button';
+import { DashboardRedirect } from '@/components/dashboard-redirect';
 
 import {
   Dialog,
@@ -16,7 +17,8 @@ import Link from 'next/link';
 export default async function Dashboard() {
   const organizations = await getorganizations();
   const user = await getCurrentUser();
-  return (
+
+  const fallbackContent = (
     <section className="grid place-items-center min-h-[600px] text-center">
       <div>
         <div>
@@ -58,5 +60,12 @@ export default async function Dashboard() {
         </section>
       </div>
     </section>
+  );
+
+  return (
+    <DashboardRedirect
+      organizations={organizations}
+      fallbackContent={fallbackContent}
+    />
   );
 }

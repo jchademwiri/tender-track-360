@@ -101,3 +101,116 @@ export async function updateProfile(
     };
   }
 }
+
+// Rate limiting store for email verification resends
+const resendAttempts = new Map<
+  string,
+  { count: number; lastAttempt: number }
+>();
+const RESEND_RATE_LIMIT = 3; // Max 3 attempts
+const RESEND_WINDOW = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+export async function resendVerificationEmail(): Promise<ActionResult> {
+  try {
+    // Get current session
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return {
+        success: false,
+        message: 'You must be logged in to resend verification email',
+      };
+    }
+
+    const userId = session.user.id;
+    const now = Date.now();
+
+    // Check rate limiting
+    const userAttempts = resendAttempts.get(userId);
+    if (userAttempts) {
+      // Reset counter if window has passed
+      if (now - userAttempts.lastAttempt > RESEND_WINDOW) {
+        resendAttempts.set(userId, { count: 1, lastAttempt: now });
+      } else if (userAttempts.count >= RESEND_RATE_LIMIT) {
+        const remainingTime = Math.ceil(
+          (RESEND_WINDOW - (now - userAttempts.lastAttempt)) / 60000
+        );
+        return {
+          success: false,
+          message: `Too many attempts. Please wait ${remainingTime} minutes before trying again.`,
+        };
+      } else {
+        // Increment attempt count
+        resendAttempts.set(userId, {
+          count: userAttempts.count + 1,
+          lastAttempt: now,
+        });
+      }
+    } else {
+      // First attempt for this user
+      resendAttempts.set(userId, { count: 1, lastAttempt: now });
+    }
+
+    // Check if email is already verified
+    if (session.user.emailVerified) {
+      return {
+        success: false,
+        message: 'Your email is already verified',
+      };
+    }
+
+    // Send verification email using Better Auth
+    const result = await auth.api.sendVerificationEmail({
+      headers: await headers(),
+      body: {
+        email: session.user.email,
+        callbackURL: `${process.env.BETTER_AUTH_URL}/api/auth/verify-email`,
+      },
+    });
+
+    if (!result) {
+      return {
+        success: false,
+        message: 'Failed to send verification email. Please try again.',
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Verification email sent successfully. Please check your inbox.',
+    };
+  } catch (error) {
+    console.error('Email verification resend error:', error);
+
+    // Handle specific Better Auth errors
+    if (error instanceof Error) {
+      if (error.message.includes('unauthorized')) {
+        return {
+          success: false,
+          message: 'You are not authorized to perform this action',
+        };
+      }
+
+      if (error.message.includes('already verified')) {
+        return {
+          success: false,
+          message: 'Your email is already verified',
+        };
+      }
+
+      if (error.message.includes('rate limit')) {
+        return {
+          success: false,
+          message: 'Too many requests. Please wait before trying again.',
+        };
+      }
+    }
+
+    return {
+      success: false,
+      message: 'An unexpected error occurred. Please try again.',
+    };
+  }
+}

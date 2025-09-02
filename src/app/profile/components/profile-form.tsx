@@ -63,10 +63,10 @@ export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
   });
 
   const handleSubmit = async (data: ProfileFormData) => {
-    // Start optimistic update
-    updateOptimisticUser(data.name);
-
     startTransition(async () => {
+      // Start optimistic update inside the transition
+      updateOptimisticUser(data.name);
+
       try {
         const result = await onSubmit(data);
 
