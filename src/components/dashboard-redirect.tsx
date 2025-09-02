@@ -14,7 +14,7 @@ export function DashboardRedirect({
   organizations,
   fallbackContent,
 }: DashboardRedirectProps) {
-  const { data: activeOrganization, isLoading } =
+  const { data: activeOrganization, isPending: isLoading } =
     authClient.useActiveOrganization();
   const router = useRouter();
 

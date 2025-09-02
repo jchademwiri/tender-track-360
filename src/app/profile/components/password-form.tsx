@@ -45,7 +45,7 @@ const passwordFormSchema = z
         'Password must contain at least one special character'
       ),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
-    signOutOtherSessions: z.boolean().default(false),
+    signOutOtherSessions: z.boolean(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords don't match",

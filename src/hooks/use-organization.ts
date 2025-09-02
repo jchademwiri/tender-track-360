@@ -3,9 +3,10 @@
 import { authClient } from '@/lib/auth-client';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCallback } from 'react';
+import type { Route } from 'next';
 
 export function useOrganization() {
-  const { data: activeOrganization, isLoading } =
+  const { data: activeOrganization, isPending: isLoading } =
     authClient.useActiveOrganization();
   const router = useRouter();
   const pathname = usePathname();
@@ -15,16 +16,16 @@ export function useOrganization() {
     (path: string) => {
       if (!activeOrganization?.slug) {
         // If no active organization, navigate normally
-        router.push(path);
+        router.push(path as Route);
         return;
       }
 
       // If the path is organization-specific, use the org slug
       if (path.startsWith('/organization') || path.startsWith('/dashboard')) {
-        router.push(`/organization/${activeOrganization.slug}`);
+        router.push(`/organization/${activeOrganization.slug}` as Route);
       } else {
         // For other paths, navigate normally but organization context is maintained
-        router.push(path);
+        router.push(path as Route);
       }
     },
     [activeOrganization?.slug, router]

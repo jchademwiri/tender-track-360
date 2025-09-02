@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import type { Route } from 'next';
 import { useOrganization } from '@/hooks/use-organization';
 
 interface OrgAwareLinkProps {
@@ -21,7 +22,7 @@ export function OrgAwareLink({
   const finalHref = getOrgUrl(href);
 
   return (
-    <Link href={finalHref} className={className} replace={replace}>
+    <Link href={finalHref as Route} className={className} replace={replace}>
       {children}
     </Link>
   );
