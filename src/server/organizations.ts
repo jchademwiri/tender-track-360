@@ -3,7 +3,7 @@
 import { db } from '@/db';
 import { member, organization } from '@/db/schema';
 
-import { eq, inArray } from 'drizzle-orm/sql/expressions/conditions';
+import { eq, inArray, and } from 'drizzle-orm/sql/expressions/conditions';
 import { getCurrentUser } from './users';
 
 export async function getorganizations() {
@@ -20,6 +20,25 @@ export async function getorganizations() {
   return organizations;
 }
 
+export async function getOrganizationsForProvider() {
+  const { currentUser } = await getCurrentUser();
+  const members = await db.query.member.findMany({
+    where: eq(member.userId, currentUser?.id),
+  });
+  const organizations = await db.query.organization.findMany({
+    where: inArray(
+      organization.id,
+      members.map((m) => m.organizationId)
+    ),
+  });
+  // Filter and map to match the expected type for OrganizationProvider
+  return organizations.map((org) => ({
+    id: org.id,
+    slug: org.slug || org.id, // Use ID as fallback if slug is null
+    name: org.name,
+  }));
+}
+
 export async function getActiveOrganization(userId: string) {
   const memberUser = await db.query.member.findFirst({
     where: eq(member.userId, userId),
@@ -34,6 +53,23 @@ export async function getActiveOrganization(userId: string) {
   });
 
   return activeOrganization;
+}
+
+export async function getUserOrganizationMembership(
+  userId: string,
+  organizationId: string
+) {
+  const membership = await db.query.member.findFirst({
+    where: and(
+      eq(member.userId, userId),
+      eq(member.organizationId, organizationId)
+    ),
+    with: {
+      organization: true,
+    },
+  });
+
+  return membership;
 }
 
 export async function getOrganizationBySlug(slug: string) {

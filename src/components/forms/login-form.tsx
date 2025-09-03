@@ -51,7 +51,7 @@ export function LoginForm({
     const { success, message } = await signIn(values.email, values.password);
     if (success) {
       toast.success(message as string);
-      router.push('/dashboard');
+      router.push('/organization/[slug]/dashboard');
     } else {
       toast.error(message as string);
     }
