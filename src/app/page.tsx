@@ -8,9 +8,9 @@ export default function Home() {
         <h1 className="text-4xl font-bold">Tender Track 360</h1>
         <p className="mt-4 text-lg">Welcome to Tender Track 360!</p>
         <div className="mt-8">
-          <Link href="/organization/[slug]/dashboard">
+          <Link href={`/organization`}>
             <Button size={'lg'} className="cursor-pointer">
-              Go to Dashboard
+              Go to my Organizations
             </Button>
           </Link>
         </div>
