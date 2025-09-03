@@ -5,15 +5,15 @@ import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 import { Organization } from '@/db/schema';
 
-interface DashboardRedirectProps {
+interface OrganizationRedirectProps {
   organizations: Organization[];
   fallbackContent: React.ReactNode;
 }
 
-export function DashboardRedirect({
+export function OrganizationRedirect({
   organizations,
   fallbackContent,
-}: DashboardRedirectProps) {
+}: OrganizationRedirectProps) {
   const { data: activeOrganization, isPending: isLoading } =
     authClient.useActiveOrganization();
   const router = useRouter();

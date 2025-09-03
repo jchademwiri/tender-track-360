@@ -1,6 +1,6 @@
 import { CreateorganizationForm } from '@/components/forms';
 import { Button } from '@/components/ui/button';
-import { DashboardRedirect } from '@/components/dashboard-redirect';
+import { OrganizationRedirect } from '@/components/organization-redirect';
 
 import {
   Dialog,
@@ -14,7 +14,7 @@ import {
 import { getCurrentUser, getorganizations } from '@/server';
 import Link from 'next/link';
 
-export default async function Dashboard() {
+export default async function OrganizationPage() {
   const organizations = await getorganizations();
   const user = await getCurrentUser();
 
@@ -63,7 +63,7 @@ export default async function Dashboard() {
   );
 
   return (
-    <DashboardRedirect
+    <OrganizationRedirect
       organizations={organizations}
       fallbackContent={fallbackContent}
     />

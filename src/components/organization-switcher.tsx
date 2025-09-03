@@ -12,7 +12,7 @@ import type { Route } from 'next';
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { useRouter, usePathname } from 'next/navigation';
-import { useTransition } from 'react';
+import { useTransition, useEffect, useState } from 'react';
 
 interface OrganizationSwitcherProps {
   organizations: Organization[];
@@ -25,6 +25,11 @@ export function OrganizationSwitcher({
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleChangeOrganization = async (organizationId: string) => {
     const selectedOrg = organizations.find((org) => org.id === organizationId);
@@ -119,6 +124,17 @@ export function OrganizationSwitcher({
     // Default: navigate to organization page
     return `/organization/${orgSlug}`;
   };
+
+  // Prevent hydration mismatch by not rendering until client-side
+  if (!isClient) {
+    return (
+      <Select disabled>
+        <SelectTrigger className="min-w-[180px]">
+          <SelectValue placeholder="Loading..." />
+        </SelectTrigger>
+      </Select>
+    );
+  }
 
   return (
     <Select

@@ -70,9 +70,9 @@ Link component that automatically generates organization-aware URLs:
 // Renders as: /organization/{active-org-slug}
 ```
 
-### DashboardRedirect
+### OrganizationRedirect
 
-**Location**: `src/components/dashboard-redirect.tsx`
+**Location**: `src/components/organization-redirect.tsx`
 
 Handles automatic redirection from `/dashboard` to active organization:
 
