@@ -64,6 +64,8 @@ export function CreateorganizationForm() {
       });
 
       toast.success('organization created successfully!');
+      // Navigate to the newly created organization
+      router.push(`/organization/${values.slug}`);
       router.refresh();
     } catch (error) {
       console.error(error);
