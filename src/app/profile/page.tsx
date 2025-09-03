@@ -7,10 +7,13 @@ import { ProfileForm } from './components/profile-form';
 import { EmailSettings } from './components/email-settings';
 import { PasswordForm } from './components/password-form';
 import { OrganizationInfo } from './components/organization-info';
+import { SecuritySettings } from './components/security-settings';
 import {
   updateProfile,
   resendVerificationEmail,
   changePassword,
+  getUserSessions,
+  SessionInfo,
 } from './actions';
 
 import { CalendarDays, Mail, Shield } from 'lucide-react';
@@ -25,6 +28,12 @@ export default async function ProfilePage() {
         session.activeOrganizationId
       )) || null
     : null;
+
+  // Get user sessions for security settings
+  const sessionsResult = await getUserSessions();
+  const userSessions = sessionsResult.success
+    ? (sessionsResult.data as SessionInfo[])
+    : [];
 
   // Get user initials for avatar fallback
   const getInitials = (name: string) => {
@@ -175,6 +184,9 @@ export default async function ProfilePage() {
             return await changePassword(data);
           }}
         />
+
+        {/* Security Settings */}
+        <SecuritySettings initialSessions={userSessions} />
       </div>
     </div>
   );

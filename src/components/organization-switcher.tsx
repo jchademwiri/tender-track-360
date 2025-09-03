@@ -12,7 +12,7 @@ import type { Route } from 'next';
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { useRouter, usePathname } from 'next/navigation';
-import { useTransition } from 'react';
+import { useTransition, useEffect, useState } from 'react';
 
 interface OrganizationSwitcherProps {
   organizations: Organization[];
@@ -25,6 +25,11 @@ export function OrganizationSwitcher({
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleChangeOrganization = async (organizationId: string) => {
     const selectedOrg = organizations.find((org) => org.id === organizationId);
@@ -97,13 +102,13 @@ export function OrganizationSwitcher({
   // Function to determine the new URL based on current path and organization slug
   const getUpdatedUrl = (currentPath: string, orgSlug: string): string => {
     // If we're on an organization-specific page, update the slug
-    if (currentPath.includes('/organization/')) {
-      return `/organization/${orgSlug}`;
+    if (currentPath.includes('/dashboard/')) {
+      return `/organization/${orgSlug}/dashboard`;
     }
 
     // For dashboard and other pages that should show organization context
-    if (currentPath === '/dashboard' || currentPath.startsWith('/dashboard')) {
-      return `/organization/${orgSlug}`;
+    if (currentPath === '/dashboard' || currentPath.endsWith('/dashboard')) {
+      return `/organization/${orgSlug}/dashboard`;
     }
 
     // For profile and other non-org specific pages, stay on the same page
@@ -117,8 +122,19 @@ export function OrganizationSwitcher({
     }
 
     // Default: navigate to organization page
-    return `/organization/${orgSlug}`;
+    return `/organization`;
   };
+
+  // Prevent hydration mismatch by not rendering until client-side
+  if (!isClient) {
+    return (
+      <Select disabled>
+        <SelectTrigger className="min-w-[180px]">
+          <SelectValue placeholder="Loading..." />
+        </SelectTrigger>
+      </Select>
+    );
+  }
 
   return (
     <Select
