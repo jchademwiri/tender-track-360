@@ -8,8 +8,14 @@ export default function ProfileLayout({
   return (
     <>
       <Header />
-      <div className="pt-20">{children}</div>
-      <footer className="py-4 text-center">
+      <div
+        className="pt-20"
+        role="main"
+        aria-label="Profile management content"
+      >
+        {children}
+      </div>
+      <footer className="py-4 text-center" role="contentinfo">
         <div className="text-sm text-muted-foreground">
           Tender Track 360 - Profile Management
         </div>
