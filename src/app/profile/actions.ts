@@ -4,6 +4,9 @@ import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
+import { db } from '@/db';
+import { session } from '@/db/schema';
+import { eq, and, ne } from 'drizzle-orm';
 
 // Server-side validation schema
 const updateProfileSchema = z.object({
@@ -44,6 +47,17 @@ export interface ActionResult {
   success: boolean;
   message: string;
   data?: unknown;
+}
+
+// Session information interface
+export interface SessionInfo {
+  id: string;
+  device: string;
+  location: string;
+  ipAddress: string | null;
+  lastActive: Date;
+  current: boolean;
+  expiresAt: Date;
 }
 
 export async function updateProfile(
@@ -367,6 +381,177 @@ export async function changePassword(
     return {
       success: false,
       message: 'An unexpected error occurred. Please try again.',
+    };
+  }
+}
+
+// Helper function to parse user agent for device information
+function parseUserAgent(userAgent: string | null): string {
+  if (!userAgent) return 'Unknown Device';
+
+  // Simple user agent parsing - in production, consider using a library like ua-parser-js
+  if (userAgent.includes('Mobile') || userAgent.includes('Android')) {
+    if (userAgent.includes('Chrome')) return 'Mobile Chrome';
+    if (userAgent.includes('Safari')) return 'Mobile Safari';
+    if (userAgent.includes('Firefox')) return 'Mobile Firefox';
+    return 'Mobile Browser';
+  }
+
+  if (userAgent.includes('Chrome')) return 'Chrome Browser';
+  if (userAgent.includes('Safari') && !userAgent.includes('Chrome'))
+    return 'Safari Browser';
+  if (userAgent.includes('Firefox')) return 'Firefox Browser';
+  if (userAgent.includes('Edge')) return 'Edge Browser';
+
+  return 'Desktop Browser';
+}
+
+// Helper function to get location from IP (placeholder - in production, use a geolocation service)
+function getLocationFromIP(ipAddress: string | null): string {
+  if (!ipAddress) return 'Unknown Location';
+
+  // Placeholder - in production, integrate with a geolocation service
+  if (
+    ipAddress === '127.0.0.1' ||
+    ipAddress.startsWith('192.168.') ||
+    ipAddress.startsWith('10.')
+  ) {
+    return 'Local Network';
+  }
+
+  return 'Unknown Location';
+}
+
+export async function getUserSessions(): Promise<ActionResult> {
+  try {
+    // Get current session
+    const currentSession = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!currentSession) {
+      return {
+        success: false,
+        message: 'You must be logged in to view sessions',
+      };
+    }
+
+    // Get all sessions for the current user
+    const userSessions = await db
+      .select()
+      .from(session)
+      .where(eq(session.userId, currentSession.user.id));
+
+    // Transform sessions into the format needed by the component
+    const sessionInfos: SessionInfo[] = userSessions.map((sess) => ({
+      id: sess.id,
+      device: parseUserAgent(sess.userAgent),
+      location: getLocationFromIP(sess.ipAddress),
+      ipAddress: sess.ipAddress,
+      lastActive: sess.updatedAt,
+      current: sess.id === currentSession.session.id,
+      expiresAt: sess.expiresAt,
+    }));
+
+    // Sort sessions with current session first, then by last active
+    sessionInfos.sort((a, b) => {
+      if (a.current) return -1;
+      if (b.current) return 1;
+      return b.lastActive.getTime() - a.lastActive.getTime();
+    });
+
+    return {
+      success: true,
+      message: 'Sessions retrieved successfully',
+      data: sessionInfos,
+    };
+  } catch (error) {
+    console.error('Get user sessions error:', error);
+    return {
+      success: false,
+      message: 'Failed to retrieve sessions. Please try again.',
+    };
+  }
+}
+
+export async function revokeSession(sessionId: string): Promise<ActionResult> {
+  try {
+    // Get current session
+    const currentSession = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!currentSession) {
+      return {
+        success: false,
+        message: 'You must be logged in to revoke sessions',
+      };
+    }
+
+    // Prevent revoking current session
+    if (sessionId === currentSession.session.id) {
+      return {
+        success: false,
+        message: 'Cannot revoke your current session',
+      };
+    }
+
+    // Delete the session from the database
+    await db
+      .delete(session)
+      .where(
+        and(
+          eq(session.id, sessionId),
+          eq(session.userId, currentSession.user.id)
+        )
+      );
+
+    return {
+      success: true,
+      message: 'Session revoked successfully',
+    };
+  } catch (error) {
+    console.error('Revoke session error:', error);
+    return {
+      success: false,
+      message: 'Failed to revoke session. Please try again.',
+    };
+  }
+}
+
+export async function revokeAllOtherSessions(): Promise<ActionResult> {
+  try {
+    // Get current session
+    const currentSession = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!currentSession) {
+      return {
+        success: false,
+        message: 'You must be logged in to revoke sessions',
+      };
+    }
+
+    // Delete all other sessions for the current user
+    await db
+      .delete(session)
+      .where(
+        and(
+          eq(session.userId, currentSession.user.id),
+          ne(session.id, currentSession.session.id)
+        )
+      );
+
+    return {
+      success: true,
+      message: 'All other sessions have been signed out successfully',
+    };
+  } catch (error) {
+    console.error('Revoke all other sessions error:', error);
+    return {
+      success: false,
+      message: 'Failed to sign out other sessions. Please try again.',
     };
   }
 }
