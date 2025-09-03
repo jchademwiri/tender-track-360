@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useTransition, useOptimistic } from 'react';
+import { useState, useTransition, useOptimistic, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { useFormFocusManagement } from '@/hooks/use-focus-management';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -45,6 +46,7 @@ interface ProfileFormProps {
 export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const { focusFirstError, announceError } = useFormFocusManagement();
 
   // Optimistic state for user data
   const [optimisticUser, updateOptimisticUser] = useOptimistic(
@@ -61,6 +63,17 @@ export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
       name: user.name,
     },
   });
+
+  // Focus first error when form validation fails
+  useEffect(() => {
+    if (Object.keys(form.formState.errors).length > 0) {
+      focusFirstError(form.formState.errors);
+      const firstError = Object.values(form.formState.errors)[0];
+      if (firstError?.message) {
+        announceError(`Form validation error: ${firstError.message}`);
+      }
+    }
+  }, [form.formState.errors, focusFirstError, announceError]);
 
   const handleSubmit = async (data: ProfileFormData) => {
     startTransition(async () => {
@@ -106,93 +119,112 @@ export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Profile Information</CardTitle>
-          {!isEditing && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-              disabled={isPending}
+    <section aria-labelledby="profile-form-heading">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
+            <CardTitle
+              id="profile-form-heading"
+              className="text-base sm:text-lg"
             >
-              <Edit className="h-4 w-4" />
-              Edit
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4"
-          >
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      disabled={!isEditing || isPending}
-                      placeholder="Enter your full name"
-                      value={isEditing ? field.value : optimisticUser.name}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Your display name (2-50 characters, letters and spaces only)
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Email field - read-only for now */}
-            <div className="space-y-2">
-              <FormLabel>Email Address</FormLabel>
-              <Input
-                value={optimisticUser.email}
-                disabled
-                className="bg-muted"
-              />
-              <FormDescription>
-                Email address cannot be changed from this form
-              </FormDescription>
-            </div>
-
-            {isEditing && (
-              <div className="flex items-center space-x-2 pt-4">
-                <Button
-                  type="submit"
-                  disabled={isPending || !form.formState.isDirty}
-                  className="flex items-center space-x-2"
-                >
-                  {isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Save className="h-4 w-4" />
-                  )}
-                  <span>{isPending ? 'Saving...' : 'Save Changes'}</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={isPending}
-                  className="flex items-center space-x-2"
-                >
-                  <X className="h-4 w-4" />
-                  <span>Cancel</span>
-                </Button>
-              </div>
+              Profile Information
+            </CardTitle>
+            {!isEditing && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+                disabled={isPending}
+                className="w-fit"
+                aria-label="Edit profile information"
+              >
+                <Edit className="h-4 w-4" aria-hidden="true" />
+                <span className="ml-2 sm:inline">Edit</span>
+              </Button>
             )}
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="space-y-4"
+              aria-describedby="profile-form-description"
+              noValidate
+            >
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        disabled={!isEditing || isPending}
+                        placeholder="Enter your full name"
+                        value={isEditing ? field.value : optimisticUser.name}
+                        aria-describedby="name-description"
+                      />
+                    </FormControl>
+                    <FormDescription id="name-description">
+                      Your display name (2-50 characters, letters and spaces
+                      only)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Email field - read-only for now */}
+              <div className="space-y-2">
+                <FormLabel htmlFor="email-readonly">Email Address</FormLabel>
+                <Input
+                  id="email-readonly"
+                  value={optimisticUser.email}
+                  disabled
+                  className="bg-muted"
+                  aria-describedby="email-readonly-description"
+                  readOnly
+                />
+                <FormDescription id="email-readonly-description">
+                  Email address cannot be changed from this form
+                </FormDescription>
+              </div>
+
+              {isEditing && (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
+                  <Button
+                    type="submit"
+                    disabled={isPending || !form.formState.isDirty}
+                    className="flex items-center justify-center space-x-2"
+                  >
+                    {isPending ? (
+                      <Loader2
+                        className="h-4 w-4 animate-spin"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <Save className="h-4 w-4" aria-hidden="true" />
+                    )}
+                    <span>{isPending ? 'Saving...' : 'Save Changes'}</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleCancel}
+                    disabled={isPending}
+                    className="flex items-center justify-center space-x-2"
+                  >
+                    <X className="h-4 w-4" aria-hidden="true" />
+                    <span>Cancel</span>
+                  </Button>
+                </div>
+              )}
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </section>
   );
 }
