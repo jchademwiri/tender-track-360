@@ -59,20 +59,9 @@ Context provider that:
 </OrganizationProvider>
 ```
 
-### OrgAwareLink
+### OrganizationSelector
 
-**Location**: `src/components/org-aware-link.tsx`
-
-Link component that automatically generates organization-aware URLs:
-
-```tsx
-<OrgAwareLink href="/dashboard">Dashboard</OrgAwareLink>
-// Renders as: /organization/{active-org-slug}
-```
-
-### OrganizationRedirect
-
-**Location**: `src/components/organization-redirect.tsx`
+**Location**: `src/components/organization-selector.tsx`
 
 Handles automatic redirection from `/dashboard` to active organization:
 
@@ -82,21 +71,35 @@ Handles automatic redirection from `/dashboard` to active organization:
 
 ## Hooks
 
-### useOrganization
+### Navigation
 
-**Location**: `src/hooks/use-organization.ts`
+**Location**: `src/components/nav-links.tsx`
 
-Custom hook providing organization utilities:
+Simple navigation component that handles organization-aware URLs:
 
 ```tsx
-const {
-  activeOrganization, // Current active organization
-  isLoading, // Loading state
-  navigateWithOrg, // Organization-aware navigation function
-  getOrgUrl, // Get organization-aware URL
-  isOrgSpecificPage, // Check if current page is org-specific
-  currentOrgSlug, // Current organization slug from URL
-} = useOrganization();
+// Navigation component
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { authClient } from '@/lib/auth-client';
+
+export function NavLinks() {
+  const { data: activeOrganization } = authClient.useActiveOrganization();
+  const pathname = usePathname();
+
+  // Extract current org slug from URL if available
+  const currentOrgSlug = pathname.match(/\/organization\/([^\/]+)/)?.[1];
+
+  // Use current org slug or active org slug as fallback
+  const orgSlug = currentOrgSlug || activeOrganization?.slug;
+
+  return (
+    <div className="flex items-center gap-2">
+      {orgSlug && <Link href={`/organization/${orgSlug}`}>Dashboard</Link>}
+      <Link href="/profile">Profile</Link>
+    </div>
+  );
+}
 ```
 
 ## Utilities
@@ -170,19 +173,23 @@ These pages maintain organization context but don't change URLs:
 
 ## Usage Examples
 
-### Basic Organization Switching
+### Basic Organization Navigation
 
 ```tsx
-// In any component
-import { useOrganization } from '@/hooks/use-organization';
+// Use standard Next.js navigation with explicit organization URLs
+import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth-client';
 
 function MyComponent() {
-  const { activeOrganization, navigateWithOrg } = useOrganization();
+  const { data: activeOrganization } = authClient.useActiveOrganization();
+  const router = useRouter();
 
   return (
     <div>
       <p>Current org: {activeOrganization?.name}</p>
-      <button onClick={() => navigateWithOrg('/dashboard')}>
+      <button
+        onClick={() => router.push(`/organization/${activeOrganization?.slug}`)}
+      >
         Go to Dashboard
       </button>
     </div>
@@ -190,35 +197,34 @@ function MyComponent() {
 }
 ```
 
-### Organization-Aware Links
+### Navigation Links
 
 ```tsx
-import { OrgAwareLink } from '@/components/org-aware-link';
+// Use standard Next.js Link with explicit organization URLs
+import Link from 'next/link';
 
-function Navigation() {
+function Navigation({ orgSlug }: { orgSlug: string }) {
   return (
     <nav>
-      <OrgAwareLink href="/dashboard">Dashboard</OrgAwareLink>
-      <OrgAwareLink href="/profile">Profile</OrgAwareLink>
+      <Link href={`/organization/${orgSlug}`}>Dashboard</Link>
+      <Link href="/profile">Profile</Link>
     </nav>
   );
 }
 ```
 
-### Programmatic Navigation
+### Smart Navigation Component
 
 ```tsx
-import { useOrganization } from '@/hooks/use-organization';
+// NavLinks component handles organization context automatically
+import { NavLinks } from '@/components/nav-links';
 
-function ActionButton() {
-  const { navigateWithOrg } = useOrganization();
-
-  const handleAction = () => {
-    // Perform some action
-    navigateWithOrg('/dashboard'); // Automatically goes to org dashboard
-  };
-
-  return <button onClick={handleAction}>Complete Action</button>;
+function Header() {
+  return (
+    <header>
+      <NavLinks />
+    </header>
+  );
 }
 ```
 
@@ -255,11 +261,12 @@ export default async function DashboardLayout({ children }) {
 
 ## Best Practices
 
-1. **Use OrgAwareLink** for navigation links that should respect organization context
-2. **Use useOrganization hook** for programmatic navigation and organization state
+1. **Use explicit organization URLs** like `/organization/{slug}` for organization-specific pages
+2. **Use standard Next.js Link and useRouter** for navigation
 3. **Handle loading states** when organization context is changing
 4. **Provide fallbacks** for users with no organizations
 5. **Test URL direct access** to ensure proper organization synchronization
+6. **Use NavLinks component** for consistent navigation behavior
 
 ## Troubleshooting
 

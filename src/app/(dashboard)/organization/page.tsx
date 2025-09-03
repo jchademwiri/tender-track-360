@@ -1,6 +1,6 @@
 import { CreateorganizationForm } from '@/components/forms';
 import { Button } from '@/components/ui/button';
-import { OrganizationRedirect } from '@/components/organization-redirect';
+import { OrganizationSelector } from '@/components/organization-selector';
 
 import {
   Dialog,
@@ -11,61 +11,37 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-import { getCurrentUser, getorganizations } from '@/server';
-import Link from 'next/link';
+import { getorganizations } from '@/server';
 
 export default async function OrganizationPage() {
   const organizations = await getorganizations();
-  const user = await getCurrentUser();
 
-  const fallbackContent = (
-    <section className="grid place-items-center min-h-[600px] text-center">
-      <div>
-        <div>
-          <h1 className="text-4xl font-bold">Tender Track 360</h1>
-          <p className="mt-4 text-lg">Welcome to Tender Track 360!</p>
-          <p className="mt-4 text-lg ">
-            Your email is:{' '}
-            <span className="text-green-300">{user.currentUser.email}</span>
-          </p>
-        </div>
-        <section className="my-4">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant={'outline'} className="cursor-pointer">
-                Create organization
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create organization</DialogTitle>
-                <DialogDescription>
-                  Please fill in the details to create a new organization.
-                </DialogDescription>
-              </DialogHeader>
-              <CreateorganizationForm />
-            </DialogContent>
-          </Dialog>
-          <hr className="my-6" />
-          <section className="">
-            <h2 className="text-2xl py-2 font-bold">Your organizations</h2>
-            <div className="grid grid-cols-1 gap-4">
-              {organizations.map((org) => (
-                <Button key={org.id} asChild variant={'outline'}>
-                  <Link href={`/organization/${org.slug}`}>{org.name}</Link>
-                </Button>
-              ))}
-            </div>
-          </section>
-        </section>
-      </div>
-    </section>
+  const createOrgContent = (
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Create New Organization</h3>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline" className="w-full">
+            Create Organization
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Organization</DialogTitle>
+            <DialogDescription>
+              Please fill in the details to create a new organization.
+            </DialogDescription>
+          </DialogHeader>
+          <CreateorganizationForm />
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 
   return (
-    <OrganizationRedirect
+    <OrganizationSelector
       organizations={organizations}
-      fallbackContent={fallbackContent}
+      fallbackContent={createOrgContent}
     />
   );
 }
