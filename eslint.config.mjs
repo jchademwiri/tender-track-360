@@ -34,6 +34,16 @@ const eslintConfig = [
       'local/no-unescaped-autofix': 'error',
     },
   },
+  // Test file overrides
+  {
+    files: ['**/*.test.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
+    rules: {
+      'react/display-name': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      'local/no-unescaped-autofix': 'off',
+    },
+  },
   {
     ignores: [
       'node_modules/**',

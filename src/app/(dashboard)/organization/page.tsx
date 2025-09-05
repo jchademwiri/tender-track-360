@@ -1,47 +1,62 @@
-import { CreateorganizationForm } from '@/components/forms';
-import { Button } from '@/components/ui/button';
-import { OrganizationSelector } from '@/components/organization-selector';
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-
+import { Suspense } from 'react';
+import { OrganizationPageHeader } from '@/components/organization-page-header';
+import { OrganizationPageContent } from '@/components/organization-page-content';
+import { OrganizationPageSkeleton } from '@/components/organization-page-skeleton';
 import { getorganizations } from '@/server';
+import { getRecentActivities } from '@/server/activity';
 
 export default async function OrganizationPage() {
-  const organizations = await getorganizations();
-
-  const createOrgContent = (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium">Create New Organization</h3>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" className="w-full">
-            Create Organization
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create Organization</DialogTitle>
-            <DialogDescription>
-              Please fill in the details to create a new organization.
-            </DialogDescription>
-          </DialogHeader>
-          <CreateorganizationForm />
-        </DialogContent>
-      </Dialog>
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <Suspense fallback={<OrganizationPageSkeleton />}>
+          <OrganizationPageAsync />
+        </Suspense>
+      </div>
     </div>
   );
+}
 
-  return (
-    <OrganizationSelector
-      organizations={organizations}
-      fallbackContent={createOrgContent}
-    />
-  );
+async function OrganizationPageAsync() {
+  try {
+    // Fetch organizations and recent activities in parallel
+    const [organizations, recentActivitiesResponse] = await Promise.all([
+      getorganizations(),
+      getRecentActivities(5), // Get 5 recent activities for the sidebar
+    ]);
+
+    return (
+      <div className="space-y-8">
+        {/* Page Header */}
+        <OrganizationPageHeader
+          organizationCount={organizations.length}
+          className="mb-8"
+        />
+
+        {/* Main Content */}
+        <OrganizationPageContent
+          organizations={organizations}
+          recentActivities={recentActivitiesResponse.activities}
+        />
+      </div>
+    );
+  } catch (error) {
+    console.error('Error loading organization page:', error);
+
+    // Fallback to basic layout on error
+    return (
+      <div className="space-y-8">
+        <OrganizationPageHeader organizationCount={0} className="mb-8" />
+        <div className="text-center py-12">
+          <h3 className="text-lg font-medium text-foreground mb-2">
+            Unable to load organizations
+          </h3>
+          <p className="text-muted-foreground">
+            Please try refreshing the page. If the problem persists, contact
+            support.
+          </p>
+        </div>
+      </div>
+    );
+  }
 }

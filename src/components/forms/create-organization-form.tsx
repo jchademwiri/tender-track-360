@@ -12,29 +12,63 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
-import { useState, useRef } from 'react';
-import { Loader } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Loader, Check, X, AlertCircle, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 const createorganizationFormSchema = z.object({
-  name: z.string().min(2).max(50),
-  slug: z.string().min(2).max(50),
-  logo: z.string().min(2).max(200).optional(),
+  name: z
+    .string()
+    .min(2, 'Organization name must be at least 2 characters')
+    .max(50, 'Organization name must be less than 50 characters')
+    .regex(
+      /^[a-zA-Z0-9\s\-_]+$/,
+      'Organization name can only contain letters, numbers, spaces, hyphens, and underscores'
+    ),
+  slug: z
+    .string()
+    .min(2, 'Slug must be at least 2 characters')
+    .max(50, 'Slug must be less than 50 characters')
+    .regex(
+      /^[a-z0-9\-]+$/,
+      'Slug can only contain lowercase letters, numbers, and hyphens'
+    )
+    .refine(
+      (slug) => !slug.startsWith('-') && !slug.endsWith('-'),
+      'Slug cannot start or end with a hyphen'
+    ),
+  logo: z.string().url('Logo must be a valid URL').optional().or(z.literal('')),
 });
+
+type SlugValidationState =
+  | 'idle'
+  | 'checking'
+  | 'available'
+  | 'taken'
+  | 'error';
 
 export function CreateorganizationForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [slugManuallyChanged, setSlugManuallyChanged] = useState(false);
   const [slugEditable, setSlugEditable] = useState(false);
+  const [slugValidation, setSlugValidation] =
+    useState<SlugValidationState>('idle');
+  const [slugCheckTimeout, setSlugCheckTimeout] =
+    useState<NodeJS.Timeout | null>(null);
   const nameRef = useRef('');
   const router = useRouter();
 
   const form = useForm<z.infer<typeof createorganizationFormSchema>>({
     resolver: zodResolver(createorganizationFormSchema),
+    mode: 'onChange', // Show validation errors on change
     defaultValues: {
       name: '',
       slug: '',
@@ -52,97 +86,364 @@ export function CreateorganizationForm() {
       .replace(/^-+|-+$/g, '');
   }
 
+  // Debounced slug validation
+  const checkSlugAvailability = useCallback(async (slug: string) => {
+    if (!slug || slug.length < 2) {
+      setSlugValidation('idle');
+      return;
+    }
+
+    setSlugValidation('checking');
+
+    try {
+      const result = await authClient.organization.checkSlug({ slug });
+      setSlugValidation(result.data?.status ? 'available' : 'taken');
+    } catch (error) {
+      console.error('Error checking slug availability:', error);
+      setSlugValidation('error');
+    }
+  }, []);
+
+  // Debounce slug checking
+  const debouncedSlugCheck = useCallback(
+    (slug: string) => {
+      if (slugCheckTimeout) {
+        clearTimeout(slugCheckTimeout);
+      }
+
+      const timeout = setTimeout(() => {
+        checkSlugAvailability(slug);
+      }, 500);
+
+      setSlugCheckTimeout(timeout);
+    },
+    [checkSlugAvailability, slugCheckTimeout]
+  );
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (slugCheckTimeout) {
+        clearTimeout(slugCheckTimeout);
+      }
+    };
+  }, [slugCheckTimeout]);
+
   async function onSubmit(
     values: z.infer<typeof createorganizationFormSchema>
   ) {
+    // Final slug availability check before submission
+    if (slugValidation === 'taken') {
+      toast.error(
+        'This organization slug is already taken. Please choose a different one.'
+      );
+      return;
+    }
+
     setIsLoading(true);
     try {
       await authClient.organization.create({
-        name: values.name, // required
-        slug: values.slug, // required
-        logo: values.logo, // optional
+        name: values.name,
+        slug: values.slug,
+        logo: values.logo || undefined,
       });
 
-      toast.success('organization created successfully!');
-      // Navigate to the newly created organization
-      router.push(`/organization/${values.slug}`);
-      router.refresh();
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to create organization.');
+      // Show success state with animation
+      setIsSuccess(true);
+      toast.success('Organization created successfully!');
+
+      // Wait for animation before navigation
+      setTimeout(() => {
+        router.push(`/organization/${values.slug}`);
+        router.refresh();
+      }, 1500);
+    } catch (error: unknown) {
+      console.error('Organization creation error:', error);
+
+      // Handle specific error cases
+      if (
+        typeof error === 'object' &&
+        error &&
+        'message' in error &&
+        typeof (error as { message: unknown }).message === 'string' &&
+        (error as { message: string }).message.includes('slug')
+      ) {
+        toast.error(
+          'This organization slug is already taken. Please choose a different one.'
+        );
+        setSlugValidation('taken');
+      } else if (
+        typeof error === 'object' &&
+        error &&
+        'message' in error &&
+        typeof (error as { message: unknown }).message === 'string' &&
+        (error as { message: string }).message.includes('name')
+      ) {
+        toast.error('An organization with this name already exists.');
+      } else {
+        toast.error('Failed to create organization. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
   }
 
+  // Get slug validation icon and color
+  const getSlugValidationIcon = () => {
+    switch (slugValidation) {
+      case 'checking':
+        return <Loader className="size-4 animate-spin text-muted-foreground" />;
+      case 'available':
+        return <Check className="size-4 text-green-600" />;
+      case 'taken':
+        return <X className="size-4 text-red-600" />;
+      case 'error':
+        return <AlertCircle className="size-4 text-yellow-600" />;
+      default:
+        return null;
+    }
+  };
+
+  const getSlugValidationMessage = () => {
+    switch (slugValidation) {
+      case 'checking':
+        return 'Checking availability...';
+      case 'available':
+        return 'This slug is available!';
+      case 'taken':
+        return 'This slug is already taken';
+      case 'error':
+        return 'Error checking availability';
+      default:
+        return null;
+    }
+  };
+
+  if (isSuccess) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 space-y-6 animate-in fade-in-0 zoom-in-95 duration-500">
+        <div className="relative">
+          {/* Main success circle with enhanced animations */}
+          <div className="size-20 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center animate-bounce">
+            <Check className="size-10 text-green-600 animate-in zoom-in-50 duration-300 delay-200" />
+          </div>
+
+          {/* Multiple ripple effects */}
+          <div className="absolute inset-0 size-20 bg-green-200 rounded-full animate-ping opacity-75"></div>
+          <div className="absolute inset-0 size-20 bg-green-300 rounded-full animate-ping opacity-50 animation-delay-150"></div>
+          <div className="absolute inset-0 size-20 bg-green-400 rounded-full animate-ping opacity-25 animation-delay-300"></div>
+
+          {/* Sparkle effects */}
+          <div className="absolute -top-2 -right-2 size-3 bg-yellow-400 rounded-full animate-pulse animation-delay-100"></div>
+          <div className="absolute -bottom-1 -left-2 size-2 bg-yellow-300 rounded-full animate-pulse animation-delay-200"></div>
+          <div className="absolute top-1 -left-3 size-1.5 bg-yellow-500 rounded-full animate-pulse animation-delay-300"></div>
+        </div>
+
+        <div className="text-center space-y-3 animate-in slide-in-from-bottom-4 duration-500 delay-300">
+          <h3 className="text-xl font-bold text-green-900 animate-in fade-in-0 duration-300 delay-400">
+            🎉 Organization Created!
+          </h3>
+          <p className="text-sm text-green-700 animate-in fade-in-0 duration-300 delay-500">
+            Redirecting you to your new organization...
+          </p>
+
+          {/* Progress indicator */}
+          <div className="w-32 h-1 bg-green-100 rounded-full mx-auto overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="name"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel className="text-sm font-medium">
+                Organization Name
+              </FormLabel>
               <FormControl>
                 <Input
-                  placeholder="My organization"
+                  placeholder="Enter your organization name"
+                  className={cn(
+                    'transition-all duration-200',
+                    fieldState.error && 'border-red-500 focus:border-red-500',
+                    !fieldState.error && field.value && 'border-green-500'
+                  )}
                   {...field}
                   onChange={(e) => {
                     field.onChange(e);
                     nameRef.current = e.target.value;
                     if (!slugManuallyChanged) {
-                      form.setValue('slug', slugify(e.target.value), {
+                      const newSlug = slugify(e.target.value);
+                      form.setValue('slug', newSlug, {
                         shouldValidate: true,
                       });
+                      if (newSlug) {
+                        debouncedSlugCheck(newSlug);
+                      }
                     }
                   }}
                 />
               </FormControl>
-              <FormMessage />
+              <FormDescription className="text-xs text-muted-foreground">
+                This will be the display name for your organization
+              </FormDescription>
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="slug"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Slug</FormLabel>
-              <div className="flex items-center gap-2">
-                <FormControl>
-                  <Input
-                    placeholder="my-organization"
-                    {...field}
-                    disabled={!slugEditable}
-                    onChange={(e) => {
-                      field.onChange(e);
-                      setSlugManuallyChanged(
-                        e.target.value !== slugify(nameRef.current)
-                      );
-                    }}
-                  />
-                </FormControl>
-                {!slugEditable && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSlugEditable(true)}
+              <FormLabel className="text-sm font-medium">
+                Organization Slug
+              </FormLabel>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <FormControl>
+                      <Input
+                        placeholder="organization-slug"
+                        className={cn(
+                          'transition-all duration-200 pr-10',
+                          fieldState.error &&
+                            'border-red-500 focus:border-red-500',
+                          !fieldState.error &&
+                            field.value &&
+                            slugValidation === 'available' &&
+                            'border-green-500',
+                          !fieldState.error &&
+                            field.value &&
+                            slugValidation === 'taken' &&
+                            'border-red-500'
+                        )}
+                        {...field}
+                        disabled={!slugEditable}
+                        onChange={(e) => {
+                          const value = e.target.value
+                            .toLowerCase()
+                            .replace(/[^a-z0-9\-]/g, '');
+                          field.onChange(value);
+                          setSlugManuallyChanged(
+                            value !== slugify(nameRef.current)
+                          );
+                          if (value) {
+                            debouncedSlugCheck(value);
+                          } else {
+                            setSlugValidation('idle');
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      {getSlugValidationIcon()}
+                    </div>
+                  </div>
+                  {!slugEditable && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="shrink-0"
+                      onClick={() => setSlugEditable(true)}
+                    >
+                      <Eye className="size-4 mr-1" />
+                      Edit
+                    </Button>
+                  )}
+                </div>
+
+                {/* URL Preview */}
+                {field.value && (
+                  <div className="flex items-center gap-2 p-2 bg-muted rounded-md">
+                    <span className="text-xs text-muted-foreground">
+                      URL Preview:
+                    </span>
+                    <Badge variant="secondary" className="text-xs font-mono">
+                      /organization/{field.value}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Slug validation message */}
+                {getSlugValidationMessage() && (
+                  <p
+                    className={cn(
+                      'text-xs',
+                      slugValidation === 'available' && 'text-green-600',
+                      slugValidation === 'taken' && 'text-red-600',
+                      slugValidation === 'checking' && 'text-muted-foreground',
+                      slugValidation === 'error' && 'text-yellow-600'
+                    )}
                   >
-                    Edit
-                  </Button>
+                    {getSlugValidationMessage()}
+                  </p>
                 )}
               </div>
-              <FormMessage />
+              <FormDescription className="text-xs text-muted-foreground">
+                This will be used in your organization&apos;s URL. Only
+                lowercase letters, numbers, and hyphens allowed.
+              </FormDescription>
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
-        <Button disabled={!form.formState.isValid || isLoading} type="submit">
+
+        <FormField
+          control={form.control}
+          name="logo"
+          render={({ field, fieldState }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-medium">
+                Logo URL (Optional)
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="https://example.com/logo.png"
+                  className={cn(
+                    'transition-all duration-200',
+                    fieldState.error && 'border-red-500 focus:border-red-500',
+                    !fieldState.error && field.value && 'border-green-500'
+                  )}
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription className="text-xs text-muted-foreground">
+                Provide a URL to your organization&apos;s logo image
+              </FormDescription>
+              <FormMessage className="text-xs" />
+            </FormItem>
+          )}
+        />
+
+        <Button
+          disabled={
+            !form.formState.isValid ||
+            isLoading ||
+            slugValidation === 'taken' ||
+            slugValidation === 'checking'
+          }
+          type="submit"
+          className="w-full transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/25 active:scale-[0.98] disabled:hover:scale-100 disabled:hover:shadow-none"
+        >
           {isLoading ? (
-            <Loader className="size-4 animate-spin" />
+            <div className="flex items-center justify-center animate-in fade-in-0 duration-200">
+              <Loader className="size-4 animate-spin mr-2" />
+              <span className="animate-pulse">Creating Organization...</span>
+            </div>
           ) : (
-            'Create organization'
+            <span className="transition-all duration-200">
+              Create Organization
+            </span>
           )}
         </Button>
       </form>
