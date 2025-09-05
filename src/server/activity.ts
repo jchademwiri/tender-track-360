@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/db';
-import { member, organization, user } from '@/db/schema';
+import { member, organization } from '@/db/schema';
 import type {
   RecentActivity,
   ActivitySummary,
