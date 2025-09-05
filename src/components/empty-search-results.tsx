@@ -34,9 +34,11 @@ export function EmptySearchResults({
 
           {/* Description with search term */}
           <p className="text-muted-foreground mb-6 max-w-sm">
-            We couldn't find any organizations matching{' '}
-            <span className="font-medium text-foreground">"{searchTerm}"</span>.
-            Try adjusting your search or create a new organization.
+            We couldn&apos;t find any organizations matching{' '}
+            <span className="font-medium text-foreground">
+              &quot;{searchTerm}&quot;
+            </span>
+            . Try adjusting your search or create a new organization.
           </p>
 
           {/* Action buttons */}

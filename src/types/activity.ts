@@ -19,7 +19,7 @@ export interface RecentActivity {
   userId?: string;
   userName?: string;
   userAvatar?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ActivitySummary {

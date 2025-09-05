@@ -116,7 +116,8 @@ export function OrganizationCard({
                 className="transition-all duration-200 hover:scale-105 hover:rotate-12"
               >
                 <Link
-                  href={`/organization/${organization.slug}/settings`}
+                  // href={`/organization/${organization.slug}/settings`}
+                  href="#"
                   aria-label="Settings"
                 >
                   <Settings className="size-4 transition-transform duration-200" />

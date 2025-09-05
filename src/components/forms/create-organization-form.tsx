@@ -157,16 +157,28 @@ export function CreateorganizationForm() {
         router.push(`/organization/${values.slug}`);
         router.refresh();
       }, 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Organization creation error:', error);
 
       // Handle specific error cases
-      if (error?.message?.includes('slug')) {
+      if (
+        typeof error === 'object' &&
+        error &&
+        'message' in error &&
+        typeof (error as { message: unknown }).message === 'string' &&
+        (error as { message: string }).message.includes('slug')
+      ) {
         toast.error(
           'This organization slug is already taken. Please choose a different one.'
         );
         setSlugValidation('taken');
-      } else if (error?.message?.includes('name')) {
+      } else if (
+        typeof error === 'object' &&
+        error &&
+        'message' in error &&
+        typeof (error as { message: unknown }).message === 'string' &&
+        (error as { message: string }).message.includes('name')
+      ) {
         toast.error('An organization with this name already exists.');
       } else {
         toast.error('Failed to create organization. Please try again.');
@@ -378,8 +390,8 @@ export function CreateorganizationForm() {
                 )}
               </div>
               <FormDescription className="text-xs text-muted-foreground">
-                This will be used in your organization's URL. Only lowercase
-                letters, numbers, and hyphens allowed.
+                This will be used in your organization&apos;s URL. Only
+                lowercase letters, numbers, and hyphens allowed.
               </FormDescription>
               <FormMessage className="text-xs" />
             </FormItem>
@@ -406,7 +418,7 @@ export function CreateorganizationForm() {
                 />
               </FormControl>
               <FormDescription className="text-xs text-muted-foreground">
-                Provide a URL to your organization's logo image
+                Provide a URL to your organization&apos;s logo image
               </FormDescription>
               <FormMessage className="text-xs" />
             </FormItem>
