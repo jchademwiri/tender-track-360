@@ -142,7 +142,6 @@ async function OrganizationContent({ slug }: { slug: string }) {
           <MembersTableWrapper
             members={organization?.members || []}
             error={membersError}
-            onRetry={() => window.location.reload()}
           />
         </ErrorBoundary>
 
