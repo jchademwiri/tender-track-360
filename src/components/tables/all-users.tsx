@@ -1,9 +1,9 @@
 'use client';
-import { user, User } from '@/db/schema';
+import { User } from '@/db/schema';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { addMember } from '@/server';
+// addMember import removed as it's not used in this component
 import { useState } from 'react';
 import { Loader, AlertCircle, RefreshCw, Users, UserPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';

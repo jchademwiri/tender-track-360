@@ -1,4 +1,6 @@
 import { HeroSectionProps } from '@/types/home-page';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export function HeroSection({ isAuthenticated, userName }: HeroSectionProps) {
   return (
@@ -13,14 +15,33 @@ export function HeroSection({ isAuthenticated, userName }: HeroSectionProps) {
             : 'Comprehensive tender management platform that helps organizations track, manage, and win more tenders.'}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          {/* Placeholder for CTA buttons - will be implemented in later tasks */}
-          <div className="bg-primary text-primary-foreground px-8 py-3 rounded-lg hover:bg-primary/90 transition-colors">
-            {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
-          </div>
+          {isAuthenticated ? (
+            <Link href="/organization">
+              <Button size="lg" className="px-8">
+                Go to Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/sign-up">
+              <Button size="lg" className="px-8">
+                Get Started
+              </Button>
+            </Link>
+          )}
           {!isAuthenticated && (
-            <div className="border border-border text-foreground px-8 py-3 rounded-lg hover:bg-secondary/50 transition-colors">
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-8"
+              onClick={() => {
+                const featuresSection = document.getElementById('features');
+                if (featuresSection) {
+                  featuresSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            >
               Learn More
-            </div>
+            </Button>
           )}
         </div>
       </div>

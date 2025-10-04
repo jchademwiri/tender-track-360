@@ -89,11 +89,18 @@ export function TestimonialsSection({
             Trusted by leading organizations
           </div>
           <div className="flex justify-center items-center space-x-8 opacity-60">
-            {/* Placeholder for company logos - will be implemented in later tasks */}
-            <div className="bg-muted h-8 w-24 rounded"></div>
-            <div className="bg-muted h-8 w-24 rounded"></div>
-            <div className="bg-muted h-8 w-24 rounded"></div>
-            <div className="bg-muted h-8 w-24 rounded"></div>
+            <div className="bg-muted h-8 w-24 rounded flex items-center justify-center text-xs font-medium text-muted-foreground">
+              TechCorp
+            </div>
+            <div className="bg-muted h-8 w-24 rounded flex items-center justify-center text-xs font-medium text-muted-foreground">
+              Global Inc
+            </div>
+            <div className="bg-muted h-8 w-24 rounded flex items-center justify-center text-xs font-medium text-muted-foreground">
+              Innovation
+            </div>
+            <div className="bg-muted h-8 w-24 rounded flex items-center justify-center text-xs font-medium text-muted-foreground">
+              Solutions
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+// useState removed as it's not used in this component
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -68,7 +68,6 @@ export function MembersAndInvitationsWithSearch({
   className = '',
 }: MembersAndInvitationsWithSearchProps) {
   const {
-    filters,
     setFilters,
     filteredMembers,
     filteredInvitations,

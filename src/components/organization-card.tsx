@@ -117,13 +117,17 @@ export function OrganizationCard({
                 asChild
                 className="transition-all duration-200 hover:scale-105 hover:rotate-12"
               >
-                <Link
-                  // href={`/organization/${organization.slug}/settings`}
-                  href="#"
+                {/* TODO: Implement settings page route */}
+                <button
+                  onClick={() => {
+                    console.log('Settings clicked for:', organization.slug);
+                    // TODO: Navigate to settings page when route is created
+                  }}
                   aria-label="Settings"
+                  className="p-1 hover:bg-muted rounded"
                 >
                   <Settings className="size-4 transition-transform duration-200" />
-                </Link>
+                </button>
               </Button>
             )}
           </div>

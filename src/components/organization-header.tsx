@@ -102,7 +102,8 @@ export function OrganizationHeader({
   error = null,
   onRetry,
 }: OrganizationHeaderProps) {
-  const [isEditing, setIsEditing] = useState(false);
+  // TODO: Implement editing functionality
+  // const [isEditing, setIsEditing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Handle loading state
@@ -147,8 +148,8 @@ export function OrganizationHeader({
   const handleEditClick = async () => {
     try {
       setIsProcessing(true);
-      setIsEditing(true);
       // TODO: Implement edit functionality in future tasks
+      // setIsEditing(true);
       console.log('Edit organization clicked');
 
       // Simulate async operation

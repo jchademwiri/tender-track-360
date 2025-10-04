@@ -1,6 +1,6 @@
 'use client';
 
-import { HomePage } from '@/components/home-page';
+import { HomePage } from '@/components/home-page/HomePage';
 import { UserContext } from '@/types/home-page';
 import { authClient } from '@/lib/auth-client';
 

@@ -135,6 +135,53 @@ export function getFilterSummary(filters: FilterState): string {
 }
 
 /**
+ * Validates if a role is a valid Role type
+ */
+export function isValidRole(role: string): role is Role {
+  return ['owner', 'admin', 'member'].includes(role);
+}
+
+/**
+ * Gets the role hierarchy level (higher number = more permissions)
+ */
+export function getRoleLevel(role: Role): number {
+  switch (role) {
+    case 'owner':
+      return 3;
+    case 'admin':
+      return 2;
+    case 'member':
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+/**
+ * Checks if a role has permission to perform actions on another role
+ */
+export function canManageRole(managerRole: Role, targetRole: Role): boolean {
+  return getRoleLevel(managerRole) > getRoleLevel(targetRole);
+}
+
+/**
+ * Gets available roles that a user can assign based on their role
+ */
+export function getAssignableRoles(userRole: Role): Role[] {
+  const userLevel = getRoleLevel(userRole);
+  const allRoles: Role[] = ['owner', 'admin', 'member'];
+
+  return allRoles.filter((role) => getRoleLevel(role) < userLevel);
+}
+
+/**
+ * Formats role name for display
+ */
+export function formatRoleName(role: Role): string {
+  return role.charAt(0).toUpperCase() + role.slice(1);
+}
+
+/**
  * Creates a "no results" message based on active filters
  */
 export function getNoResultsMessage(

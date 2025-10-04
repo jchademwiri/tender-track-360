@@ -1,3 +1,6 @@
+import { Twitter, Linkedin, Github } from 'lucide-react';
+import Link from 'next/link';
+
 export function FooterSection() {
   return (
     <footer className="bg-foreground text-background py-16">
@@ -12,10 +15,33 @@ export function FooterSection() {
               platform.
             </p>
             <div className="flex space-x-4">
-              {/* Placeholder for social media icons - will be implemented in later tasks */}
-              <div className="w-8 h-8 bg-background/20 rounded"></div>
-              <div className="w-8 h-8 bg-background/20 rounded"></div>
-              <div className="w-8 h-8 bg-background/20 rounded"></div>
+              <a
+                href="https://twitter.com/tendertrack360"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 bg-background/20 rounded flex items-center justify-center hover:bg-background/30 transition-colors"
+                aria-label="Follow us on Twitter"
+              >
+                <Twitter className="w-4 h-4" />
+              </a>
+              <a
+                href="https://linkedin.com/company/tendertrack360"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 bg-background/20 rounded flex items-center justify-center hover:bg-background/30 transition-colors"
+                aria-label="Follow us on LinkedIn"
+              >
+                <Linkedin className="w-4 h-4" />
+              </a>
+              <a
+                href="https://github.com/tendertrack360"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 bg-background/20 rounded flex items-center justify-center hover:bg-background/30 transition-colors"
+                aria-label="View our GitHub"
+              >
+                <Github className="w-4 h-4" />
+              </a>
             </div>
           </div>
 
@@ -23,24 +49,36 @@ export function FooterSection() {
             <h4 className="font-semibold mb-4 text-background">Product</h4>
             <ul className="space-y-2 text-background/70">
               <li>
-                <a href="#" className="hover:text-background transition-colors">
+                <Link
+                  href="#features"
+                  className="hover:text-background transition-colors"
+                >
                   Features
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-background transition-colors">
+                <Link
+                  href="#pricing"
+                  className="hover:text-background transition-colors"
+                >
                   Pricing
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-background transition-colors">
+                <Link
+                  href="#security"
+                  className="hover:text-background transition-colors"
+                >
                   Security
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-background transition-colors">
+                <Link
+                  href="#integrations"
+                  className="hover:text-background transition-colors"
+                >
                   Integrations
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -49,24 +87,38 @@ export function FooterSection() {
             <h4 className="font-semibold mb-4 text-background">Support</h4>
             <ul className="space-y-2 text-background/70">
               <li>
-                <a href="#" className="hover:text-background transition-colors">
+                <a
+                  href="https://docs.tendertrack360.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-background transition-colors"
+                >
                   Documentation
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-background transition-colors">
+                <Link
+                  href="#help"
+                  className="hover:text-background transition-colors"
+                >
                   Help Center
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-background transition-colors">
+                <Link
+                  href="#contact"
+                  className="hover:text-background transition-colors"
+                >
                   Contact Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-background transition-colors">
+                <Link
+                  href="#training"
+                  className="hover:text-background transition-colors"
+                >
                   Training
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -88,15 +140,24 @@ export function FooterSection() {
               © 2024 Tender Track 360. All rights reserved.
             </div>
             <div className="flex space-x-6 text-sm text-background/70">
-              <a href="#" className="hover:text-background transition-colors">
+              <Link
+                href="#privacy"
+                className="hover:text-background transition-colors"
+              >
                 Privacy Policy
-              </a>
-              <a href="#" className="hover:text-background transition-colors">
+              </Link>
+              <Link
+                href="#terms"
+                className="hover:text-background transition-colors"
+              >
                 Terms of Service
-              </a>
-              <a href="#" className="hover:text-background transition-colors">
+              </Link>
+              <Link
+                href="#cookies"
+                className="hover:text-background transition-colors"
+              >
                 Cookie Policy
-              </a>
+              </Link>
             </div>
           </div>
         </div>

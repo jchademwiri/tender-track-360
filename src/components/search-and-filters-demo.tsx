@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SearchAndFilters } from '@/components/search-and-filters';
+// SearchAndFilters import removed as it's not used in this demo component
 import { MembersAndInvitationsWithSearch } from '@/components/members-and-invitations-with-search';
 import type { MemberWithUser } from '@/lib/filter-utils';
 import type { PendingInvitation } from '@/server/organizations';
