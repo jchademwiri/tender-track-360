@@ -1,18 +1,1 @@
-import { AppSidebar } from '@/components/app-sidebar';
-import { getorganizations } from '@/server/organizations';
-import { getCurrentUser } from '@/server/users';
-import type { ComponentProps } from 'react';
-
-type AppSidebarWrapperProps = Omit<
-  ComponentProps<typeof AppSidebar>,
-  'organizations' | 'user'
->;
-
-export async function AppSidebarWrapper(props: AppSidebarWrapperProps) {
-  const organizations = await getorganizations();
-  const { currentUser } = await getCurrentUser();
-
-  return (
-    <AppSidebar organizations={organizations} user={currentUser} {...props} />
-  );
-}
+export * from './shared/navigation/app-sidebar-wrapper';
