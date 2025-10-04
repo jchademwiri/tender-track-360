@@ -98,12 +98,16 @@ export function NavMain({ items }: { items: NavItem[] }) {
                   {!item.items || item.items.length === 0 ? (
                     <Link href={item.url as Route}>
                       {item.icon && <item.icon />}
-                      <span>{item.title}</span>
+                      <span className="group-data-[collapsible=icon]:hidden">
+                        {item.title}
+                      </span>
                     </Link>
                   ) : (
                     <>
                       {item.icon && <item.icon />}
-                      <span>{item.title}</span>
+                      <span className="group-data-[collapsible=icon]:hidden">
+                        {item.title}
+                      </span>
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:hidden" />
                     </>
                   )}
@@ -116,7 +120,9 @@ export function NavMain({ items }: { items: NavItem[] }) {
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
                           <Link href={subItem.url as Route}>
-                            <span>{subItem.title}</span>
+                            <span className="group-data-[collapsible=icon]:hidden">
+                              {subItem.title}
+                            </span>
                           </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>

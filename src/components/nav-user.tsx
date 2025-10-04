@@ -25,6 +25,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+
 import type { User } from '@/db/schema';
 import { signOut } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
@@ -60,6 +61,7 @@ export function NavUser({ user }: { user: User }) {
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              tooltip={`${user.name} (${user.email})`}
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.image || ''} alt={user.name} />
