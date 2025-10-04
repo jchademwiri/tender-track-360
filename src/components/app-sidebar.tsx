@@ -1,16 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import {
-  BookOpen,
-  Bot,
-  Frame,
-  LayoutDashboard,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-} from 'lucide-react';
 
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -24,105 +14,9 @@ import {
 } from '@/components/ui/sidebar';
 import type { OrganizationWithStats } from '@/server/organizations';
 import type { User } from '@/db/schema';
+import { dashboadLinks } from '@/data/dashboad-links';
 
 // This is sample data.
-const dashboadLinks = {
-  navMain: [
-    {
-      title: 'Dashboard',
-      url: '/dashboard',
-      icon: LayoutDashboard,
-      isActive: true,
-    },
-    {
-      title: 'Tender Management',
-      url: '#',
-      icon: SquareTerminal,
-      items: [
-        {
-          title: 'Tenders',
-          url: '/dashboard/tenders',
-        },
-        {
-          title: 'Submited',
-          url: '#',
-        },
-        {
-          title: 'Briefings',
-          url: '#',
-        },
-        {
-          title: 'Documents',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Project Management',
-      url: '#',
-      icon: BookOpen,
-      items: [
-        {
-          title: 'Current Projects',
-          url: '#',
-        },
-        {
-          title: 'Purchase Orders',
-          url: '#',
-        },
-        {
-          title: 'Invoices',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Customers',
-      url: '#',
-      icon: Bot,
-    },
-    {
-      title: 'Settings',
-      url: '#',
-      icon: Settings2,
-      items: [
-        {
-          title: 'General',
-          url: '#',
-        },
-        {
-          title: 'Team',
-          url: '#',
-        },
-        {
-          title: 'Billing',
-          url: '#',
-        },
-        {
-          title: 'Limits',
-          url: '#',
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame,
-    },
-    {
-      name: 'Sales & Marketing',
-      url: '#',
-      icon: PieChart,
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map,
-    },
-  ],
-};
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   organizations: OrganizationWithStats[];
