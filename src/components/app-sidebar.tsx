@@ -5,6 +5,7 @@ import {
   BookOpen,
   Bot,
   Frame,
+  LayoutDashboard,
   Map,
   PieChart,
   Settings2,
@@ -12,7 +13,6 @@ import {
 } from 'lucide-react';
 
 import { NavMain } from '@/components/nav-main';
-import { NavProjects } from '@/components/nav-projects';
 import { NavUser } from '@/components/nav-user';
 import { TeamSwitcher } from '@/components/team-switcher';
 import {
@@ -26,17 +26,22 @@ import type { OrganizationWithStats } from '@/server/organizations';
 import type { User } from '@/db/schema';
 
 // This is sample data.
-const data = {
+const dashboadLinks = {
   navMain: [
+    {
+      title: 'Dashboard',
+      url: '/dashboard',
+      icon: LayoutDashboard,
+      isActive: true,
+    },
     {
       title: 'Tender Management',
       url: '#',
       icon: SquareTerminal,
-      isActive: true,
       items: [
         {
           title: 'Tenders',
-          url: '#',
+          url: '/dashboard/tenders',
         },
         {
           title: 'Submited',
@@ -46,35 +51,35 @@ const data = {
           title: 'Briefings',
           url: '#',
         },
+        {
+          title: 'Documents',
+          url: '#',
+        },
+      ],
+    },
+    {
+      title: 'Project Management',
+      url: '#',
+      icon: BookOpen,
+      items: [
+        {
+          title: 'Current Projects',
+          url: '#',
+        },
+        {
+          title: 'Purchase Orders',
+          url: '#',
+        },
+        {
+          title: 'Invoices',
+          url: '#',
+        },
       ],
     },
     {
       title: 'Customers',
       url: '#',
       icon: Bot,
-    },
-    {
-      title: 'Documentation',
-      url: '#',
-      icon: BookOpen,
-      items: [
-        {
-          title: 'Introduction',
-          url: '#',
-        },
-        {
-          title: 'Get Started',
-          url: '#',
-        },
-        {
-          title: 'Tutorials',
-          url: '#',
-        },
-        {
-          title: 'Changelog',
-          url: '#',
-        },
-      ],
     },
     {
       title: 'Settings',
@@ -131,8 +136,7 @@ export function AppSidebar({ organizations, user, ...props }: AppSidebarProps) {
         <TeamSwitcher organizations={organizations} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain items={dashboadLinks.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />
