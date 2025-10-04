@@ -125,26 +125,21 @@ export function OrganizationSwitcher({
     return `/organization`;
   };
 
-  // Prevent hydration mismatch by not rendering until client-side
-  if (!isClient) {
-    return (
-      <Select disabled>
-        <SelectTrigger className="min-w-[180px]">
-          <SelectValue placeholder="Loading..." />
-        </SelectTrigger>
-      </Select>
-    );
-  }
-
   return (
     <Select
-      onValueChange={handleChangeOrganization}
-      value={activeOrganization?.id}
-      disabled={isPending}
+      onValueChange={isClient ? handleChangeOrganization : undefined}
+      value={isClient ? activeOrganization?.id : undefined}
+      disabled={isPending || !isClient}
     >
       <SelectTrigger className="min-w-[180px]">
         <SelectValue
-          placeholder={isPending ? 'Switching...' : 'Organization'}
+          placeholder={
+            !isClient
+              ? 'Loading...'
+              : isPending
+                ? 'Switching...'
+                : 'Organization'
+          }
         />
       </SelectTrigger>
       <SelectContent>

@@ -125,6 +125,7 @@ export function OrganizationPageContent({
             onOpenChange={setIsCreateDialogOpen}
           >
             <DialogContent
+              title="Create Organization"
               aria-labelledby="create-dialog-title"
               aria-describedby="create-dialog-description"
             >
@@ -210,6 +211,7 @@ export function OrganizationPageContent({
                 onOpenChange={setIsCreateDialogOpen}
               >
                 <DialogContent
+                  title="Create Organization"
                   aria-labelledby="grid-create-dialog-title"
                   aria-describedby="grid-create-dialog-description"
                 >
@@ -259,6 +261,7 @@ export function OrganizationPageContent({
                     onOpenChange={setIsQuickActionDialogOpen}
                   >
                     <DialogContent
+                      title="Create Organization"
                       aria-labelledby="quick-create-dialog-title"
                       aria-describedby="quick-create-dialog-description"
                     >
