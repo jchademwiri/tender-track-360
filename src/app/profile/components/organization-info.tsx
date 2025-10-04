@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Building2, Settings, Shield, Calendar } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface OrganizationInfoProps {
   membership: {
@@ -107,10 +108,12 @@ export function OrganizationInfo({ membership }: OrganizationInfoProps) {
                   {organization.name}
                 </p>
                 {organization.logo && (
-                  <img
+                  <Image
                     src={organization.logo}
                     alt={`${organization.name} logo`}
-                    className="h-6 w-6 rounded mx-auto sm:mx-0"
+                    width={24}
+                    height={24}
+                    className="rounded mx-auto sm:mx-0"
                   />
                 )}
               </div>

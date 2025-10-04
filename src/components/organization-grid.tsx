@@ -1,6 +1,5 @@
 'use client';
 
-import { Organization, Role } from '@/db/schema';
 import { OrganizationCard } from './organization-card';
 import { CreateOrganizationCard } from './create-organization-card';
 import { EmptyOrganizationsState } from './empty-organizations-state';

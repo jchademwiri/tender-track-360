@@ -24,7 +24,7 @@ jest.mock('next/link', () => {
 jest.mock('../organization-grid', () => ({
   OrganizationGrid: ({ organizations, onCreateOrganization }: any) => (
     <div data-testid="organization-grid" role="grid" aria-label="Organizations">
-      {organizations.map((org: any, index: number) => (
+      {organizations.map((org: any) => (
         <div
           key={org.id}
           data-testid={`org-${org.id}`}

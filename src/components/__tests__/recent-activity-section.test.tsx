@@ -8,11 +8,7 @@ jest.mock('date-fns', () => ({
   formatDistanceToNow: jest.fn(() => '2 hours ago'),
 }));
 
-// Import the mocked function
-import { formatDistanceToNow } from 'date-fns';
-const mockFormatDistanceToNow = formatDistanceToNow as jest.MockedFunction<
-  typeof formatDistanceToNow
->;
+// Import the mocked function (not used directly but needed for mock)
 
 describe('RecentActivitySection', () => {
   const mockActivities: RecentActivity[] = [

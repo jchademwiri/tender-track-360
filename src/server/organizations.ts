@@ -1,8 +1,10 @@
 'use server';
 
 import { db } from '@/db';
-import { member, organization } from '@/db/schema';
-import type { Organization, Role } from '@/db/schema';
+import { member, organization, invitation, user } from '@/db/schema';
+import type { Role } from '@/db/schema';
+
+type Organization = typeof organization.$inferSelect;
 
 import { eq, inArray, and } from 'drizzle-orm/sql/expressions/conditions';
 import { count } from 'drizzle-orm';
@@ -133,6 +135,57 @@ export async function getOrganizationBySlug(slug: string) {
   }
 }
 
+// Get organization by slug with user role information
+export async function getOrganizationBySlugWithUserRole(slug: string) {
+  try {
+    const { currentUser } = await getCurrentUser();
+
+    if (!currentUser?.id) {
+      throw new Error('User not authenticated');
+    }
+
+    const organizationBySlug = await db.query.organization.findFirst({
+      where: eq(organization.slug, slug),
+      with: {
+        members: {
+          with: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!organizationBySlug) {
+      return null;
+    }
+
+    // Get user's role in this organization
+    const userMembership = await db.query.member.findFirst({
+      where: and(
+        eq(member.userId, currentUser.id),
+        eq(member.organizationId, organizationBySlug.id)
+      ),
+    });
+
+    // Get member count
+    const memberCountResult = await db
+      .select({ count: count() })
+      .from(member)
+      .where(eq(member.organizationId, organizationBySlug.id));
+
+    const memberCount = memberCountResult[0]?.count || 0;
+
+    return {
+      ...organizationBySlug,
+      userRole: userMembership?.role as Role,
+      memberCount,
+    };
+  } catch (error) {
+    console.error('Error fetching organization by slug with user role:', error);
+    return null;
+  }
+}
+
 // Organization statistics interface
 export interface OrganizationStats {
   memberCount: number;
@@ -229,5 +282,79 @@ export async function getOrganizationsStats(
   } catch (error) {
     console.error('Error fetching organizations stats:', error);
     return {};
+  }
+}
+
+// Invitation interface for pending invitations
+export interface PendingInvitation {
+  id: string;
+  email: string;
+  role: Role;
+  status: string;
+  expiresAt: Date;
+  invitedAt: Date;
+  inviterName: string;
+}
+
+// Get pending invitations for an organization
+export async function getPendingInvitations(
+  organizationId: string
+): Promise<PendingInvitation[]> {
+  try {
+    const { currentUser } = await getCurrentUser();
+
+    if (!currentUser?.id) {
+      throw new Error('User not authenticated');
+    }
+
+    // Verify user has access to this organization
+    const userMembership = await getUserOrganizationMembership(
+      currentUser.id,
+      organizationId
+    );
+
+    if (!userMembership) {
+      throw new Error('User does not have access to this organization');
+    }
+
+    // Only owners and admins can view pending invitations
+    if (!['owner', 'admin'].includes(userMembership.role)) {
+      throw new Error('Insufficient permissions to view invitations');
+    }
+
+    // Get pending invitations with inviter information
+    const pendingInvitations = await db.query.invitation.findMany({
+      where: and(
+        eq(invitation.organizationId, organizationId),
+        eq(invitation.status, 'pending')
+      ),
+      with: {
+        // We need to add the inviter relation to get the inviter's name
+      },
+    });
+
+    // Get inviter names separately since we don't have the relation set up
+    const invitationsWithInviterNames = await Promise.all(
+      pendingInvitations.map(async (inv) => {
+        const inviter = await db.query.user.findFirst({
+          where: eq(user.id, inv.inviterId),
+        });
+
+        return {
+          id: inv.id,
+          email: inv.email,
+          role: inv.role as Role,
+          status: inv.status,
+          expiresAt: inv.expiresAt,
+          invitedAt: new Date(), // We'll use current date as placeholder since invitation table doesn't have createdAt
+          inviterName: inviter?.name || 'Unknown',
+        };
+      })
+    );
+
+    return invitationsWithInviterNames;
+  } catch (error) {
+    console.error('Error fetching pending invitations:', error);
+    throw new Error('Failed to fetch pending invitations');
   }
 }

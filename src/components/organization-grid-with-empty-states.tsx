@@ -1,9 +1,7 @@
 'use client';
 
-import { Organization, Role } from '@/db/schema';
 import { OrganizationGrid } from './organization-grid';
 import { EmptySearchResults } from './empty-search-results';
-import { cn } from '@/lib/utils';
 import type { OrganizationWithStats } from '@/server/organizations';
 
 interface OrganizationGridWithEmptyStatesProps {

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { OrganizationGridWithEmptyStates } from '../organization-grid-with-empty-states';
-import { Organization, Role } from '@/db/schema';
+import { Role } from '@/db/schema';
 
 // Mock the child components
 jest.mock('../organization-grid', () => ({

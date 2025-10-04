@@ -38,12 +38,6 @@ export function CreateOrganizationCard({
           <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-all duration-300 group-hover:scale-110 group-hover:rotate-90">
             <Plus className="size-6 text-primary transition-transform duration-300" />
           </div>
-          <div className="space-y-2">
-            <h3 className="font-semibold text-lg">Create Organization</h3>
-            <p className="text-sm text-muted-foreground max-w-[200px]">
-              Start a new organization to collaborate with your team
-            </p>
-          </div>
           <Button
             onClick={(e) => {
               e.stopPropagation();
@@ -54,7 +48,7 @@ export function CreateOrganizationCard({
             className="mt-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200 hover:scale-105"
           >
             <Plus className="size-4 mr-2 transition-transform duration-200 group-hover:rotate-90" />
-            Get Started
+            Create Organization
           </Button>
         </div>
       </CardContent>

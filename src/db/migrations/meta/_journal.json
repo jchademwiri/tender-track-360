@@ -8,6 +8,13 @@
       "when": 1755154914892,
       "tag": "0000_breezy_zodiak",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1758382806568,
+      "tag": "0001_rapid_christian_walker",
+      "breakpoints": true
     }
   ]
 }

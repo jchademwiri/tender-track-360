@@ -4,13 +4,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, X } from 'lucide-react';
-import { Organization } from '@/db/schema';
+import { organization } from '@/db/schema';
 import { cn } from '@/lib/utils';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 
 interface OrganizationSearchProps {
-  organizations: Organization[];
-  onFilter: (filtered: Organization[]) => void;
+  organizations: (typeof organization.$inferSelect)[];
+  onFilter: (filtered: (typeof organization.$inferSelect)[]) => void;
   onSearchChange?: (searchTerm: string) => void;
   className?: string;
 }
