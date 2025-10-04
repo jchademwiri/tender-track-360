@@ -26,9 +26,12 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import type { User } from '@/db/schema';
+import { signOut } from '@/lib/auth-client';
+import { useRouter } from 'next/navigation';
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();
+  const router = useRouter();
 
   // Generate initials from user name
   const getInitials = (name: string) => {
@@ -38,6 +41,15 @@ export function NavUser({ user }: { user: User }) {
       .join('')
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push('/');
+  };
+
+  const handleProfileClick = () => {
+    router.push('/profile');
   };
 
   return (
@@ -84,28 +96,37 @@ export function NavUser({ user }: { user: User }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
+              <DropdownMenuItem asChild>
+                <a href="#" className="cursor-pointer">
+                  <Sparkles />
+                  Upgrade to Pro
+                </a>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleProfileClick}
+                className="cursor-pointer"
+              >
                 <BadgeCheck />
-                Account
+                Profile
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
+              <DropdownMenuItem asChild>
+                <a href="#" className="cursor-pointer">
+                  <CreditCard />
+                  Billing
+                </a>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
+              <DropdownMenuItem asChild>
+                <a href="#" className="cursor-pointer">
+                  <Bell />
+                  Notifications
+                </a>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
               <LogOut />
               Log out
             </DropdownMenuItem>
