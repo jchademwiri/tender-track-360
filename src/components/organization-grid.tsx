@@ -2,9 +2,10 @@
 
 import { OrganizationCard } from './organization-card';
 import { CreateOrganizationCard } from './create-organization-card';
-import { EmptyOrganizationsState } from './empty-organizations-state';
+
 import { cn } from '@/lib/utils';
 import type { OrganizationWithStats } from '@/server/organizations';
+import { EmptyOrganizationsState } from './shared/empty-states';
 
 interface OrganizationGridProps {
   organizations: OrganizationWithStats[];

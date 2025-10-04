@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import type { FilterState } from '@/components/search-and-filters';
+
 import {
   filterMembers,
   filterInvitations,
@@ -8,6 +8,7 @@ import {
 } from '@/lib/filter-utils';
 import type { MemberWithUser } from '@/lib/filter-utils';
 import type { PendingInvitation } from '@/server/organizations';
+import { FilterState } from '@/components/shared/search';
 
 export interface UseSearchAndFilterProps {
   members?: MemberWithUser[];

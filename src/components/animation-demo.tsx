@@ -1,11 +1,14 @@
 'use client';
 
-import { OrganizationCard } from './organization-card';
-import { CreateOrganizationCard } from './create-organization-card';
-import { OrganizationGridSkeleton } from './organization-grid-skeleton';
+// import { OrganizationCard } from './organization-card';
+// import { CreateOrganizationCard } from './create-organization-card';
+// import { OrganizationGridSkeleton } from './organization-grid-skeleton';
 import { useState } from 'react';
 import { Button } from './ui/button';
 import type { OrganizationWithStats } from '@/server/organizations';
+import { OrganizationGridSkeleton } from './shared/loading';
+import { OrganizationCard } from './organization-card';
+import { CreateOrganizationCard } from './create-organization-card';
 
 const mockOrganization: OrganizationWithStats = {
   id: '1',

@@ -2,9 +2,7 @@
 
 import * as React from 'react';
 
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
-import { TeamSwitcher } from '@/components/team-switcher';
+
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +13,11 @@ import {
 import type { OrganizationWithStats } from '@/server/organizations';
 import type { User } from '@/db/schema';
 import { dashboadLinks } from '@/data/dashboad-links';
+
+
+import { NavUser } from './nav-user';
+import { TeamSwitcher } from './team-switcher';
+import { NavMain } from './nav-main';
 
 // This is sample data.
 
