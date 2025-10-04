@@ -23,9 +23,13 @@ export const dashboadLinks = {
     // },
     {
       title: 'Tender Management',
-      url: '/dashboard/tenders/overview',
+      url: '#',
       icon: ClipboardList,
       items: [
+        {
+          title: 'Overview',
+          url: '/dashboard/tenders/overview',
+        },
         {
           title: 'Active Tenders',
           url: '/dashboard/tenders',
@@ -47,9 +51,13 @@ export const dashboadLinks = {
 
     {
       title: 'Project Management',
-      url: '/dashboard/projects/overview',
+      url: '#',
       icon: FolderKanban,
       items: [
+        {
+          title: 'Overview',
+          url: '/dashboard/projects/overview',
+        },
         {
           title: 'Active Projects',
           url: '/dashboard/projects',
@@ -77,25 +85,25 @@ export const dashboadLinks = {
       url: '/dashboard/calendar',
       icon: Calendar,
     },
-    {
-      title: 'Reports',
-      url: '/dashboard/reports/overview',
-      icon: BarChart3,
-      items: [
-        {
-          title: 'Analytics',
-          url: '/dashboard/reports/analytics',
-        },
-        {
-          title: 'Performance',
-          url: '/dashboard/reports/performance',
-        },
-        {
-          title: 'Export Data',
-          url: '/dashboard/reports/export',
-        },
-      ],
-    },
+    // {
+    //   title: 'Reports',
+    //   url: '/dashboard/reports/overview',
+    //   icon: BarChart3,
+    //   items: [
+    //     {
+    //       title: 'Analytics',
+    //       url: '/dashboard/reports/analytics',
+    //     },
+    //     {
+    //       title: 'Performance',
+    //       url: '/dashboard/reports/performance',
+    //     },
+    //     {
+    //       title: 'Export Data',
+    //       url: '/dashboard/reports/export',
+    //     },
+    //   ],
+    // },
     {
       title: 'Clients',
       url: '/dashboard/clients',
@@ -106,6 +114,10 @@ export const dashboadLinks = {
       url: '/dashboard/settings/overview',
       icon: Settings2,
       items: [
+        {
+          title: 'Overview',
+          url: '/dashboard/settings/overview',
+        },
         {
           title: 'Profile', // must be your personal profile
           url: '/dashboard/settings/profile',

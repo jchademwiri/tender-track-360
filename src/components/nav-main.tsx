@@ -1,6 +1,9 @@
 'use client';
 
 import { ChevronRight, type LucideIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import {
   Collapsible,
@@ -32,6 +35,48 @@ export function NavMain({
     }[];
   }[];
 }) {
+  const pathname = usePathname();
+
+  // Initialize state for each collapsible item
+  const [openItems, setOpenItems] = useState<Record<string, boolean>>(() => {
+    const initialState: Record<string, boolean> = {};
+    items.forEach((item) => {
+      if (item.items && item.items.length > 0) {
+        // Check if current path matches any sub-item to keep parent open
+        const hasActiveSubItem = item.items.some((subItem) =>
+          pathname.startsWith(subItem.url)
+        );
+        initialState[item.title] = item.isActive || hasActiveSubItem;
+      }
+    });
+    return initialState;
+  });
+
+  // Update open state when pathname changes to keep relevant sections open
+  useEffect(() => {
+    setOpenItems((prev) => {
+      const newState = { ...prev };
+      items.forEach((item) => {
+        if (item.items && item.items.length > 0) {
+          const hasActiveSubItem = item.items.some((subItem) =>
+            pathname.startsWith(subItem.url)
+          );
+          if (hasActiveSubItem && !newState[item.title]) {
+            newState[item.title] = true;
+          }
+        }
+      });
+      return newState;
+    });
+  }, [pathname, items]);
+
+  const toggleItem = (itemTitle: string) => {
+    setOpenItems((prev) => ({
+      ...prev,
+      [itemTitle]: !prev[itemTitle],
+    }));
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -39,8 +84,9 @@ export function NavMain({
         {items.map((item) => (
           <Collapsible
             key={item.title}
+            open={openItems[item.title]}
+            onOpenChange={() => toggleItem(item.title)}
             asChild
-            defaultOpen={item.isActive}
             className="group/collapsible"
           >
             <SidebarMenuItem>
@@ -50,10 +96,10 @@ export function NavMain({
                   asChild={!item.items || item.items.length === 0}
                 >
                   {!item.items || item.items.length === 0 ? (
-                    <a href={item.url}>
+                    <Link href={item.url as any}>
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   ) : (
                     <>
                       {item.icon && <item.icon />}
@@ -69,9 +115,9 @@ export function NavMain({
                     {item.items.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <a href={subItem.url}>
+                          <Link href={subItem.url as any}>
                             <span>{subItem.title}</span>
-                          </a>
+                          </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
