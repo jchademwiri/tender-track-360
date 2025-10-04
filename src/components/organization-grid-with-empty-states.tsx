@@ -1,7 +1,8 @@
 'use client';
 
-import { OrganizationGrid } from './organization-grid';
 import { EmptySearchResults } from './empty-search-results';
+import { OrganizationGrid } from './organization-grid';
+
 import type { OrganizationWithStats } from '@/server/organizations';
 
 interface OrganizationGridWithEmptyStatesProps {

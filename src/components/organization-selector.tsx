@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { authClient } from '@/lib/auth-client';
-import { organization } from '@/db/schema';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import type { OrganizationWithStats } from '@/server/organizations';
 
 interface OrganizationSelectorProps {
-  organizations: (typeof organization.$inferSelect)[];
+  organizations: OrganizationWithStats[];
   fallbackContent: React.ReactNode;
 }
 
