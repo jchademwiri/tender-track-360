@@ -1,20 +1,12 @@
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { HomePage } from '@/components/home-page';
+import { UserContext } from '@/types/home-page';
 
 export default function Home() {
-  return (
-    <section className="grid place-items-center min-h-screen text-center">
-      <div>
-        <h1 className="text-4xl font-bold">Tender Track 360</h1>
-        <p className="mt-4 text-lg">Welcome to Tender Track 360!</p>
-        <div className="mt-8">
-          <Link href={`/organization`}>
-            <Button size={'lg'} className="cursor-pointer">
-              Go to my Organizations
-            </Button>
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
+  // Placeholder user context - will be populated with real authentication in later tasks
+  const userContext: UserContext = {
+    isAuthenticated: false, // This will be determined by actual auth state in later tasks
+    user: undefined,
+  };
+
+  return <HomePage userContext={userContext} />;
 }
