@@ -1,9 +1,7 @@
 import {
-  BarChart3,
   Calendar,
   ClipboardList,
   FolderKanban,
-  HandCoins,
   LayoutDashboard,
   Settings2,
   Users,
