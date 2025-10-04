@@ -642,7 +642,7 @@ describe('OrganizationPageContent Visual Regression Tests', () => {
     it('adapts to tablet viewport (768px)', async () => {
       mockViewport(768, 1024);
 
-      const { container } = render(
+      render(
         <OrganizationPageContent
           organizations={mockOrganizations}
           recentActivities={mockRecentActivities}
@@ -735,8 +735,6 @@ describe('OrganizationPageContent Visual Regression Tests', () => {
     });
 
     it('shows focus states on interactive elements', async () => {
-      const user = userEvent.setup();
-
       render(
         <OrganizationPageContent
           organizations={mockOrganizations}

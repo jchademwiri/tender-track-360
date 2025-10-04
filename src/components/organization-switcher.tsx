@@ -7,29 +7,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Organization } from '@/db/schema';
+import { organization } from '@/db/schema';
 import type { Route } from 'next';
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { useRouter, usePathname } from 'next/navigation';
-import { useTransition, useEffect, useState } from 'react';
+import { useTransition } from 'react';
+import dynamic from 'next/dynamic';
 
 interface OrganizationSwitcherProps {
-  organizations: Organization[];
+  organizations: (typeof organization.$inferSelect)[];
 }
 
-export function OrganizationSwitcher({
+function OrganizationSwitcherClient({
   organizations,
 }: OrganizationSwitcherProps) {
   const { data: activeOrganization } = authClient.useActiveOrganization();
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const handleChangeOrganization = async (organizationId: string) => {
     const selectedOrg = organizations.find((org) => org.id === organizationId);
@@ -125,17 +121,6 @@ export function OrganizationSwitcher({
     return `/organization`;
   };
 
-  // Prevent hydration mismatch by not rendering until client-side
-  if (!isClient) {
-    return (
-      <Select disabled>
-        <SelectTrigger className="min-w-[180px]">
-          <SelectValue placeholder="Loading..." />
-        </SelectTrigger>
-      </Select>
-    );
-  }
-
   return (
     <Select
       onValueChange={handleChangeOrganization}
@@ -157,3 +142,18 @@ export function OrganizationSwitcher({
     </Select>
   );
 }
+
+// Export the dynamically imported component to prevent hydration mismatch
+export const OrganizationSwitcher = dynamic(
+  () => Promise.resolve(OrganizationSwitcherClient),
+  {
+    ssr: false,
+    loading: () => (
+      <Select disabled>
+        <SelectTrigger className="min-w-[180px]">
+          <SelectValue placeholder="Loading..." />
+        </SelectTrigger>
+      </Select>
+    ),
+  }
+);

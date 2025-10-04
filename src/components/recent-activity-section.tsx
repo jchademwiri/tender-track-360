@@ -141,7 +141,7 @@ function ActivityItem({ activity }: ActivityItemProps) {
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex flex-col mb-1">
           <Badge
             variant="secondary"
             className={`text-xs ${getActivityBadgeColor(activity.type)}`}
@@ -156,13 +156,13 @@ function ActivityItem({ activity }: ActivityItemProps) {
 
         <p className="text-sm text-foreground mb-2">{activity.description}</p>
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col">
           <div className="text-xs text-muted-foreground">
             in <span className="font-medium">{activity.organizationName}</span>
           </div>
 
           {activity.userName && (
-            <div className="flex items-center space-x-2">
+            <div className="flex  items-center space-x-2">
               <Avatar className="h-6 w-6">
                 <AvatarImage
                   src={activity.userAvatar}

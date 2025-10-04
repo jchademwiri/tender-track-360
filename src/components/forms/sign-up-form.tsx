@@ -57,7 +57,7 @@ export function SignUpForm({
       toast.success(`
         ${message as string}, Please check your email to verify your account.
       `);
-      router.push('/onboarding');
+      router.push('/organization');
     } else {
       toast.error(message as string);
     }

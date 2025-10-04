@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Organization } from '@/db/schema';
+import { organization } from '@/db/schema';
 import { OrganizationSearch } from './organization-search';
 import { OrganizationCard } from './organization-card';
 import { EmptySearchResults } from './empty-search-results';
 
 interface OrganizationSearchExampleProps {
-  organizations: Organization[];
+  organizations: (typeof organization.$inferSelect)[];
   onCreateOrganization?: () => void;
 }
 
@@ -19,7 +19,7 @@ export function OrganizationSearchExample({
     useState(organizations);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleFilter = (filtered: Organization[]) => {
+  const handleFilter = (filtered: (typeof organization.$inferSelect)[]) => {
     setFilteredOrganizations(filtered);
   };
 

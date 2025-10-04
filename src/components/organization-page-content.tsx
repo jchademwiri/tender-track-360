@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { authClient } from '@/lib/auth-client';
-import { Organization } from '@/db/schema';
+import { organization } from '@/db/schema';
 import { OrganizationGrid } from './organization-grid';
 import { OrganizationSearch } from './organization-search';
 import { RecentActivitySection } from './recent-activity-section';
@@ -45,7 +45,7 @@ export function OrganizationPageContent({
     setFilteredOrganizations(organizations);
   }, [organizations]);
 
-  const handleFilter = (filtered: Organization[]) => {
+  const handleFilter = (filtered: (typeof organization.$inferSelect)[]) => {
     setFilteredOrganizations(filtered as OrganizationWithStats[]);
   };
 
@@ -125,6 +125,7 @@ export function OrganizationPageContent({
             onOpenChange={setIsCreateDialogOpen}
           >
             <DialogContent
+              title="Create Organization"
               aria-labelledby="create-dialog-title"
               aria-describedby="create-dialog-description"
             >
@@ -210,6 +211,7 @@ export function OrganizationPageContent({
                 onOpenChange={setIsCreateDialogOpen}
               >
                 <DialogContent
+                  title="Create Organization"
                   aria-labelledby="grid-create-dialog-title"
                   aria-describedby="grid-create-dialog-description"
                 >
@@ -234,18 +236,6 @@ export function OrganizationPageContent({
           aria-label="Sidebar with recent activity and quick actions"
         >
           <div className="space-y-6">
-            {/* Recent Activity */}
-            <section aria-labelledby="recent-activity-heading">
-              <RecentActivitySection
-                activities={recentActivities}
-                showViewAll={recentActivities.length > 0}
-                onViewAll={() => {
-                  // TODO: Navigate to full activity page
-                  console.log('Navigate to full activity page');
-                }}
-              />
-            </section>
-
             {/* Quick Actions Card */}
             <section aria-labelledby="quick-actions-heading">
               <div className="bg-card border rounded-lg p-6">
@@ -259,7 +249,7 @@ export function OrganizationPageContent({
                 >
                   <Button
                     variant="outline"
-                    className="w-full justify-start"
+                    className="w-full text-primary justify-start cursor-pointer "
                     onClick={() => setIsQuickActionDialogOpen(true)}
                     aria-describedby="quick-actions-heading"
                   >
@@ -271,6 +261,7 @@ export function OrganizationPageContent({
                     onOpenChange={setIsQuickActionDialogOpen}
                   >
                     <DialogContent
+                      title="Create Organization"
                       aria-labelledby="quick-create-dialog-title"
                       aria-describedby="quick-create-dialog-description"
                     >
@@ -290,7 +281,7 @@ export function OrganizationPageContent({
                   {activeOrganization && (
                     <Button
                       variant="outline"
-                      className="w-full justify-start"
+                      className="w-full justify-start cursor-pointer"
                       onClick={() => {
                         window.location.href = `/organization/${activeOrganization.slug}/dashboard`;
                       }}
@@ -301,6 +292,17 @@ export function OrganizationPageContent({
                   )}
                 </div>
               </div>
+            </section>
+            {/* Recent Activity */}
+            <section aria-labelledby="recent-activity-heading">
+              <RecentActivitySection
+                activities={recentActivities}
+                showViewAll={recentActivities.length > 0}
+                onViewAll={() => {
+                  // TODO: Navigate to full activity page
+                  console.log('Navigate to full activity page');
+                }}
+              />
             </section>
           </div>
         </aside>

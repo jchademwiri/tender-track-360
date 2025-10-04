@@ -1,20 +1,36 @@
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+'use client';
+
+import { HomePage } from '@/components/home-page/HomePage';
+import { UserContext } from '@/types/home-page';
+import { authClient } from '@/lib/auth-client';
 
 export default function Home() {
-  return (
-    <section className="grid place-items-center min-h-screen text-center">
-      <div>
-        <h1 className="text-4xl font-bold">Tender Track 360</h1>
-        <p className="mt-4 text-lg">Welcome to Tender Track 360!</p>
-        <div className="mt-8">
-          <Link href={`/organization`}>
-            <Button size={'lg'} className="cursor-pointer">
-              Go to my Organizations
-            </Button>
-          </Link>
-        </div>
+  const { data: session, isPending } = authClient.useSession();
+  const { data: activeOrganization } = authClient.useActiveOrganization();
+
+  // Show loading state while checking authentication
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
-    </section>
-  );
+    );
+  }
+
+  // Build user context based on actual authentication state
+  const userContext: UserContext = {
+    isAuthenticated: !!session?.user,
+    user: session?.user
+      ? {
+          id: session.user.id,
+          name: session.user.name,
+          email: session.user.email,
+          organizationId: activeOrganization?.id || '',
+          organizationName: activeOrganization?.name || '',
+          role: 'member', // Default role - will be determined by server-side logic when needed
+        }
+      : undefined,
+  };
+
+  return <HomePage userContext={userContext} />;
 }

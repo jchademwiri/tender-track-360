@@ -8,7 +8,11 @@ Built with modern web technologies, Tender Track 360 provides a centralized hub 
 
 ## Key Features
 
+- **Tender Management**: Comprehensive tools to manage and organize tenders
 - **Tender Lifecycle Management**: Track tenders from publication through submission to final award decision
+- **Purchase Order Management**: Track and manage purchase orders associated with tenders
+- **Tender Tracking**: Monitor the status of each tender from initial publication to final award
+- **Tender Analytics**: Gain insights from historical tender data to inform future bids
 - **Document Repository**: Centralized storage for all tender-related files with version control
 - **Deadline Tracking**: Automated notifications for approaching deadlines and submission requirements
 - **Status Dashboard**: Visual overview of all active, pending, and completed tenders

@@ -46,7 +46,7 @@ export const signIn = async (email: string, password: string) => {
   }
 };
 
-// https://youtu.be/gzYTDGToYcw?list=PLb3Vtl4F8GHTUJ_RmNINhE6GxB97otFzS&t=1916
+
 
 export const signUp = async (name: string, email: string, password: string) => {
   try {

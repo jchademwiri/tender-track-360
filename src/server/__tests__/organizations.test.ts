@@ -150,7 +150,7 @@ describe('Enhanced Organization Data Fetching', () => {
       // Simulate error handling
       try {
         throw mockError;
-      } catch (error) {
+      } catch {
         expect(() => {
           throw new Error('Failed to fetch organizations');
         }).toThrow('Failed to fetch organizations');
@@ -174,7 +174,6 @@ describe('Enhanced Organization Data Fetching', () => {
     });
 
     it('should deny access when user is not a member', () => {
-      const mockUser = { id: 'user-1' };
       const mockMembership = null;
 
       // Simulate access verification

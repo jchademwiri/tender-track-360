@@ -19,6 +19,9 @@ import {
 import { CalendarDays, Mail, Shield } from 'lucide-react';
 import { SkipNavigation } from '@/components/skip-navigation';
 
+// Force dynamic rendering since we use headers() in server functions
+export const dynamic = 'force-dynamic';
+
 export default async function ProfilePage() {
   const { session, currentUser } = await getCurrentUser();
 

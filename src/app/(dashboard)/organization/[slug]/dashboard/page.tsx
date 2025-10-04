@@ -1,9 +1,11 @@
-export default async function Dashboard() {
-  return (
-    <div>
-      <section className="flex max-w-3xl gap-4 flex-col py-16 mx-auto">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-      </section>
-    </div>
-  );
+type Params = Promise<{ slug: string }>;
+
+export default async function Dashboard({ params }: { params: Params }) {
+  // Extract slug from params for future use
+  const { slug } = await params;
+
+  // Dashboard intentionally left empty for now for all roles
+  // TODO: Implement dashboard content based on organization slug
+  console.log('Dashboard for organization:', slug);
+  return null;
 }

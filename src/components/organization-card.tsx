@@ -1,6 +1,6 @@
 'use client';
 
-import { Organization, Role } from '@/db/schema';
+import { organization, Role } from '@/db/schema';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 interface OrganizationCardProps {
-  organization: Organization;
+  organization: typeof organization.$inferSelect;
   memberCount?: number;
   isActive?: boolean;
   userRole?: Role;
@@ -55,7 +55,9 @@ export function OrganizationCard({
             <Avatar className="size-12 transition-transform duration-300 group-hover:scale-110">
               <AvatarImage src={organization.logo || undefined} />
               <AvatarFallback className="bg-primary/10 text-primary font-semibold transition-colors duration-300 group-hover:bg-primary/20">
-                {getInitials(organization.name)}
+                <Link href={`/organization/${organization.slug}`}>
+                  {getInitials(organization.name)}
+                </Link>
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
@@ -105,7 +107,7 @@ export function OrganizationCard({
             >
               <Link href={`/organization/${organization.slug}/dashboard`}>
                 <ExternalLink className="size-4 mr-2 transition-transform duration-200 group-hover:translate-x-0.5" />
-                Enter
+                Go to Dashboard
               </Link>
             </Button>
             {(userRole === 'owner' || userRole === 'admin') && (
@@ -115,13 +117,17 @@ export function OrganizationCard({
                 asChild
                 className="transition-all duration-200 hover:scale-105 hover:rotate-12"
               >
-                <Link
-                  // href={`/organization/${organization.slug}/settings`}
-                  href="#"
+                {/* TODO: Implement settings page route */}
+                <button
+                  onClick={() => {
+                    console.log('Settings clicked for:', organization.slug);
+                    // TODO: Navigate to settings page when route is created
+                  }}
                   aria-label="Settings"
+                  className="p-1 hover:bg-muted rounded"
                 >
                   <Settings className="size-4 transition-transform duration-200" />
-                </Link>
+                </button>
               </Button>
             )}
           </div>

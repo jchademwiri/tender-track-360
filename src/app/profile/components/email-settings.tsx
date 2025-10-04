@@ -89,6 +89,7 @@ export function EmailSettings({
         toast.success(successMessage);
         announce(successMessage, 'polite');
       } catch (error) {
+        console.error('Failed to send verification email:', error);
         toast.error('Failed to send verification email. Please try again.');
       } finally {
         setIsResending(false);
