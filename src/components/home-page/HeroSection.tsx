@@ -28,21 +28,19 @@ export function HeroSection({ isAuthenticated, userName }: HeroSectionProps) {
               </Button>
             </Link>
           )}
-          {!isAuthenticated && (
-            <Button
-              size="lg"
-              variant="outline"
-              className="px-8"
-              onClick={() => {
-                const featuresSection = document.getElementById('features');
-                if (featuresSection) {
-                  featuresSection.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-            >
-              Learn More
-            </Button>
-          )}
+          <Button
+            size="lg"
+            variant="outline"
+            className="px-8"
+            onClick={() => {
+              const featuresSection = document.getElementById('features');
+              if (featuresSection) {
+                featuresSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+          >
+            Learn More
+          </Button>
         </div>
       </div>
     </section>
