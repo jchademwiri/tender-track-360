@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import Logout from '../ui/logout';
 
 interface HeaderProps {
   isAuthenticated: boolean;
@@ -27,6 +28,7 @@ export function Header({ isAuthenticated, userName }: HeaderProps) {
                   Dashboard
                 </Button>
               </Link>
+              <Logout />
             </div>
           ) : (
             <div className="flex items-center gap-3">
