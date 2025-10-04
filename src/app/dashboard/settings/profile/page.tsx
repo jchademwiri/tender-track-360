@@ -35,10 +35,14 @@ export default async function ProfileSettingsPage() {
     ? (sessionsResult.data as SessionInfo[])
     : [];
 
-  // Wrapper function to match EmailSettings expected signature
-  const handleResendVerification = async (): Promise<void> => {
-    await resendVerificationEmail();
-  };
+  // Server action wrapper that handles the ActionResult
+  async function handleResendVerification(): Promise<void> {
+    'use server';
+    const result = await resendVerificationEmail();
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+  }
 
   // Get user initials for avatar fallback
   const getInitials = (name: string) => {

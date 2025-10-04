@@ -31,9 +31,9 @@ export function HomePage({ userContext }: HomePageProps) {
               organizationName: userContext.user.organizationName,
             }}
             recentActivity={{
-              activeTenders: 0, // Placeholder - will be populated in later tasks
               upcomingDeadlines: 0,
-              recentDocuments: [],
+              submitedThisMonth: 0, // Placeholder - will be populated in later tasks
+              activeProjects: [],
             }}
           />
         )}

@@ -23,7 +23,7 @@ export function Header({ isAuthenticated, userName }: HeaderProps) {
               <span className="text-sm text-muted-foreground">
                 Welcome, {userName}
               </span>
-              <Link href="/organization">
+              <Link href="/dashboard">
                 <Button variant="outline" size="sm">
                   Dashboard
                 </Button>
@@ -32,14 +32,12 @@ export function Header({ isAuthenticated, userName }: HeaderProps) {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <Link href="/login">
-                <Button variant="ghost" size="sm">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/sign-up">
-                <Button size="sm">Get Started</Button>
-              </Link>
+              <Button variant="ghost" asChild size="sm">
+                <Link href="/login">Sign In</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/sign-up">Get Started</Link>
+              </Button>
             </div>
           )}
         </nav>

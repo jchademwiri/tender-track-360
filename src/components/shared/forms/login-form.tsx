@@ -51,7 +51,8 @@ export function LoginForm({
     const { success, message } = await signIn(values.email, values.password);
     if (success) {
       toast.success(message as string);
-      router.push('/');
+      // Use window.location.replace for full page refresh with auth state
+      window.location.replace('/');
     } else {
       toast.error(message as string);
     }

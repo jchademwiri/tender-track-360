@@ -50,9 +50,9 @@ export interface HomeAuthenticatedUserDashboardProps {
     organizationName: string;
   };
   recentActivity: {
-    activeTenders: number;
+    submitedThisMonth: number;
     upcomingDeadlines: number;
-    recentDocuments: string[];
+    activeProjects: string[];
   };
 }
 
