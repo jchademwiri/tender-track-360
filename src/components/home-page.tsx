@@ -24,15 +24,15 @@ export function HomePage({ userContext }: HomePageProps) {
 
   if (userContext.isAuthenticated && userContext.user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <header className="bg-white shadow-sm border-b">
+      <div className="min-h-screen bg-gradient-to-br from-secondary/30 to-background">
+        <header className="bg-card shadow-sm border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-6">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-card-foreground">
                   Welcome back, {userContext.user.name}!
                 </h1>
-                <p className="text-gray-600 mt-1">
+                <p className="text-muted-foreground mt-1">
                   {userContext.user.organizationName && (
                     <>Organization: {userContext.user.organizationName}</>
                   )}
@@ -145,7 +145,7 @@ export function HomePage({ userContext }: HomePageProps) {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
                     <div className="flex-1">
                       <p className="text-sm font-medium">
                         New tender document uploaded
@@ -156,14 +156,14 @@ export function HomePage({ userContext }: HomePageProps) {
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-chart-2 rounded-full"></div>
                     <div className="flex-1">
                       <p className="text-sm font-medium">Team member invited</p>
                       <p className="text-xs text-muted-foreground">1 day ago</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-chart-4 rounded-full"></div>
                     <div className="flex-1">
                       <p className="text-sm font-medium">
                         Tender deadline approaching
@@ -184,11 +184,11 @@ export function HomePage({ userContext }: HomePageProps) {
 
   // Unauthenticated user view
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <header className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-gradient-to-br from-secondary/30 to-background">
+      <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-card-foreground">
               Tender Track 360
             </h1>
             <div className="flex items-center space-x-4">
@@ -205,10 +205,10 @@ export function HomePage({ userContext }: HomePageProps) {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-5xl font-bold text-foreground mb-6">
             Streamline Your Tender Management
           </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
             Manage tenders, collaborate with your team, and track opportunities
             all in one powerful platform designed for modern businesses.
           </p>
@@ -229,11 +229,11 @@ export function HomePage({ userContext }: HomePageProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           <Card>
             <CardHeader>
-              <FileText className="h-12 w-12 text-blue-500 mb-4" />
+              <FileText className="h-12 w-12 text-primary mb-4" />
               <CardTitle>Tender Management</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Organize and track all your tender opportunities in one
                 centralized location.
               </p>
@@ -242,11 +242,11 @@ export function HomePage({ userContext }: HomePageProps) {
 
           <Card>
             <CardHeader>
-              <Users className="h-12 w-12 text-green-500 mb-4" />
+              <Users className="h-12 w-12 text-chart-2 mb-4" />
               <CardTitle>Team Collaboration</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Work together seamlessly with role-based access and real-time
                 updates.
               </p>
@@ -255,11 +255,11 @@ export function HomePage({ userContext }: HomePageProps) {
 
           <Card>
             <CardHeader>
-              <TrendingUp className="h-12 w-12 text-purple-500 mb-4" />
+              <TrendingUp className="h-12 w-12 text-chart-5 mb-4" />
               <CardTitle>Analytics & Insights</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Get valuable insights into your tender performance and success
                 rates.
               </p>

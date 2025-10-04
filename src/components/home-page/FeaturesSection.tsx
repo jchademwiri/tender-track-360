@@ -52,13 +52,13 @@ export function FeaturesSection({
   const displayFeatures = features.length > 0 ? features : defaultFeatures;
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Powerful Features for Tender Management
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Everything you need to streamline your tender process and increase
             your success rate
           </p>
@@ -68,17 +68,19 @@ export function FeaturesSection({
           {displayFeatures.map((feature) => (
             <div
               key={feature.id}
-              className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow"
+              className="p-6 border border-border rounded-lg hover:shadow-lg transition-shadow bg-card"
             >
               <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-card-foreground mb-2">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 mb-4">{feature.description}</p>
-              <ul className="text-sm text-gray-500">
+              <p className="text-muted-foreground mb-4">
+                {feature.description}
+              </p>
+              <ul className="text-sm text-muted-foreground">
                 {feature.benefits.map((benefit, index) => (
                   <li key={index} className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-primary mr-2">✓</span>
                     {benefit}
                   </li>
                 ))}

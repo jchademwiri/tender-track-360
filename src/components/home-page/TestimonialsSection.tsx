@@ -38,13 +38,13 @@ export function TestimonialsSection({
     testimonials.length > 0 ? testimonials : defaultTestimonials;
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             What Our Customers Say
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Join hundreds of organizations that have transformed their tender
             management process
           </p>
@@ -52,27 +52,30 @@ export function TestimonialsSection({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {displayTestimonials.map((testimonial) => (
-            <div key={testimonial.id} className="bg-gray-50 p-6 rounded-lg">
+            <div
+              key={testimonial.id}
+              className="bg-card p-6 rounded-lg border border-border"
+            >
               <div className="mb-4">
-                <p className="text-gray-700 italic">
+                <p className="text-card-foreground italic">
                   &quot;{testimonial.content}&quot;
                 </p>
               </div>
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold mr-4">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold mr-4">
                   {testimonial.name
                     .split(' ')
                     .map((n) => n[0])
                     .join('')}
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900">
+                  <div className="font-semibold text-card-foreground">
                     {testimonial.name}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-muted-foreground">
                     {testimonial.role}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-muted-foreground">
                     {testimonial.company}
                   </div>
                 </div>
@@ -82,15 +85,15 @@ export function TestimonialsSection({
         </div>
 
         <div className="text-center mt-12">
-          <div className="text-sm text-gray-500 mb-4">
+          <div className="text-sm text-muted-foreground mb-4">
             Trusted by leading organizations
           </div>
           <div className="flex justify-center items-center space-x-8 opacity-60">
             {/* Placeholder for company logos - will be implemented in later tasks */}
-            <div className="bg-gray-200 h-8 w-24 rounded"></div>
-            <div className="bg-gray-200 h-8 w-24 rounded"></div>
-            <div className="bg-gray-200 h-8 w-24 rounded"></div>
-            <div className="bg-gray-200 h-8 w-24 rounded"></div>
+            <div className="bg-muted h-8 w-24 rounded"></div>
+            <div className="bg-muted h-8 w-24 rounded"></div>
+            <div className="bg-muted h-8 w-24 rounded"></div>
+            <div className="bg-muted h-8 w-24 rounded"></div>
           </div>
         </div>
       </div>
