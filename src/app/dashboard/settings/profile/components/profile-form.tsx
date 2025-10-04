@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Edit, Save, X, Loader2 } from 'lucide-react';
+import { AvatarUpload } from './avatar-upload';
 
 // Validation schema for profile form
 const profileFormSchema = z.object({
@@ -51,9 +52,9 @@ export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
   // Optimistic state for user data
   const [optimisticUser, updateOptimisticUser] = useOptimistic(
     user,
-    (state, newName: string) => ({
+    (state, updates: { name?: string; image?: string | null }) => ({
       ...state,
-      name: newName,
+      ...updates,
     })
   );
 
@@ -78,7 +79,7 @@ export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
   const handleSubmit = async (data: ProfileFormData) => {
     startTransition(async () => {
       // Start optimistic update inside the transition
-      updateOptimisticUser(data.name);
+      updateOptimisticUser({ name: data.name });
 
       try {
         const result = await onSubmit(data);
@@ -89,7 +90,7 @@ export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
           form.reset(data); // Reset form with new values
         } else {
           // Revert optimistic update on error
-          updateOptimisticUser(user.name);
+          updateOptimisticUser({ name: user.name });
           toast.error(result.message);
 
           // Handle field-specific errors
@@ -106,11 +107,21 @@ export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
         }
       } catch (error) {
         // Revert optimistic update on error
-        updateOptimisticUser(user.name);
+        updateOptimisticUser({ name: user.name });
         toast.error('An unexpected error occurred. Please try again.');
         console.error('Profile update failed:', error);
       }
     });
+  };
+
+  const handleImageChange = (imageUrl: string | null) => {
+    updateOptimisticUser({ image: imageUrl });
+    // In a real app, you would also update the image on the server here
+  };
+
+  const handleImageRemove = () => {
+    updateOptimisticUser({ image: null });
+    // In a real app, you would also remove the image from the server here
   };
 
   const handleCancel = () => {
@@ -148,10 +159,20 @@ export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
-              className="space-y-4"
+              className="space-y-6"
               aria-describedby="profile-form-description"
               noValidate
             >
+              {/* Profile Picture Upload */}
+              <div className="flex justify-center">
+                <AvatarUpload
+                  currentImage={optimisticUser.image}
+                  userName={optimisticUser.name}
+                  onImageChange={handleImageChange}
+                  onImageRemove={handleImageRemove}
+                  disabled={isPending}
+                />
+              </div>
               <FormField
                 control={form.control}
                 name="name"

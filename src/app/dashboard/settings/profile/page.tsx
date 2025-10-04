@@ -1,13 +1,9 @@
 import { getCurrentUser } from '@/server';
 import { getUserOrganizationMembership } from '@/server/organizations';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { ProfileForm } from './components/profile-form';
-import { EmailSettings } from './components/email-settings';
-import { PasswordForm } from './components/password-form';
-import { OrganizationInfo } from './components/organization-info';
-import { SecuritySettings } from './components/security-settings';
+import { ProfileTabsWrapper } from './components/profile-tabs-wrapper';
 import {
   updateProfile,
   resendVerificationEmail,
@@ -16,7 +12,7 @@ import {
   SessionInfo,
 } from './actions';
 
-import { CalendarDays, Mail, Shield } from 'lucide-react';
+import { CalendarDays, Mail } from 'lucide-react';
 import { SkipNavigation } from '@/components/skip-navigation';
 
 // Force dynamic rendering since we use headers() in server functions
@@ -38,6 +34,11 @@ export default async function ProfileSettingsPage() {
   const userSessions = sessionsResult.success
     ? (sessionsResult.data as SessionInfo[])
     : [];
+
+  // Wrapper function to match EmailSettings expected signature
+  const handleResendVerification = async (): Promise<void> => {
+    await resendVerificationEmail();
+  };
 
   // Get user initials for avatar fallback
   const getInitials = (name: string) => {
@@ -82,130 +83,52 @@ export default async function ProfileSettingsPage() {
           </p>
         </header>
 
-        {/* Profile Header Card */}
+        {/* Profile Header Card - Mobile Optimized */}
         <section aria-labelledby="profile-header">
           <Card className="mb-6 sm:mb-8">
             <CardHeader className="pb-4 sm:pb-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
-                <Avatar className="h-16 w-16 sm:h-20 sm:w-20 mx-auto sm:mx-0">
-                  <AvatarImage
-                    src={currentUser.image || ''}
-                    alt={`Profile picture of ${currentUser.name}`}
-                  />
-                  <AvatarFallback
-                    className="text-base sm:text-lg"
-                    aria-label={`${currentUser.name} initials`}
-                  >
-                    {getInitials(currentUser.name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 text-center sm:text-left w-full">
-                  <CardTitle
-                    id="profile-header"
-                    className="text-xl sm:text-2xl"
-                  >
-                    {currentUser.name}
-                  </CardTitle>
-                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-2">
-                    <div className="flex items-center justify-center sm:justify-start space-x-2">
-                      <Mail
-                        className="h-4 w-4 text-muted-foreground"
-                        aria-hidden="true"
-                      />
-                      <span
-                        className="text-muted-foreground text-sm sm:text-base break-all"
-                        aria-label={`Email address: ${currentUser.email}`}
-                      >
-                        {currentUser.email}
-                      </span>
-                    </div>
-                    {currentUser.emailVerified ? (
-                      <Badge
-                        variant="secondary"
-                        className="text-xs w-fit mx-auto sm:mx-0"
-                        aria-label="Email verification status: verified"
-                      >
-                        Verified
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant="destructive"
-                        className="text-xs w-fit mx-auto sm:mx-0"
-                        aria-label="Email verification status: not verified"
-                      >
-                        Unverified
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-center sm:justify-start space-x-2 mt-1">
-                    <CalendarDays
-                      className="h-4 w-4 text-muted-foreground"
-                      aria-hidden="true"
+              <div className="flex flex-col space-y-4">
+                {/* Avatar and Basic Info - Centered on Mobile */}
+                <div className="flex flex-col items-center text-center space-y-3">
+                  <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
+                    <AvatarImage
+                      src={currentUser.image || ''}
+                      alt={`Profile picture of ${currentUser.name}`}
                     />
-                    <span
-                      className="text-xs sm:text-sm text-muted-foreground"
-                      aria-label={`Account created on ${formatDate(currentUser.createdAt)}`}
+                    <AvatarFallback
+                      className="text-lg sm:text-xl"
+                      aria-label={`${currentUser.name} initials`}
                     >
-                      Member since {formatDate(currentUser.createdAt)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
-        </section>
-
-        {/* Profile Sections */}
-        <div className="grid gap-6" role="main">
-          {/* Profile Form - Editable Profile Information */}
-          <ProfileForm
-            user={{
-              id: currentUser.id,
-              name: currentUser.name,
-              email: currentUser.email,
-              image: currentUser.image,
-            }}
-            onSubmit={updateProfile}
-          />
-
-          {/* Account Information - Read-only details */}
-          <section aria-labelledby="account-info-heading">
-            <Card>
-              <CardHeader>
-                <CardTitle
-                  id="account-info-heading"
-                  className="flex items-center space-x-2 text-base sm:text-lg"
-                >
-                  <Shield
-                    className="h-4 w-4 sm:h-5 sm:w-5"
-                    aria-hidden="true"
-                  />
-                  <span>Account Information</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="space-y-1">
-                    <label
-                      className="text-sm font-medium text-muted-foreground"
-                      id="email-verification-label"
+                      {getInitials(currentUser.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="space-y-2">
+                    <CardTitle
+                      id="profile-header"
+                      className="text-xl sm:text-2xl"
                     >
-                      Email Verification Status
-                    </label>
-                    <div
-                      className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-1"
-                      aria-labelledby="email-verification-label"
-                    >
-                      <p className="text-sm sm:text-base break-all">
-                        {currentUser.email}
-                      </p>
+                      {currentUser.name}
+                    </CardTitle>
+                    <div className="flex flex-col items-center space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Mail
+                          className="h-4 w-4 text-muted-foreground"
+                          aria-hidden="true"
+                        />
+                        <span
+                          className="text-muted-foreground text-sm sm:text-base break-all"
+                          aria-label={`Email address: ${currentUser.email}`}
+                        >
+                          {currentUser.email}
+                        </span>
+                      </div>
                       {currentUser.emailVerified ? (
                         <Badge
                           variant="secondary"
                           className="text-xs w-fit"
                           aria-label="Email verification status: verified"
                         >
-                          Verified
+                          Email Verified
                         </Badge>
                       ) : (
                         <Badge
@@ -213,71 +136,38 @@ export default async function ProfileSettingsPage() {
                           className="text-xs w-fit"
                           aria-label="Email verification status: not verified"
                         >
-                          Unverified
+                          Email Unverified
                         </Badge>
                       )}
+                      <div className="flex items-center space-x-2">
+                        <CalendarDays
+                          className="h-4 w-4 text-muted-foreground"
+                          aria-hidden="true"
+                        />
+                        <span
+                          className="text-xs sm:text-sm text-muted-foreground"
+                          aria-label={`Account created on ${formatDate(currentUser.createdAt)}`}
+                        >
+                          Member since {formatDate(currentUser.createdAt)}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div className="space-y-1">
-                    <label
-                      className="text-sm font-medium text-muted-foreground"
-                      id="account-created-label"
-                    >
-                      Account Created
-                    </label>
-                    <p
-                      className="mt-1 text-sm sm:text-base"
-                      aria-labelledby="account-created-label"
-                    >
-                      {formatDate(currentUser.createdAt)}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <label
-                      className="text-sm font-medium text-muted-foreground"
-                      id="last-updated-label"
-                    >
-                      Last Updated
-                    </label>
-                    <p
-                      className="mt-1 text-sm sm:text-base"
-                      aria-labelledby="last-updated-label"
-                    >
-                      {formatDate(currentUser.updatedAt)}
-                    </p>
-                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </section>
+              </div>
+            </CardHeader>
+          </Card>
+        </section>
 
-          {/* Organization Information */}
-          <OrganizationInfo membership={organizationMembership} />
-
-          {/* Email Settings */}
-          <EmailSettings
-            email={currentUser.email}
-            emailVerified={currentUser.emailVerified}
-            onResendVerification={async () => {
-              'use server';
-              const result = await resendVerificationEmail();
-              if (!result.success) {
-                throw new Error(result.message);
-              }
-            }}
-          />
-
-          {/* Password Management */}
-          <PasswordForm
-            onSubmit={async (data) => {
-              'use server';
-              return await changePassword(data);
-            }}
-          />
-
-          {/* Security Settings */}
-          <SecuritySettings initialSessions={userSessions} />
-        </div>
+        {/* Tabbed Interface */}
+        <ProfileTabsWrapper
+          currentUser={currentUser}
+          organizationMembership={organizationMembership}
+          userSessions={userSessions}
+          updateProfile={updateProfile}
+          resendVerificationEmail={handleResendVerification}
+          changePassword={changePassword}
+        />
       </main>
     </>
   );
