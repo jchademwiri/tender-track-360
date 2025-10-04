@@ -2,7 +2,7 @@ import { UserContext } from '@/types/home-page';
 import { HeroSection } from './HeroSection';
 import { FeaturesSection } from './FeaturesSection';
 import { FooterSection } from './FooterSection';
-import { AuthenticatedUserSection } from './AuthenticatedUserSection';
+import { HomeAuthenticatedUserDashboard } from './HomeAuthenticatedUserDashboard';
 import { BenefitsSection } from './BenefitsSection';
 import { TestimonialsSection } from './TestimonialsSection';
 
@@ -19,7 +19,7 @@ export function HomePage({ userContext }: HomePageProps) {
       />
 
       {userContext.isAuthenticated && userContext.user && (
-        <AuthenticatedUserSection
+        <HomeAuthenticatedUserDashboard
           user={{
             name: userContext.user.name,
             organizationName: userContext.user.organizationName,

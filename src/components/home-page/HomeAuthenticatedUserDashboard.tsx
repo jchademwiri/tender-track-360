@@ -1,9 +1,9 @@
-import { AuthenticatedUserSectionProps } from '@/types/home-page';
+import { HomeAuthenticatedUserDashboardProps } from '@/types/home-page';
 
-export function AuthenticatedUserSection({
+export function HomeAuthenticatedUserDashboard({
   user,
   recentActivity,
-}: AuthenticatedUserSectionProps) {
+}: HomeAuthenticatedUserDashboardProps) {
   return (
     <section className="py-16 bg-secondary/30">
       <div className="container mx-auto px-4">

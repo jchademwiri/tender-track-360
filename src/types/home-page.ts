@@ -44,7 +44,7 @@ export interface HeroSectionProps {
   userName?: string;
 }
 
-export interface AuthenticatedUserSectionProps {
+export interface HomeAuthenticatedUserDashboardProps {
   user: {
     name: string;
     organizationName: string;
