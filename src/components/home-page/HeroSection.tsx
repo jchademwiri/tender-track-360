@@ -16,22 +16,18 @@ export function HeroSection({ isAuthenticated, userName }: HeroSectionProps) {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           {isAuthenticated ? (
-            <Link href="/organization">
-              <Button size="lg" className="px-8">
-                Go to Dashboard
-              </Button>
-            </Link>
+            <Button size="lg" asChild className="px-8 ">
+              <Link href="/dashboard">Go to Dashboard</Link>
+            </Button>
           ) : (
-            <Link href="/sign-up">
-              <Button size="lg" className="px-8">
-                Get Started
-              </Button>
-            </Link>
+            <Button size="lg" asChild className="px-8">
+              <Link href="/sign-up">Get Started</Link>
+            </Button>
           )}
           <Button
             size="lg"
             variant="outline"
-            className="px-8"
+            className="px-8 cursor-pointer"
             onClick={() => {
               const featuresSection = document.getElementById('features');
               if (featuresSection) {

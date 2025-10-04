@@ -1,4 +1,6 @@
 import { HomeAuthenticatedUserDashboardProps } from '@/types/home-page';
+import { Button } from '../ui';
+import Link from 'next/link';
 
 export function HomeAuthenticatedUserDashboard({
   user,
@@ -19,18 +21,6 @@ export function HomeAuthenticatedUserDashboard({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-primary/10 p-6 rounded-lg border border-primary/20">
-              <div className="text-3xl font-bold text-primary mb-2">
-                {recentActivity.activeTenders}
-              </div>
-              <div className="text-sm font-medium text-card-foreground">
-                Active Tenders
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Currently in progress
-              </div>
-            </div>
-
             <div className="bg-chart-4/10 p-6 rounded-lg border border-chart-4/20">
               <div className="text-3xl font-bold text-chart-4 mb-2">
                 {recentActivity.upcomingDeadlines}
@@ -40,28 +30,41 @@ export function HomeAuthenticatedUserDashboard({
               </div>
               <div className="text-xs text-muted-foreground">Next 7 days</div>
             </div>
+            <div className="bg-primary/10 p-6 rounded-lg border border-primary/20">
+              <div className="text-3xl font-bold text-primary mb-2">
+                {recentActivity.submitedThisMonth}
+              </div>
+              <div className="text-sm font-medium text-card-foreground">
+                Current Submitions
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Total Submitions For This Year
+              </div>
+            </div>
 
             <div className="bg-chart-2/10 p-6 rounded-lg border border-chart-2/20">
               <div className="text-3xl font-bold text-chart-2 mb-2">
-                {recentActivity.recentDocuments.length}
+                {recentActivity.activeProjects.length}
               </div>
               <div className="text-sm font-medium text-card-foreground">
-                Recent Documents
+                Current Projects
               </div>
               <div className="text-xs text-muted-foreground">Last 24 hours</div>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors">
-              View Dashboard
-            </button>
-            <button className="border border-border text-foreground px-6 py-3 rounded-lg hover:bg-secondary/50 transition-colors">
-              Create New Tender
-            </button>
-            <button className="border border-border text-foreground px-6 py-3 rounded-lg hover:bg-secondary/50 transition-colors">
-              View Reports
-            </button>
+            <Button>
+              <Link href="/dashboard">View Dashboard</Link>
+            </Button>
+            <Button variant={'outline'}>
+              <Link href="/dashboard/tenders/overview">View Tenders</Link>
+            </Button>
+            <Button variant={'outline'}>
+              <Link href="/dashboard/projects/overview">
+                View Purchase Orders
+              </Link>
+            </Button>
           </div>
 
           {recentActivity.upcomingDeadlines > 0 && (
