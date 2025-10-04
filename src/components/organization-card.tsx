@@ -1,6 +1,6 @@
 'use client';
 
-import { Organization, Role } from '@/db/schema';
+import { organization, Role } from '@/db/schema';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 interface OrganizationCardProps {
-  organization: Organization;
+  organization: typeof organization.$inferSelect;
   memberCount?: number;
   isActive?: boolean;
   userRole?: Role;

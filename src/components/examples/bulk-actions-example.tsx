@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { OrganizationMembersSection } from '@/components/organization-members-section';
 import { Member } from '@/db/schema';
 import { PendingInvitation } from '@/server/organizations';

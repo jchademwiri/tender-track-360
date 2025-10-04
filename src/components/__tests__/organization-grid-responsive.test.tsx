@@ -3,7 +3,7 @@
  */
 import { render } from '@testing-library/react';
 import { OrganizationGrid } from '../organization-grid';
-import { Organization, Role } from '@/db/schema';
+import { Role } from '@/db/schema';
 import type { OrganizationWithStats } from '@/server/organizations';
 
 // Mock Next.js Link component

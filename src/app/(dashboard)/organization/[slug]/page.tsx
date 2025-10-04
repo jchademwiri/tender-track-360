@@ -32,8 +32,8 @@ function OrganizationNotFound({ slug }: { slug: string }) {
         </CardHeader>
         <CardContent className="space-y-4 text-center">
           <p className="text-muted-foreground">
-            The organization "{slug}" could not be found or you don't have
-            access to it.
+            The organization &quot;{slug}&quot; could not be found or you
+            don&apos;t have access to it.
           </p>
           <div className="flex flex-col sm:flex-row gap-2">
             <Button
@@ -61,10 +61,10 @@ function OrganizationNotFound({ slug }: { slug: string }) {
 // Main organization content component
 async function OrganizationContent({ slug }: { slug: string }) {
   let organization;
-  let users;
+  let users: Awaited<ReturnType<typeof getAllUsers>> = [];
   let pendingInvitations: Awaited<ReturnType<typeof getPendingInvitations>> =
     [];
-  let membersError: string | null = null;
+  const membersError: string | null = null;
   let invitationsError: string | null = null;
   let usersError: string | null = null;
 

@@ -48,8 +48,6 @@ describe('Invitation Management Server Actions', () => {
 
   describe('Permission Validation Logic', () => {
     it('should check admin permissions correctly', () => {
-      const userRoles = ['owner', 'admin', 'member'];
-
       // Admin permissions (owner and admin can invite)
       const canInvite = (role: string) => ['owner', 'admin'].includes(role);
 

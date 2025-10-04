@@ -2,13 +2,12 @@
 
 import { OrganizationCard } from './organization-card';
 import { CreateOrganizationCard } from './create-organization-card';
-import { OrganizationCardSkeleton } from './organization-card-skeleton';
 import { OrganizationGridSkeleton } from './organization-grid-skeleton';
-import { Organization } from '@/db/schema';
+import { organization } from '@/db/schema';
 import { useState } from 'react';
 import { Button } from './ui/button';
 
-const mockOrganization: Organization = {
+const mockOrganization: typeof organization.$inferSelect = {
   id: '1',
   name: 'Demo Organization',
   slug: 'demo-org',

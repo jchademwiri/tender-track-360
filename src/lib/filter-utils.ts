@@ -3,12 +3,6 @@ import type { Member, Role } from '@/db/schema';
 import type { PendingInvitation } from '@/server/organizations';
 
 export interface MemberWithUser extends Member {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    image?: string | null;
-  };
   status?: 'active' | 'inactive';
   joinedAt?: Date;
 }

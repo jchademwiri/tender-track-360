@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Organization } from '@/db/schema';
+import { organization } from '@/db/schema';
 import type { Route } from 'next';
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
@@ -15,7 +15,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useTransition, useEffect, useState } from 'react';
 
 interface OrganizationSwitcherProps {
-  organizations: Organization[];
+  organizations: (typeof organization.$inferSelect)[];
 }
 
 export function OrganizationSwitcher({

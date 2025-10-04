@@ -1,12 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CreateOrganizationCard } from '../create-organization-card';
-import { it } from 'zod/v4/locales';
-import { it } from 'zod/v4/locales';
-import { it } from 'zod/v4/locales';
-import { it } from 'zod/v4/locales';
-import { it } from 'zod/v4/locales';
-import { it } from 'zod/v4/locales';
-import { describe } from 'node:test';
 
 describe('CreateOrganizationCard', () => {
   it('renders the create organization content', () => {

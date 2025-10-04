@@ -1,7 +1,6 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { PendingInvitationsSection } from '@/components/pending-invitations-section';
 import { PendingInvitation } from '@/server/organizations';
-import { toast } from 'sonner';
 
 // Mock the server actions
 jest.mock('@/server/invitations', () => ({

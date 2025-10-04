@@ -24,7 +24,6 @@ interface MembersTableActionProps {
 
 export default function MembersTableAction({
   memberId,
-  memberRole: _memberRole,
   memberName,
   disabled = false,
 }: MembersTableActionProps) {

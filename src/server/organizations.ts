@@ -2,7 +2,9 @@
 
 import { db } from '@/db';
 import { member, organization, invitation, user } from '@/db/schema';
-import type { Organization, Role } from '@/db/schema';
+import type { Role } from '@/db/schema';
+
+type Organization = typeof organization.$inferSelect;
 
 import { eq, inArray, and } from 'drizzle-orm/sql/expressions/conditions';
 import { count } from 'drizzle-orm';

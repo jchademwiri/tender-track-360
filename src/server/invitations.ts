@@ -6,8 +6,6 @@ import type { Role } from '@/db/schema';
 import { eq, and, inArray } from 'drizzle-orm';
 import { getCurrentUser } from './users';
 import { getUserOrganizationMembership } from './organizations';
-import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'crypto';
 
@@ -457,7 +455,7 @@ export async function bulkCancelInvitations(
     }
 
     // Cancel all invitations
-    const result = await db
+    await db
       .update(invitation)
       .set({ status: 'cancelled' })
       .where(inArray(invitation.id, invitationIds));

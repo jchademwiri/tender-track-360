@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Organization, Role } from '@/db/schema';
+import { organization, Role } from '@/db/schema';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import {
 import { handleError, handleSuccess } from '@/lib/error-handler';
 
 interface OrganizationHeaderProps {
-  organization: Organization & {
+  organization: typeof organization.$inferSelect & {
     memberCount?: number;
     userRole?: Role;
   };

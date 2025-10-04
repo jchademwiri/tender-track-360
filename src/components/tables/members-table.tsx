@@ -28,7 +28,7 @@ interface MembersTableProps {
 }
 
 // Helper function to get member status
-function getMemberStatus(_member: Member): 'active' | 'inactive' {
+function getMemberStatus(): 'active' | 'inactive' {
   // For now, we'll consider all members as active
   // This can be enhanced based on additional logic like last login, etc.
   return 'active';
@@ -242,7 +242,7 @@ export function MembersTable({
       </TableHeader>
       <TableBody>
         {members.map((member) => {
-          const status = getMemberStatus(member);
+          const status = getMemberStatus();
           const isSelected = selectedMembers.includes(member.id);
 
           return (

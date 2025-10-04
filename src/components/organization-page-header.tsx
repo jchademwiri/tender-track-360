@@ -1,11 +1,11 @@
 'use client';
 
-import { Organization } from '@/db/schema';
+import { organization } from '@/db/schema';
 import { cn } from '@/lib/utils';
 
 interface OrganizationPageHeaderProps {
   organizationCount: number;
-  activeOrganization?: Organization;
+  activeOrganization?: typeof organization.$inferSelect;
   className?: string;
 }
 

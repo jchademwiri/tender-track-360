@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { OrganizationPageContent } from '../organization-page-content';
@@ -27,7 +27,7 @@ jest.mock('next/link', () => {
 jest.mock('../organization-grid', () => ({
   OrganizationGrid: ({ organizations, onCreateOrganization }: any) => (
     <div data-testid="organization-grid" role="grid" aria-label="Organizations">
-      {organizations.map((org: any, index: number) => (
+      {organizations.map((org: any) => (
         <div
           key={org.id}
           data-testid={`org-${org.id}`}

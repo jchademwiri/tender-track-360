@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { authClient } from '@/lib/auth-client';
-import { Organization } from '@/db/schema';
+import { organization } from '@/db/schema';
 import { OrganizationGrid } from './organization-grid';
 import { OrganizationSearch } from './organization-search';
 import { RecentActivitySection } from './recent-activity-section';
@@ -45,7 +45,7 @@ export function OrganizationPageContent({
     setFilteredOrganizations(organizations);
   }, [organizations]);
 
-  const handleFilter = (filtered: Organization[]) => {
+  const handleFilter = (filtered: (typeof organization.$inferSelect)[]) => {
     setFilteredOrganizations(filtered as OrganizationWithStats[]);
   };
 

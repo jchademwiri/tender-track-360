@@ -137,7 +137,7 @@ export function AllUsers({
       });
 
       if (error) {
-        handleError(error.message, {
+        handleError(error.message || 'Unknown error occurred', {
           title: 'Invitation Failed',
         });
         return;
