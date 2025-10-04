@@ -12,24 +12,20 @@ import type { Route } from 'next';
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { useRouter, usePathname } from 'next/navigation';
-import { useTransition, useEffect, useState } from 'react';
+import { useTransition } from 'react';
+import dynamic from 'next/dynamic';
 
 interface OrganizationSwitcherProps {
   organizations: (typeof organization.$inferSelect)[];
 }
 
-export function OrganizationSwitcher({
+function OrganizationSwitcherClient({
   organizations,
 }: OrganizationSwitcherProps) {
   const { data: activeOrganization } = authClient.useActiveOrganization();
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const handleChangeOrganization = async (organizationId: string) => {
     const selectedOrg = organizations.find((org) => org.id === organizationId);
@@ -127,19 +123,13 @@ export function OrganizationSwitcher({
 
   return (
     <Select
-      onValueChange={isClient ? handleChangeOrganization : undefined}
-      value={isClient ? activeOrganization?.id : undefined}
-      disabled={isPending || !isClient}
+      onValueChange={handleChangeOrganization}
+      value={activeOrganization?.id}
+      disabled={isPending}
     >
       <SelectTrigger className="min-w-[180px]">
         <SelectValue
-          placeholder={
-            !isClient
-              ? 'Loading...'
-              : isPending
-                ? 'Switching...'
-                : 'Organization'
-          }
+          placeholder={isPending ? 'Switching...' : 'Organization'}
         />
       </SelectTrigger>
       <SelectContent>
@@ -152,3 +142,18 @@ export function OrganizationSwitcher({
     </Select>
   );
 }
+
+// Export the dynamically imported component to prevent hydration mismatch
+export const OrganizationSwitcher = dynamic(
+  () => Promise.resolve(OrganizationSwitcherClient),
+  {
+    ssr: false,
+    loading: () => (
+      <Select disabled>
+        <SelectTrigger className="min-w-[180px]">
+          <SelectValue placeholder="Loading..." />
+        </SelectTrigger>
+      </Select>
+    ),
+  }
+);

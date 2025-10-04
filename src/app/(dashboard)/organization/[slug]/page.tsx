@@ -15,6 +15,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, RefreshCw, Home } from 'lucide-react';
 
+// Force dynamic rendering since we use headers() in server functions
+export const dynamic = 'force-dynamic';
+
 type Params = Promise<{ slug: string }>;
 
 // Error fallback component for organization not found

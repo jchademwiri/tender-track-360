@@ -5,6 +5,9 @@ import { OrganizationPageSkeleton } from '@/components/organization-page-skeleto
 import { getorganizations } from '@/server';
 import { getRecentActivities } from '@/server/activity';
 
+// Force dynamic rendering since we use headers() in server functions
+export const dynamic = 'force-dynamic';
+
 export default async function OrganizationPage() {
   return (
     <div className="min-h-screen bg-background">
