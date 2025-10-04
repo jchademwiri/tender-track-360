@@ -55,11 +55,11 @@ export const dashboadLinks = {
           url: '/dashboard/projects',
         },
         {
-          title: 'Purchase Orders',
+          title: 'Purchase Orders', // Can not be visible to the role of member
           url: '/dashboard/projects/purchase-orders',
         },
         {
-          title: 'Contracts',
+          title: 'Contracts', // Can not be visible to the role of member
           url: '/dashboard/projects/contracts',
         },
         // {
@@ -113,6 +113,7 @@ export const dashboadLinks = {
         },
         {
           title: 'Company', // Must be for Current Active Organisation: must be seen only of you are owner or admin
+          // Can not be visible to the role of member
           url: '/dashboard/settings/company',
         },
         {
