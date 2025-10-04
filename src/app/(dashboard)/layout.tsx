@@ -1,5 +1,5 @@
-import Header from '@/components/header';
-import { OrganizationProvider } from '@/components/organization-provider';
+import Header from '@/components/shared/navigation/header';
+import { OrganizationProvider } from '@/components/shared/providers';
 import { getOrganizationsForProvider } from '@/server/organizations';
 
 export default async function DashboardLayout({

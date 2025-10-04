@@ -1,6 +1,6 @@
 'use client';
 
-import { organization, Role } from '@/db/schema';
+import { Role } from '@/db/schema';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -8,9 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { Users, Calendar, Settings, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import type { OrganizationWithStats } from '@/server/organizations';
 
 interface OrganizationCardProps {
-  organization: typeof organization.$inferSelect;
+  organization: OrganizationWithStats;
   memberCount?: number;
   isActive?: boolean;
   userRole?: Role;
@@ -19,11 +20,14 @@ interface OrganizationCardProps {
 
 export function OrganizationCard({
   organization,
-  memberCount = 0,
+  memberCount,
   isActive = false,
-  userRole = 'member',
+  userRole,
   className,
 }: OrganizationCardProps) {
+  // Use the organization's built-in data if not provided as props
+  const actualMemberCount = memberCount ?? organization.memberCount;
+  const actualUserRole = userRole ?? organization.userRole;
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -69,7 +73,7 @@ export function OrganizationCard({
                   variant={isActive ? 'default' : 'secondary'}
                   className="text-xs"
                 >
-                  {userRole}
+                  {actualUserRole}
                 </Badge>
                 {isActive && (
                   <Badge variant="outline" className="text-xs">
@@ -89,7 +93,7 @@ export function OrganizationCard({
             <div className="flex items-center gap-1">
               <Users className="size-4" />
               <span>
-                {memberCount} member{memberCount !== 1 ? 's' : ''}
+                {actualMemberCount} member{actualMemberCount !== 1 ? 's' : ''}
               </span>
             </div>
             <div className="flex items-center gap-1">
@@ -110,7 +114,7 @@ export function OrganizationCard({
                 Go to Dashboard
               </Link>
             </Button>
-            {(userRole === 'owner' || userRole === 'admin') && (
+            {(actualUserRole === 'owner' || actualUserRole === 'admin') && (
               <Button
                 variant="outline"
                 size="sm"

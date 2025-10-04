@@ -14,13 +14,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Separator } from '@/components/ui/separator';
-import { SearchAndFilters } from '@/components/search-and-filters';
-import { NoResults } from '@/components/no-results';
+
 import { useSearchAndFilter } from '@/hooks/use-search-and-filter';
 import { getInvitationDisplayStatus } from '@/lib/filter-utils';
 import type { MemberWithUser } from '@/lib/filter-utils';
 import type { PendingInvitation } from '@/server/organizations';
 import { MoreHorizontal, Mail, UserPlus } from 'lucide-react';
+import { NoResults } from '@/components/shared/empty-states';
+import { SearchAndFilters } from './shared/search';
 
 export interface MembersAndInvitationsWithSearchProps {
   members: MemberWithUser[];

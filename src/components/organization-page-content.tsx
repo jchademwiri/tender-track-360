@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { organization } from '@/db/schema';
 import { OrganizationGrid } from './organization-grid';
-import { OrganizationSearch } from './organization-search';
+
 import { RecentActivitySection } from './recent-activity-section';
-import { CreateorganizationForm } from '@/components/forms';
+
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,6 +17,8 @@ import {
 } from '@/components/ui/dialog';
 import type { RecentActivity } from '@/types/activity';
 import type { OrganizationWithStats } from '@/server/organizations';
+import { CreateorganizationForm } from './forms';
+import { OrganizationSearch } from './shared/search';
 
 interface OrganizationPageContentProps {
   organizations: OrganizationWithStats[];

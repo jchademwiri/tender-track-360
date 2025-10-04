@@ -91,6 +91,10 @@ export type Member = typeof member.$inferSelect & {
   user: typeof user.$inferSelect;
 };
 
+// Backwards-compatible type aliases for tests and older imports
+export type Organization = typeof organization.$inferSelect;
+export type MemberWithUser = Member;
+
 export const invitation = pgTable('invitation', {
   id: text('id').primaryKey(),
   organizationId: text('organization_id')

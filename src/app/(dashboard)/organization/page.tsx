@@ -1,9 +1,10 @@
 import { Suspense } from 'react';
 import { OrganizationPageHeader } from '@/components/organization-page-header';
 import { OrganizationPageContent } from '@/components/organization-page-content';
-import { OrganizationPageSkeleton } from '@/components/organization-page-skeleton';
+
 import { getorganizations } from '@/server';
 import { getRecentActivities } from '@/server/activity';
+import { OrganizationPageSkeleton } from '@/components/shared/loading';
 
 // Force dynamic rendering since we use headers() in server functions
 export const dynamic = 'force-dynamic';
