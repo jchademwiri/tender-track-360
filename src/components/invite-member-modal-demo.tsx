@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { InviteMemberModal } from './invite-member-modal';
+
 import { Button } from '@/components/ui/button';
+import { InviteMemberModal } from './shared/modals';
 
 export function InviteMemberModalDemo() {
   const [isOpen, setIsOpen] = useState(false);

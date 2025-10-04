@@ -1,10 +1,9 @@
-import { AllUsers } from '@/components/tables';
 import { MembersTableWrapper } from '@/components/members-table-wrapper';
 import { PendingInvitationsSection } from '@/components/pending-invitations-section';
 import { OrganizationHeader } from '@/components/organization-header';
 import { OrganizationStats } from '@/components/organization-stats';
 import { ErrorBoundary } from '@/components/error-boundary';
-import { PageLoadingSkeleton } from '@/components/loading-states';
+
 import {
   getAllUsers,
   getOrganizationBySlugWithUserRole,
@@ -14,6 +13,8 @@ import { Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, RefreshCw, Home } from 'lucide-react';
+import { PageLoadingSkeleton } from '@/components/shared/loading';
+import { AllUsers } from '@/components/shared/tables';
 
 // Force dynamic rendering since we use headers() in server functions
 export const dynamic = 'force-dynamic';

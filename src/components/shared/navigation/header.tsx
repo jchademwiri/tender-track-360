@@ -1,6 +1,7 @@
-import { NavLinks } from '@/components/nav-links';
+
 import Logout from '@/components/ui/logout';
 import { ThemeSwitcher } from '@/components/theme-switcher';
+import { NavLinks } from './nav-links';
 
 export default function Header() {
   return (

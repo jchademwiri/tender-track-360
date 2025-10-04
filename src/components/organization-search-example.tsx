@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { OrganizationSearch } from './organization-search';
+
 import { OrganizationCard } from './organization-card';
-import { EmptySearchResults } from './empty-search-results';
+
 import type { OrganizationWithStats } from '@/server/organizations';
+import { OrganizationSearch } from './shared/search';
+import { EmptySearchResults } from './shared/empty-states';
 
 interface OrganizationSearchExampleProps {
   organizations: OrganizationWithStats[];

@@ -1,4 +1,5 @@
-import type { FilterState } from '@/components/search-and-filters';
+
+import { FilterState } from '@/components/shared/search';
 import type { Member, Role } from '@/db/schema';
 import type { PendingInvitation } from '@/server/organizations';
 

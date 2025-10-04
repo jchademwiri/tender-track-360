@@ -180,3 +180,5 @@ export function withErrorBoundary<P extends object>(
 
   return WrappedComponent;
 }
+
+// The ErrorBoundary is defined in this file. Do not re-export from './ui/error-boundary' to avoid duplicate declarations.

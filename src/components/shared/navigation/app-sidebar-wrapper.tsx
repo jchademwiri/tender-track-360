@@ -1,7 +1,8 @@
-import { AppSidebar } from '@/components/app-sidebar';
+
 import { getorganizations } from '@/server/organizations';
 import { getCurrentUser } from '@/server/users';
 import type { ComponentProps } from 'react';
+import { AppSidebar } from './app-sidebar';
 
 type AppSidebarWrapperProps = Omit<
   ComponentProps<typeof AppSidebar>,
