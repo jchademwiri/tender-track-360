@@ -1,7 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronsUpDown, Plus } from 'lucide-react';
+import { ChevronsUpDown, Plus, Building2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth-client';
+import { toast } from 'sonner';
 
 import {
   DropdownMenu,
@@ -18,20 +21,63 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { CreateorganizationForm } from '@/components/forms';
+import type { OrganizationWithStats } from '@/server/organizations';
 
 export function TeamSwitcher({
-  teams,
+  organizations,
 }: {
-  teams: {
-    name: string;
-    logo: React.ElementType;
-    plan: string;
-  }[];
+  organizations: OrganizationWithStats[];
 }) {
   const { isMobile } = useSidebar();
-  const [activeTeam, setActiveTeam] = React.useState(teams[0]);
+  const router = useRouter();
+  const { data: activeOrganization } = authClient.useActiveOrganization();
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
 
-  if (!activeTeam) {
+  // Find the active organization from the list or use the first one as fallback
+  const activeOrg = React.useMemo(() => {
+    if (activeOrganization) {
+      return (
+        organizations.find((org) => org.id === activeOrganization.id) ||
+        organizations[0]
+      );
+    }
+    return organizations[0];
+  }, [activeOrganization, organizations]);
+
+  const handleOrganizationSwitch = async (
+    organization: OrganizationWithStats
+  ) => {
+    try {
+      // Switch the active organization
+      const result = await authClient.organization.setActive({
+        organizationId: organization.id,
+      });
+
+      if (result.error) {
+        toast.error('Failed to switch organization');
+        return;
+      }
+
+      // Stay on the current dashboard, just refresh to update the organization context
+      router.refresh();
+
+      toast.success(`Switched to ${organization.name}`);
+    } catch (error) {
+      console.error('Organization switch error:', error);
+      toast.error('Failed to switch organization');
+    }
+  };
+
+  if (!activeOrg) {
     return null;
   }
 
@@ -45,11 +91,14 @@ export function TeamSwitcher({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <activeTeam.logo className="size-4" />
+                <Building2 className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                <span className="truncate font-medium">{activeTeam.name}</span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
+                <span className="truncate font-medium">{activeOrg.name}</span>
+                <span className="truncate text-xs">
+                  {activeOrg.memberCount}{' '}
+                  {activeOrg.memberCount === 1 ? 'member' : 'members'}
+                </span>
               </div>
               <ChevronsUpDown className="ml-auto group-data-[collapsible=icon]:hidden" />
             </SidebarMenuButton>
@@ -61,28 +110,58 @@ export function TeamSwitcher({
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Teams
+              Organizations
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            {organizations.map((organization, index) => (
               <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
+                key={organization.id}
+                onClick={() => handleOrganizationSwitch(organization)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
-                  <team.logo className="size-3.5 shrink-0" />
+                  <Building2 className="size-3.5 shrink-0" />
                 </div>
-                {team.name}
+                <div className="flex flex-col">
+                  <span className="font-medium">{organization.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {organization.memberCount}{' '}
+                    {organization.memberCount === 1 ? 'member' : 'members'}
+                  </span>
+                </div>
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <Plus className="size-4" />
-              </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
-            </DropdownMenuItem>
+            <Dialog
+              open={isCreateDialogOpen}
+              onOpenChange={setIsCreateDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <DropdownMenuItem
+                  className="gap-2 p-2"
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setIsCreateDialogOpen(true);
+                  }}
+                >
+                  <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
+                    <Plus className="size-4" />
+                  </div>
+                  <div className="text-muted-foreground font-medium">
+                    Add organization
+                  </div>
+                </DropdownMenuItem>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Create Organization</DialogTitle>
+                  <DialogDescription>
+                    Create a new organization to collaborate with your team.
+                  </DialogDescription>
+                </DialogHeader>
+                <CreateorganizationForm />
+              </DialogContent>
+            </Dialog>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

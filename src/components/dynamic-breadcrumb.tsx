@@ -33,7 +33,7 @@ export function DynamicBreadcrumb() {
 
         {pathSegments.map((segment, index) => {
           const isLast = index === pathSegments.length - 1;
-          const href = '/' + pathSegments.slice(0, index + 1).join('/');
+          const href = `/${pathSegments.slice(0, index + 1).join('/')}`;
           const displayName = formatSegmentName(segment);
 
           return (

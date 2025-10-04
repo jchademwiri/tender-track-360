@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { organization } from '@/db/schema';
 import { OrganizationSearch } from './organization-search';
 import { OrganizationCard } from './organization-card';
 import { EmptySearchResults } from './empty-search-results';
+import type { OrganizationWithStats } from '@/server/organizations';
 
 interface OrganizationSearchExampleProps {
-  organizations: (typeof organization.$inferSelect)[];
+  organizations: OrganizationWithStats[];
   onCreateOrganization?: () => void;
 }
 
@@ -19,7 +19,7 @@ export function OrganizationSearchExample({
     useState(organizations);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleFilter = (filtered: (typeof organization.$inferSelect)[]) => {
+  const handleFilter = (filtered: OrganizationWithStats[]) => {
     setFilteredOrganizations(filtered);
   };
 
@@ -54,8 +54,8 @@ export function OrganizationSearchExample({
             <OrganizationCard
               key={org.id}
               organization={org}
-              memberCount={Math.floor(Math.random() * 20) + 1} // Mock member count
-              userRole="member"
+              memberCount={org.memberCount}
+              userRole={org.userRole}
             />
           ))}
         </div>
