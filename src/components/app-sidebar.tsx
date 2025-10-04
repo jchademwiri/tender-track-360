@@ -23,53 +23,35 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import type { OrganizationWithStats } from '@/server/organizations';
+import type { User } from '@/db/schema';
 
 // This is sample data.
 const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
   navMain: [
     {
-      title: 'Playground',
+      title: 'Tender Management',
       url: '#',
       icon: SquareTerminal,
       isActive: true,
       items: [
         {
-          title: 'History',
+          title: 'Tenders',
           url: '#',
         },
         {
-          title: 'Starred',
+          title: 'Submited',
           url: '#',
         },
         {
-          title: 'Settings',
+          title: 'Briefings',
           url: '#',
         },
       ],
     },
     {
-      title: 'Models',
+      title: 'Customers',
       url: '#',
       icon: Bot,
-      items: [
-        {
-          title: 'Genesis',
-          url: '#',
-        },
-        {
-          title: 'Explorer',
-          url: '#',
-        },
-        {
-          title: 'Quantum',
-          url: '#',
-        },
-      ],
     },
     {
       title: 'Documentation',
@@ -139,9 +121,10 @@ const data = {
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   organizations: OrganizationWithStats[];
+  user: User;
 }
 
-export function AppSidebar({ organizations, ...props }: AppSidebarProps) {
+export function AppSidebar({ organizations, user, ...props }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -152,7 +135,7 @@ export function AppSidebar({ organizations, ...props }: AppSidebarProps) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
