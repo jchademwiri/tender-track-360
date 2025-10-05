@@ -26,7 +26,7 @@ export async function getorganizations(): Promise<OrganizationWithStats[]> {
       throw new Error('User not authenticated');
     }
 
-    // Get user's memberships with role information, excluding soft-deleted organizations
+    // Get user's memberships with role information (including soft-deleted organizations for the list)
     const userMemberships = await db.query.member.findMany({
       where: eq(member.userId, currentUser.id),
       with: {
@@ -34,18 +34,13 @@ export async function getorganizations(): Promise<OrganizationWithStats[]> {
       },
     });
 
-    // Filter out soft-deleted organizations
-    const activeMemberships = userMemberships.filter(
-      (membership) => !membership.organization.deletedAt
-    );
-
-    if (activeMemberships.length === 0) {
+    if (userMemberships.length === 0) {
       return [];
     }
 
-    // Get organizations with enhanced data
+    // Get organizations with enhanced data (including soft-deleted ones for the organization list)
     const organizationsWithStats: OrganizationWithStats[] = await Promise.all(
-      activeMemberships.map(async (membership) => {
+      userMemberships.map(async (membership) => {
         // Get member count for this organization
         const memberCountResult = await db
           .select({ count: count() })
@@ -70,6 +65,61 @@ export async function getorganizations(): Promise<OrganizationWithStats[]> {
   }
 }
 
+// Function specifically for sidebar - excludes soft-deleted organizations
+export async function getActiveOrganizations(): Promise<
+  OrganizationWithStats[]
+> {
+  try {
+    const { currentUser } = await getCurrentUser();
+
+    if (!currentUser?.id) {
+      throw new Error('User not authenticated');
+    }
+
+    // Get user's memberships with role information, excluding soft-deleted organizations
+    const userMemberships = await db.query.member.findMany({
+      where: eq(member.userId, currentUser.id),
+      with: {
+        organization: true,
+      },
+    });
+
+    // Filter out soft-deleted organizations for sidebar
+    const activeMemberships = userMemberships.filter(
+      (membership) => !membership.organization.deletedAt
+    );
+
+    if (activeMemberships.length === 0) {
+      return [];
+    }
+
+    // Get organizations with enhanced data (only active ones for sidebar)
+    const organizationsWithStats: OrganizationWithStats[] = await Promise.all(
+      activeMemberships.map(async (membership) => {
+        // Get member count for this organization
+        const memberCountResult = await db
+          .select({ count: count() })
+          .from(member)
+          .where(eq(member.organizationId, membership.organizationId));
+
+        const memberCount = memberCountResult[0]?.count || 0;
+
+        return {
+          ...membership.organization,
+          memberCount,
+          userRole: membership.role as Role,
+          lastActivity: membership.organization.createdAt, // Placeholder for now
+        };
+      })
+    );
+
+    return organizationsWithStats;
+  } catch (error) {
+    console.error('Error fetching active organizations:', error);
+    throw new Error('Failed to fetch active organizations');
+  }
+}
+
 export async function getOrganizationsForProvider() {
   const { currentUser } = await getCurrentUser();
   const members = await db.query.member.findMany({
@@ -81,7 +131,7 @@ export async function getOrganizationsForProvider() {
         organization.id,
         members.map((m) => m.organizationId)
       ),
-      isNull(organization.deletedAt) // Filter out soft-deleted organizations
+      isNull(organization.deletedAt) // Filter out soft-deleted organizations from sidebar
     ),
   });
   // Map to match the expected type for OrganizationProvider

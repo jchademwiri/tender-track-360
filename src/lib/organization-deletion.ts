@@ -97,11 +97,11 @@ class OrganizationDeletionManager {
 
   async softDeleteOrganization(
     organizationId: string,
-    _userId: string, // eslint-disable-line @typescript-eslint/no-unused-vars
-    _confirmation: DeletionConfirmation // eslint-disable-line @typescript-eslint/no-unused-vars
+    userId: string,
+    confirmation: DeletionConfirmation
   ): Promise<OrganizationDeletionResult> {
     try {
-      // TODO: Implement soft deletion logic
+      // Check if organization exists and is not already deleted
       const org = await db.query.organization.findFirst({
         where: eq(organization.id, organizationId),
       });
@@ -120,13 +120,42 @@ class OrganizationDeletionManager {
         };
       }
 
+      if (org.deletedAt) {
+        return {
+          success: false,
+          deletionType: 'soft',
+          affectedRecords: {
+            tenders: 0,
+            contracts: 0,
+            members: 0,
+            followUps: 0,
+          },
+          error: 'Organization is already deleted',
+        };
+      }
+
+      // Calculate permanent deletion date (30 days from now)
+      const permanentDeletionDate = new Date(
+        Date.now() +
+          this.DEFAULT_SOFT_DELETE_GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000
+      );
+
+      // Update organization with soft deletion fields
+      await db
+        .update(organization)
+        .set({
+          deletedAt: new Date(),
+          deletedBy: userId,
+          deletionReason: confirmation.reason || null,
+          permanentDeletionScheduledAt: permanentDeletionDate,
+        })
+        .where(eq(organization.id, organizationId));
+
       return {
         success: true,
         deletionId: crypto.randomUUID(),
         deletionType: 'soft',
-        permanentDeletionScheduledAt: new Date(
-          Date.now() + 30 * 24 * 60 * 60 * 1000
-        ),
+        permanentDeletionScheduledAt: permanentDeletionDate,
         affectedRecords: { tenders: 0, contracts: 0, members: 0, followUps: 0 },
       };
     } catch (error) {

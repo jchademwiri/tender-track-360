@@ -2,7 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Building2, Users, Calendar, ChevronRight } from 'lucide-react';
+import {
+  Building2,
+  Users,
+  Calendar,
+  ChevronRight,
+  AlertTriangle,
+  Clock,
+} from 'lucide-react';
 import type { Role } from '@/db/schema';
 import Link from 'next/link';
 
@@ -16,6 +23,10 @@ interface OrganizationCardProps {
     memberCount: number;
     userRole: Role;
     lastActivity?: Date;
+    deletedAt?: Date | null;
+    deletedBy?: string | null;
+    deletionReason?: string | null;
+    permanentDeletionScheduledAt?: Date | null;
   };
 }
 
@@ -52,9 +63,18 @@ function canManageOrganization(role: Role): boolean {
 export function OrganizationCard({ organization }: OrganizationCardProps) {
   const canManage = canManageOrganization(organization.userRole);
   const isReadOnly = organization.userRole === 'member';
+  const isDeleted = !!organization.deletedAt;
+  const daysUntilPermanentDeletion = organization.permanentDeletionScheduledAt
+    ? Math.ceil(
+        (organization.permanentDeletionScheduledAt.getTime() - Date.now()) /
+          (1000 * 60 * 60 * 24)
+      )
+    : 0;
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card
+      className={`hover:shadow-md transition-shadow ${isDeleted ? 'border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10' : ''}`}
+    >
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -68,13 +88,28 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
               </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-lg">{organization.name}</CardTitle>
-              <Badge
-                className={`text-xs mt-1 ${getRoleBadgeColor(organization.userRole)}`}
+              <CardTitle
+                className={`text-lg ${isDeleted ? 'text-red-700 dark:text-red-300' : ''}`}
               >
-                {organization.userRole.charAt(0).toUpperCase() +
-                  organization.userRole.slice(1)}
-              </Badge>
+                {organization.name}
+                {isDeleted && (
+                  <AlertTriangle className="h-4 w-4 text-red-500 inline ml-2" />
+                )}
+              </CardTitle>
+              <div className="flex gap-2 mt-1">
+                <Badge
+                  className={`text-xs ${getRoleBadgeColor(organization.userRole)}`}
+                >
+                  {organization.userRole.charAt(0).toUpperCase() +
+                    organization.userRole.slice(1)}
+                </Badge>
+                {isDeleted && (
+                  <Badge className="text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                    <Clock className="h-3 w-3 mr-1" />
+                    Pending Deletion
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -98,8 +133,30 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
           </div>
         </div>
 
+        {/* Deletion Status */}
+        {isDeleted && (
+          <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+            <div className="flex items-center gap-2 text-sm text-red-700 dark:text-red-300 mb-1">
+              <AlertTriangle className="h-4 w-4" />
+              <span className="font-medium">Scheduled for deletion</span>
+            </div>
+            <p className="text-xs text-red-600 dark:text-red-400">
+              Will be permanently deleted in {daysUntilPermanentDeletion} day
+              {daysUntilPermanentDeletion !== 1 ? 's' : ''}
+              {organization.permanentDeletionScheduledAt && (
+                <> ({formatDate(organization.permanentDeletionScheduledAt)})</>
+              )}
+            </p>
+            {organization.deletionReason && (
+              <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                Reason: {organization.deletionReason}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Last Activity */}
-        {organization.lastActivity && (
+        {!isDeleted && organization.lastActivity && (
           <div className="text-sm text-muted-foreground">
             Last activity: {formatDate(organization.lastActivity)}
           </div>
@@ -107,7 +164,23 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
 
         {/* Action Button */}
         <div className="pt-2">
-          {canManage ? (
+          {isDeleted ? (
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                disabled
+              >
+                Organization Deleted
+              </Button>
+              {canManage && (
+                <Button type="button" variant="secondary" size="sm">
+                  Restore
+                </Button>
+              )}
+            </div>
+          ) : canManage ? (
             <Link
               href={`/dashboard/settings/organisation/${organization.slug || organization.id}`}
             >
