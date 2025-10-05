@@ -25,8 +25,6 @@ import {
   error as errorToast,
   success as successToast,
 } from '@/lib/toast-enhanced';
-import { OwnershipTransferModal } from './transfer-ownership-modal';
-import { DataExportModal } from './data-export-modal';
 
 interface DangerZoneProps {
   organizationId: string;
