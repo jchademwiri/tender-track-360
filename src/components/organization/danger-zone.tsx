@@ -22,7 +22,11 @@ import {
   initiateOwnershipTransfer,
   exportOrganizationData,
 } from '@/server/organization-advanced-actions';
-import { toast } from 'sonner';
+import {
+  organization as orgToast,
+  error as errorToast,
+  success as successToast,
+} from '@/lib/toast-enhanced';
 
 interface DangerZoneProps {
   organizationId: string;
@@ -210,22 +214,18 @@ export function DangerZone({
             );
 
             if (result.success) {
-              toast.success(
-                confirmation.deletionType === 'soft'
-                  ? 'Organization soft deletion initiated. You have 30 days to restore it.'
-                  : 'Organization permanently deleted.'
-              );
+              orgToast.deleted(organizationName, confirmation.deletionType);
               setShowDeletionModal(false);
               // Redirect to organizations list after successful deletion
               window.location.href = '/dashboard/settings/organisation';
             } else {
-              toast.error(
+              errorToast(
                 result.error?.message || 'Failed to delete organization'
               );
             }
           } catch (error) {
             console.error('Error deleting organization:', error);
-            toast.error(
+            errorToast(
               'An unexpected error occurred while deleting the organization'
             );
           }
@@ -242,18 +242,18 @@ export function DangerZone({
             const result = await initiateOwnershipTransfer(request);
 
             if (result.success) {
-              toast.success(
+              successToast(
                 'Ownership transfer initiated. The new owner will receive an email to confirm.'
               );
               setShowTransferModal(false);
             } else {
-              toast.error(
+              errorToast(
                 result.error?.message || 'Failed to initiate ownership transfer'
               );
             }
           } catch (error) {
             console.error('Error initiating ownership transfer:', error);
-            toast.error(
+            errorToast(
               'An unexpected error occurred while initiating the transfer'
             );
           }
@@ -270,18 +270,18 @@ export function DangerZone({
             const result = await exportOrganizationData(organizationId, format);
 
             if (result.success && result.data?.exportUrl) {
-              toast.success('Data export completed successfully');
+              orgToast.dataExported(format);
               // Open the export URL in a new tab
               window.open(result.data.exportUrl, '_blank');
               setShowExportModal(false);
             } else {
-              toast.error(
+              errorToast(
                 result.error?.message || 'Failed to export organization data'
               );
             }
           } catch (error) {
             console.error('Error exporting organization data:', error);
-            toast.error('An unexpected error occurred while exporting data');
+            errorToast('An unexpected error occurred while exporting data');
           }
         }}
       />
