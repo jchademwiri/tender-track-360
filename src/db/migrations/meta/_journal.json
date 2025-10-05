@@ -15,6 +15,13 @@
       "when": 1758382806568,
       "tag": "0001_rapid_christian_walker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1759648429438,
+      "tag": "0002_icy_tomas",
+      "breakpoints": true
     }
   ]
 }

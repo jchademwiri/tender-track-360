@@ -6,7 +6,7 @@ import type { Role } from '@/db/schema';
 
 type Organization = typeof organization.$inferSelect;
 
-import { eq, inArray, and } from 'drizzle-orm/sql/expressions/conditions';
+import { eq, inArray, and, isNull } from 'drizzle-orm';
 import { count } from 'drizzle-orm';
 import { desc } from 'drizzle-orm';
 import { getCurrentUser } from './users';
@@ -26,7 +26,7 @@ export async function getorganizations(): Promise<OrganizationWithStats[]> {
       throw new Error('User not authenticated');
     }
 
-    // Get user's memberships with role information
+    // Get user's memberships with role information, excluding soft-deleted organizations
     const userMemberships = await db.query.member.findMany({
       where: eq(member.userId, currentUser.id),
       with: {
@@ -38,7 +38,7 @@ export async function getorganizations(): Promise<OrganizationWithStats[]> {
       return [];
     }
 
-    // Get organizations with enhanced data
+    // Get organizations with enhanced data (soft deletion filtering temporarily disabled until DB migration)
     const organizationsWithStats: OrganizationWithStats[] = await Promise.all(
       userMemberships.map(async (membership) => {
         // Get member count for this organization
@@ -76,7 +76,7 @@ export async function getOrganizationsForProvider() {
       members.map((m) => m.organizationId)
     ),
   });
-  // Filter and map to match the expected type for OrganizationProvider
+  // Map to match the expected type for OrganizationProvider (soft deletion filtering temporarily disabled)
   return organizations.map((org) => ({
     id: org.id,
     slug: org.slug || org.id, // Use ID as fallback if slug is null
