@@ -14,8 +14,6 @@ import {
   Users,
 } from 'lucide-react';
 import { OrganizationDeletionModal } from './deletion-modal';
-import { OwnershipTransferModal } from './transfer-ownership-modal';
-import { DataExportModal } from './data-export-modal';
 import type { Role } from '@/db/schema';
 import {
   initiateOrganizationDeletion,
@@ -27,6 +25,8 @@ import {
   error as errorToast,
   success as successToast,
 } from '@/lib/toast-enhanced';
+import { OwnershipTransferModal } from './transfer-ownership-modal';
+import { DataExportModal } from './data-export-modal';
 
 interface DangerZoneProps {
   organizationId: string;
