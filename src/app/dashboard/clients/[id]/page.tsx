@@ -15,6 +15,7 @@ export default async function ClientDetailPage({
   params,
 }: ClientDetailPageProps) {
   const { session } = await getCurrentUser();
+  const { id } = await params;
 
   if (!session.activeOrganizationId) {
     return (
@@ -31,7 +32,7 @@ export default async function ClientDetailPage({
     );
   }
 
-  const result = await getClientById(session.activeOrganizationId, params.id);
+  const result = await getClientById(session.activeOrganizationId, id);
 
   if (!result.success || !result.client) {
     notFound();

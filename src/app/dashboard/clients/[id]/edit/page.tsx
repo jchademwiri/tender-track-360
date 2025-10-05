@@ -13,6 +13,7 @@ interface EditClientPageProps {
 
 export default async function EditClientPage({ params }: EditClientPageProps) {
   const { session } = await getCurrentUser();
+  const { id } = await params;
 
   if (!session.activeOrganizationId) {
     return (
@@ -29,7 +30,7 @@ export default async function EditClientPage({ params }: EditClientPageProps) {
     );
   }
 
-  const result = await getClientById(session.activeOrganizationId, params.id);
+  const result = await getClientById(session.activeOrganizationId, id);
 
   if (!result.success || !result.client) {
     notFound();
