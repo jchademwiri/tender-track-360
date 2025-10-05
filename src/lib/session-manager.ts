@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { sessionTracking, session } from '@/db/schema';
-import { eq, and, desc, gte } from 'drizzle-orm';
+import { eq, and, desc, gte, isNull } from 'drizzle-orm';
 import { headers } from 'next/headers';
 import { auditLogger } from './audit-logger';
 
@@ -84,7 +84,7 @@ class SessionManager {
   }
 
   private async getLocationInfo(
-    ipAddress: string
+    _ipAddress: string // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<LocationInfo | null> {
     // In production, integrate with a geolocation service like MaxMind or ipapi
     // For now, return null to avoid external dependencies
@@ -187,7 +187,7 @@ class SessionManager {
       const sessions = await db.query.sessionTracking.findMany({
         where: and(
           eq(sessionTracking.organizationId, organizationId),
-          eq(sessionTracking.logoutTime, null) // Only active sessions
+          isNull(sessionTracking.logoutTime) // Only active sessions
         ),
         orderBy: [desc(sessionTracking.lastActivity)],
       });
@@ -228,7 +228,7 @@ class SessionManager {
         .where(
           and(
             eq(session.userId, userId),
-            eq(sessionTracking.logoutTime, null) // Only active sessions
+            isNull(sessionTracking.logoutTime) // Only active sessions
           )
         )
         .orderBy(desc(sessionTracking.lastActivity));
@@ -345,7 +345,7 @@ class SessionManager {
         .set({ logoutTime: new Date() })
         .where(
           and(
-            eq(sessionTracking.logoutTime, null),
+            isNull(sessionTracking.logoutTime),
             gte(sessionTracking.lastActivity, expiredThreshold)
           )
         );

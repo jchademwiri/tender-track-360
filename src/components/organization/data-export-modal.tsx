@@ -34,7 +34,7 @@ interface DataExportModalProps {
 export function DataExportModal({
   isOpen,
   onClose,
-  organizationId,
+  organizationId: _organizationId, // eslint-disable-line @typescript-eslint/no-unused-vars
   organizationName,
   onExport,
 }: DataExportModalProps) {
@@ -126,7 +126,9 @@ export function DataExportModal({
             <Label>Export Format</Label>
             <RadioGroup
               value={format}
-              onValueChange={(value) => setFormat(value as 'json' | 'csv')}
+              onValueChange={(value: string) =>
+                setFormat(value as 'json' | 'csv')
+              }
             >
               <div className="flex items-start space-x-3 p-3 border rounded-lg">
                 <RadioGroupItem value="json" id="json" className="mt-1" />

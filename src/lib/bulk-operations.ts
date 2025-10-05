@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { member, invitation, user } from '@/db/schema';
+import { member, invitation } from '@/db/schema';
 import type { Role } from '@/db/schema';
 import { eq, and, inArray } from 'drizzle-orm';
 import { auditLogger } from './audit-logger';
@@ -264,7 +264,7 @@ class BulkOperationsManager {
       });
 
       const memberMap = new Map(members.map((m) => [m.id, m]));
-      const rollbackData: Array<{ memberId: string; memberData: any }> = [];
+      const rollbackData: Array<{ memberId: string; memberData: unknown }> = [];
 
       // Process each removal
       for (const memberId of memberIds) {
@@ -652,7 +652,7 @@ class BulkOperationsManager {
 
   private async storeRollbackData(
     operationId: string,
-    rollbackData: any[]
+    rollbackData: unknown[]
   ): Promise<string> {
     // In a real implementation, store rollback data in a secure location
     // For now, we'll just return a token
@@ -691,8 +691,8 @@ class BulkOperationsManager {
   }
 
   async rollbackOperation(
-    rollbackToken: string,
-    performingUserId: string
+    _rollbackToken: string, // eslint-disable-line @typescript-eslint/no-unused-vars
+    _performingUserId: string // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<BulkOperationResult> {
     // In a real implementation, retrieve and apply rollback data
     // For now, return a placeholder result

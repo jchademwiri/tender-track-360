@@ -6,7 +6,7 @@ import type { Role } from '@/db/schema';
 
 type Organization = typeof organization.$inferSelect;
 
-import { eq, inArray, and, isNull } from 'drizzle-orm';
+import { eq, inArray, and } from 'drizzle-orm';
 import { count } from 'drizzle-orm';
 import { desc } from 'drizzle-orm';
 import { getCurrentUser } from './users';

@@ -15,7 +15,7 @@ import {
   type BulkMemberUpdate,
   type BulkInvitation,
 } from '@/lib/bulk-operations';
-import { auditLogger } from '@/lib/audit-logger';
+// import { auditLogger } from '@/lib/audit-logger'; // TODO: Use for additional logging if needed
 import { revalidatePath } from 'next/cache';
 
 export interface ServerActionResult<T = unknown> {
@@ -251,7 +251,7 @@ export async function forcePermanentDeletion(
 }
 
 export async function getSoftDeletedOrganizations(): Promise<
-  ServerActionResult<any[]>
+  ServerActionResult<unknown[]>
 > {
   try {
     const { currentUser } = await getCurrentUser();
@@ -442,7 +442,7 @@ export async function acceptOwnershipTransferByToken(
 }
 
 export async function getPendingTransfers(): Promise<
-  ServerActionResult<any[]>
+  ServerActionResult<unknown[]>
 > {
   try {
     const { currentUser } = await getCurrentUser();
@@ -469,7 +469,7 @@ export async function getPendingTransfers(): Promise<
 export async function bulkUpdateMemberRoles(
   organizationId: string,
   updates: BulkMemberUpdate[]
-): Promise<ServerActionResult<any>> {
+): Promise<ServerActionResult<unknown>> {
   try {
     const { currentUser } = await getCurrentUser();
 
@@ -514,7 +514,7 @@ export async function bulkRemoveMembers(
   organizationId: string,
   memberIds: string[],
   reason?: string
-): Promise<ServerActionResult<any>> {
+): Promise<ServerActionResult<unknown>> {
   try {
     const { currentUser } = await getCurrentUser();
 
@@ -559,7 +559,7 @@ export async function bulkRemoveMembers(
 export async function bulkInviteMembers(
   organizationId: string,
   invitations: BulkInvitation[]
-): Promise<ServerActionResult<any>> {
+): Promise<ServerActionResult<unknown>> {
   try {
     const { currentUser } = await getCurrentUser();
 

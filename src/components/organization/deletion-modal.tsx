@@ -240,7 +240,7 @@ export function OrganizationDeletionModal({
                 <Label>Deletion Type</Label>
                 <RadioGroup
                   value={formData.deletionType}
-                  onValueChange={(value) =>
+                  onValueChange={(value: string) =>
                     setFormData({
                       ...formData,
                       deletionType: value as 'soft' | 'permanent',
@@ -313,7 +313,7 @@ export function OrganizationDeletionModal({
                     <Label>Export Format</Label>
                     <RadioGroup
                       value={formData.exportFormat}
-                      onValueChange={(value) =>
+                      onValueChange={(value: string) =>
                         setFormData({
                           ...formData,
                           exportFormat: value as 'json' | 'csv',

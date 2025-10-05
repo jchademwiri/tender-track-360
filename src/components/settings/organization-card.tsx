@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Building2, Users, Calendar, ChevronRight, Eye } from 'lucide-react';
+import { Building2, Users, Calendar, ChevronRight } from 'lucide-react';
 import type { Role } from '@/db/schema';
 import Link from 'next/link';
 
@@ -117,15 +117,17 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
               </Button>
             </Link>
           ) : (
-            <Link
-              // @ts-expect-error - Dynamic route typing issue
-              href={`/dashboard/settings/organisation/${organization.slug || organization.id}/view`}
-            >
-              <Button type="button" variant="outline" className="w-full">
-                <Eye className="h-4 w-4 mr-2" />
-                View Organization
-              </Button>
-            </Link>
+            // <Link
+            //   // @ts-expect-error - Dynamic route typing issue
+            //   href={`/dashboard/settings/organisation/${organization.slug || organization.id}/view`}
+            // >
+            //   <Button type="button" variant="outline" className="w-full">
+            //     <Eye className="h-4 w-4 mr-2" />
+            //     View Organization
+            //   </Button>
+            // </Link>
+            // TODO: To add read only functionality to member role
+            <></>
           )}
         </div>
 
