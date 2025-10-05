@@ -114,10 +114,10 @@ describe('CreateorganizationForm - Basic Functionality', () => {
       const nameInput = screen.getByLabelText(/organization name/i);
       const slugInput = screen.getByLabelText(/organization slug/i);
 
-      await user.type(nameInput, 'Test & Company @ 2024!');
+      await user.type(nameInput, 'Test & Organisation @ 2024!');
 
       // Special characters should be converted to hyphens
-      expect(slugInput).toHaveValue('test-company-2024');
+      expect(slugInput).toHaveValue('test-organisation-2024');
     });
 
     it('shows URL preview when slug is entered', async () => {

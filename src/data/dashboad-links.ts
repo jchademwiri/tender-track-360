@@ -122,9 +122,9 @@ export const dashboadLinks = {
           //   /profile this is the personal profile page i created
         },
         {
-          title: 'Company', // Must be for Current Active Organisation: must be seen only of you are owner or admin
+          title: 'Organisation', // Must be for Current Active Organisation: must be seen only of you are owner or admin
           // Can not be visible to the role of member
-          url: '/dashboard/settings/company',
+          url: '/dashboard/settings/organisation',
         },
         {
           title: 'Notifications', // your prefereance on notifications

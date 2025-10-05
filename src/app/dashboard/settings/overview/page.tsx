@@ -6,7 +6,7 @@ export default async function SettingsOverviewPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Settings Overview</h1>
         <p className="text-muted-foreground">
-          Manage your account, company, and system preferences.
+          Manage your account, organisation, and system preferences.
         </p>
       </div>
 
@@ -16,18 +16,24 @@ export default async function SettingsOverviewPage() {
           <p className="text-muted-foreground mb-4">
             Manage your personal profile information and preferences.
           </p>
-          <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm">
+          <button
+            type="button"
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm"
+          >
             Edit Profile
           </button>
         </div>
 
         <div className="bg-muted/50 rounded-xl p-6">
-          <h2 className="text-xl font-semibold mb-4">Company Settings</h2>
+          <h2 className="text-xl font-semibold mb-4">Organisation Settings</h2>
           <p className="text-muted-foreground mb-4">
-            Configure company information and organizational settings.
+            Configure organisation information and organizational settings.
           </p>
-          <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm">
-            Manage Company
+          <button
+            type="button"
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm"
+          >
+            Manage Organisation
           </button>
         </div>
 
@@ -36,7 +42,10 @@ export default async function SettingsOverviewPage() {
           <p className="text-muted-foreground mb-4">
             Control how and when you receive notifications.
           </p>
-          <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm">
+          <button
+            type="button"
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm"
+          >
             Configure Alerts
           </button>
         </div>
@@ -50,7 +59,10 @@ export default async function SettingsOverviewPage() {
             <p className="text-sm text-muted-foreground mb-3">
               Last backup: Dec 18, 2024 at 3:00 AM
             </p>
-            <button className="text-blue-600 hover:text-blue-800 text-sm">
+            <button
+              type="button"
+              className="text-blue-600 hover:text-blue-800 text-sm"
+            >
               Create Backup Now
             </button>
           </div>
@@ -60,7 +72,10 @@ export default async function SettingsOverviewPage() {
             <p className="text-sm text-muted-foreground mb-3">
               Export all your data for backup or migration
             </p>
-            <button className="text-blue-600 hover:text-blue-800 text-sm">
+            <button
+              type="button"
+              className="text-blue-600 hover:text-blue-800 text-sm"
+            >
               Export Data
             </button>
           </div>
@@ -70,7 +85,10 @@ export default async function SettingsOverviewPage() {
             <p className="text-sm text-muted-foreground mb-3">
               Manage passwords and two-factor authentication
             </p>
-            <button className="text-blue-600 hover:text-blue-800 text-sm">
+            <button
+              type="button"
+              className="text-blue-600 hover:text-blue-800 text-sm"
+            >
               Security Options
             </button>
           </div>

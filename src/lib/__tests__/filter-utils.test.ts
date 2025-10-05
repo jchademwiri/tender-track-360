@@ -49,7 +49,7 @@ const mockMembers: MemberWithUser[] = [
     user: {
       id: 'user3',
       name: 'Bob Johnson',
-      email: 'bob@company.com',
+      email: 'bob@organisation.com',
       image: null,
     },
     status: 'active',
@@ -93,13 +93,13 @@ describe('filterMembers', () => {
 
   it('filters members by search term (email)', () => {
     const filters: FilterState = {
-      search: 'company.com',
+      search: 'organisation.com',
       role: 'all',
       status: 'all',
     };
     const result = filterMembers(mockMembers, filters);
     expect(result).toHaveLength(1);
-    expect(result[0].user.email).toBe('bob@company.com');
+    expect(result[0].user.email).toBe('bob@organisation.com');
   });
 
   it('filters members by role', () => {

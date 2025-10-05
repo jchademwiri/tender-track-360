@@ -6,8 +6,9 @@ import type { Role } from '@/db/schema';
 
 type Organization = typeof organization.$inferSelect;
 
-import { eq, inArray, and } from 'drizzle-orm/sql/expressions/conditions';
+import { eq, inArray, and, isNull } from 'drizzle-orm';
 import { count } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
 import { getCurrentUser } from './users';
 
 // Enhanced organization data with member counts and user roles
@@ -25,7 +26,7 @@ export async function getorganizations(): Promise<OrganizationWithStats[]> {
       throw new Error('User not authenticated');
     }
 
-    // Get user's memberships with role information
+    // Get user's memberships with role information (including soft-deleted organizations for the list)
     const userMemberships = await db.query.member.findMany({
       where: eq(member.userId, currentUser.id),
       with: {
@@ -37,7 +38,7 @@ export async function getorganizations(): Promise<OrganizationWithStats[]> {
       return [];
     }
 
-    // Get organizations with enhanced data
+    // Get organizations with enhanced data (including soft-deleted ones for the organization list)
     const organizationsWithStats: OrganizationWithStats[] = await Promise.all(
       userMemberships.map(async (membership) => {
         // Get member count for this organization
@@ -64,18 +65,76 @@ export async function getorganizations(): Promise<OrganizationWithStats[]> {
   }
 }
 
+// Function specifically for sidebar - excludes soft-deleted organizations
+export async function getActiveOrganizations(): Promise<
+  OrganizationWithStats[]
+> {
+  try {
+    const { currentUser } = await getCurrentUser();
+
+    if (!currentUser?.id) {
+      throw new Error('User not authenticated');
+    }
+
+    // Get user's memberships with role information, excluding soft-deleted organizations
+    const userMemberships = await db.query.member.findMany({
+      where: eq(member.userId, currentUser.id),
+      with: {
+        organization: true,
+      },
+    });
+
+    // Filter out soft-deleted organizations for sidebar
+    const activeMemberships = userMemberships.filter(
+      (membership) => !membership.organization.deletedAt
+    );
+
+    if (activeMemberships.length === 0) {
+      return [];
+    }
+
+    // Get organizations with enhanced data (only active ones for sidebar)
+    const organizationsWithStats: OrganizationWithStats[] = await Promise.all(
+      activeMemberships.map(async (membership) => {
+        // Get member count for this organization
+        const memberCountResult = await db
+          .select({ count: count() })
+          .from(member)
+          .where(eq(member.organizationId, membership.organizationId));
+
+        const memberCount = memberCountResult[0]?.count || 0;
+
+        return {
+          ...membership.organization,
+          memberCount,
+          userRole: membership.role as Role,
+          lastActivity: membership.organization.createdAt, // Placeholder for now
+        };
+      })
+    );
+
+    return organizationsWithStats;
+  } catch (error) {
+    console.error('Error fetching active organizations:', error);
+    throw new Error('Failed to fetch active organizations');
+  }
+}
+
 export async function getOrganizationsForProvider() {
   const { currentUser } = await getCurrentUser();
   const members = await db.query.member.findMany({
     where: eq(member.userId, currentUser?.id),
   });
   const organizations = await db.query.organization.findMany({
-    where: inArray(
-      organization.id,
-      members.map((m) => m.organizationId)
+    where: and(
+      inArray(
+        organization.id,
+        members.map((m) => m.organizationId)
+      ),
+      isNull(organization.deletedAt) // Filter out soft-deleted organizations from sidebar
     ),
   });
-  // Filter and map to match the expected type for OrganizationProvider
+  // Map to match the expected type for OrganizationProvider
   return organizations.map((org) => ({
     id: org.id,
     slug: org.slug || org.id, // Use ID as fallback if slug is null
@@ -285,6 +344,18 @@ export async function getOrganizationsStats(
   }
 }
 
+// Organization member interface for member data
+export interface OrganizationMember {
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+  image?: string | null;
+  role: Role;
+  joinedAt: Date;
+  lastActive?: Date;
+}
+
 // Invitation interface for pending invitations
 export interface PendingInvitation {
   id: string;
@@ -294,6 +365,59 @@ export interface PendingInvitation {
   expiresAt: Date;
   invitedAt: Date;
   inviterName: string;
+}
+
+// Get all members of an organization
+export async function getOrganizationMembers(
+  organizationId: string
+): Promise<OrganizationMember[]> {
+  try {
+    const { currentUser } = await getCurrentUser();
+
+    if (!currentUser?.id) {
+      throw new Error('User not authenticated');
+    }
+
+    // Verify user has access to this organization
+    const userMembership = await getUserOrganizationMembership(
+      currentUser.id,
+      organizationId
+    );
+    if (!userMembership) {
+      throw new Error('Access denied to this organization');
+    }
+
+    // Fetch all members of the organization
+    const members = await db.query.member.findMany({
+      where: eq(member.organizationId, organizationId),
+      with: {
+        user: {
+          columns: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            createdAt: true,
+          },
+        },
+      },
+      orderBy: [desc(member.createdAt)],
+    });
+
+    return members.map((memberRecord) => ({
+      id: memberRecord.id,
+      userId: memberRecord.userId,
+      name: memberRecord.user.name,
+      email: memberRecord.user.email,
+      image: memberRecord.user.image,
+      role: memberRecord.role as Role,
+      joinedAt: memberRecord.createdAt,
+      lastActive: memberRecord.user.createdAt, // You might want to add a lastActive field to user table
+    }));
+  } catch (error) {
+    console.error('Error fetching organization members:', error);
+    throw new Error('Failed to fetch organization members');
+  }
 }
 
 // Get pending invitations for an organization

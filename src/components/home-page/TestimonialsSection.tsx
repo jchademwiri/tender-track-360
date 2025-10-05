@@ -8,7 +8,7 @@ export function TestimonialsSection({
     {
       id: '1',
       name: 'Sarah Johnson',
-      company: 'TechCorp Solutions',
+      organisation: 'TechCorp Solutions',
       role: 'Procurement Director',
       content:
         'Tender Track 360 has transformed our tender management process. We&apos;ve seen a 40% increase in our success rate since implementation.',
@@ -17,7 +17,7 @@ export function TestimonialsSection({
     {
       id: '2',
       name: 'Michael Chen',
-      company: 'Global Industries',
+      organisation: 'Global Industries',
       role: 'Operations Manager',
       content:
         'The automated deadline tracking alone has saved us countless hours and prevented missed opportunities.',
@@ -26,7 +26,7 @@ export function TestimonialsSection({
     {
       id: '3',
       name: 'Emma Rodriguez',
-      company: 'Innovation Partners',
+      organisation: 'Innovation Partners',
       role: 'Business Development Lead',
       content:
         'The collaboration features have improved our team coordination significantly. Everyone stays informed and aligned.',
@@ -76,7 +76,7 @@ export function TestimonialsSection({
                     {testimonial.role}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {testimonial.company}
+                    {testimonial.organisation}
                   </div>
                 </div>
               </div>
