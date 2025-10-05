@@ -206,6 +206,101 @@ export const sessionTracking = pgTable('session_tracking', {
 });
 
 /* =========================
+   TENDER MANAGEMENT TABLES
+========================= */
+
+// Client table with embedded contact fields
+export const client = pgTable('client', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  notes: text('notes'),
+  // Embedded contact fields
+  contactName: text('contact_name'),
+  contactEmail: text('contact_email'),
+  contactPhone: text('contact_phone'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'), // Soft deletion
+});
+
+// Tender table with unique tender numbers
+export const tender = pgTable('tender', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  tenderNumber: text('tender_number').notNull().unique(), // User-input unique identifier
+  description: text('description'),
+  clientId: text('client_id')
+    .notNull()
+    .references(() => client.id, { onDelete: 'cascade' }),
+  submissionDate: timestamp('submission_date'),
+  value: text('value'), // String for currency formatting
+  status: text('status').default('draft').notNull(), // draft, submitted, won, lost, pending
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'), // Soft deletion
+});
+
+// Project table with tender inheritance support
+export const project = pgTable('project', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  projectNumber: text('project_number').notNull(), // Inherited from tender or custom
+  description: text('description'), // Inherited from tender or custom
+  tenderId: text('tender_id').references(() => tender.id), // Optional link to originating tender
+  clientId: text('client_id').references(() => client.id), // Inherited from tender or custom
+  status: text('status').default('active').notNull(), // active, completed, cancelled
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'), // Soft deletion
+});
+
+// Purchase Order table with project relationships
+export const purchaseOrder = pgTable('purchase_order', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => project.id, { onDelete: 'cascade' }),
+  supplierName: text('supplier_name').notNull(), // Defaults to organization name
+  description: text('description').notNull(),
+  totalAmount: text('total_amount').notNull(), // String for currency
+  status: text('status').default('draft').notNull(), // draft, sent, delivered
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'), // Soft deletion
+});
+
+// Follow-up table with tender and user relationships
+export const followUp = pgTable('follow_up', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  tenderId: text('tender_id')
+    .notNull()
+    .references(() => tender.id, { onDelete: 'cascade' }),
+  notes: text('notes').notNull(),
+  contactPerson: text('contact_person'),
+  nextFollowUpDate: timestamp('next_follow_up_date'),
+  createdBy: text('created_by')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'), // Soft deletion
+});
+
+/* =========================
    RELATIONS
    ⚠️ Moved here AFTER all tables are defined
 ========================= */
@@ -230,6 +325,13 @@ export type NotificationPreferences =
 export type OwnershipTransfer = typeof ownershipTransfer.$inferSelect;
 export type SecurityAuditLog = typeof securityAuditLog.$inferSelect;
 export type SessionTracking = typeof sessionTracking.$inferSelect;
+
+// Tender Management Types
+export type Client = typeof client.$inferSelect;
+export type Tender = typeof tender.$inferSelect;
+export type Project = typeof project.$inferSelect;
+export type PurchaseOrder = typeof purchaseOrder.$inferSelect;
+export type FollowUp = typeof followUp.$inferSelect;
 
 // Notification Preferences Relations
 export const notificationPreferencesRelations = relations(
@@ -291,6 +393,71 @@ export const sessionTrackingRelations = relations(
   })
 );
 
+// Tender Management Relations
+export const clientRelations = relations(client, ({ one, many }) => ({
+  organization: one(organization, {
+    fields: [client.organizationId],
+    references: [organization.id],
+  }),
+  tenders: many(tender),
+  projects: many(project),
+}));
+
+export const tenderRelations = relations(tender, ({ one, many }) => ({
+  organization: one(organization, {
+    fields: [tender.organizationId],
+    references: [organization.id],
+  }),
+  client: one(client, {
+    fields: [tender.clientId],
+    references: [client.id],
+  }),
+  projects: many(project),
+  followUps: many(followUp),
+}));
+
+export const projectRelations = relations(project, ({ one, many }) => ({
+  organization: one(organization, {
+    fields: [project.organizationId],
+    references: [organization.id],
+  }),
+  tender: one(tender, {
+    fields: [project.tenderId],
+    references: [tender.id],
+  }),
+  client: one(client, {
+    fields: [project.clientId],
+    references: [client.id],
+  }),
+  purchaseOrders: many(purchaseOrder),
+}));
+
+export const purchaseOrderRelations = relations(purchaseOrder, ({ one }) => ({
+  organization: one(organization, {
+    fields: [purchaseOrder.organizationId],
+    references: [organization.id],
+  }),
+  project: one(project, {
+    fields: [purchaseOrder.projectId],
+    references: [project.id],
+  }),
+}));
+
+export const followUpRelations = relations(followUp, ({ one }) => ({
+  organization: one(organization, {
+    fields: [followUp.organizationId],
+    references: [organization.id],
+  }),
+  tender: one(tender, {
+    fields: [followUp.tenderId],
+    references: [tender.id],
+  }),
+  createdByUser: one(user, {
+    fields: [followUp.createdBy],
+    references: [user.id],
+  }),
+}));
+
 /* =========================
    EXPORT SCHEMA
 ========================= */
@@ -306,10 +473,23 @@ export const schema = {
   ownershipTransfer,
   securityAuditLog,
   sessionTracking,
+  // Tender Management Tables
+  client,
+  tender,
+  project,
+  purchaseOrder,
+  followUp,
+  // Relations
   organizationRelations,
   memberRelations,
   notificationPreferencesRelations,
   ownershipTransferRelations,
   securityAuditLogRelations,
   sessionTrackingRelations,
+  // Tender Management Relations
+  clientRelations,
+  tenderRelations,
+  projectRelations,
+  purchaseOrderRelations,
+  followUpRelations,
 };

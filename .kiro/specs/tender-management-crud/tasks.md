@@ -2,42 +2,42 @@
 
 ## Phase 1: Database Schema Creation (5 New Tables)
 
-- [-] 1. Create client table with embedded contact fields
+- [x] 1. Create client table with embedded contact fields
   - Create client table with organizationId, name, notes, contactName, contactEmail, contactPhone
   - Add proper foreign key constraints and organization isolation
   - Include soft deletion support with deletedAt field
   - Add database indexes for search optimization
   - _Requirements: 1.2_
 
-- [ ] 1.1 Create tender table with unique tender numbers
+- [x] 1.1 Create tender table with unique tender numbers
   - Create tender table with organizationId, tenderNumber (unique), description, clientId
   - Add submissionDate, value, status fields with proper constraints
   - Include foreign key relationship to client table
   - Add soft deletion support and audit fields
   - _Requirements: 1.3_
 
-- [ ] 1.2 Create project table with tender inheritance support
+- [x] 1.2 Create project table with tender inheritance support
   - Create project table with organizationId, projectNumber, description
   - Add optional tenderId and clientId foreign key relationships
   - Include status field with default 'active' value
   - Add soft deletion support and audit fields
   - _Requirements: 1.4_
 
-- [ ] 1.3 Create purchaseOrder table with project relationships
+- [x] 1.3 Create purchaseOrder table with project relationships
   - Create purchaseOrder table with organizationId, projectId, supplierName
   - Add description, totalAmount, status, notes fields
   - Include foreign key relationship to project table
   - Add soft deletion support and audit fields
   - _Requirements: 1.5_
 
-- [ ] 1.4 Create followUp table with tender and user relationships
+- [x] 1.4 Create followUp table with tender and user relationships
   - Create followUp table with organizationId, tenderId, notes, contactPerson
   - Add nextFollowUpDate and createdBy fields with user foreign key
   - Include foreign key relationship to tender table
   - Add soft deletion support and audit fields
   - _Requirements: 1.6_
 
-- [ ] 1.5 Add table relations and update schema exports
+- [x] 1.5 Add table relations and update schema exports
   - Create Drizzle relations for all new tables
   - Add TypeScript types for all new table schemas
   - Update schema export to include all new tables and relations

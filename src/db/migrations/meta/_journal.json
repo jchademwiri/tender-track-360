@@ -57,6 +57,13 @@
       "when": 1759686521544,
       "tag": "0007_cute_micromacro",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1759691807343,
+      "tag": "0008_gray_devos",
+      "breakpoints": true
     }
   ]
 }
