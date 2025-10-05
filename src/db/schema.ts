@@ -100,6 +100,21 @@ export type Member = typeof member.$inferSelect & {
 export type Organization = typeof organization.$inferSelect;
 export type MemberWithUser = Member;
 
+// New table types
+export type Project = typeof project.$inferSelect;
+export type PurchaseOrder = typeof purchaseOrder.$inferSelect;
+export type PurchaseOrderItem = typeof purchaseOrderItem.$inferSelect;
+export type Client = typeof client.$inferSelect;
+export type ClientContact = typeof clientContact.$inferSelect;
+export type ClientAddress = typeof clientAddress.$inferSelect;
+export type CalendarEvent = typeof calendarEvent.$inferSelect;
+export type Reminder = typeof reminder.$inferSelect;
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type NotificationPreferences =
+  typeof notificationPreferences.$inferSelect;
+export type UserNotifications = typeof userNotifications.$inferSelect;
+export type Analytics = typeof analytics.$inferSelect;
+
 export const invitation = pgTable('invitation', {
   id: text('id').primaryKey(),
   organizationId: text('organization_id')
@@ -129,6 +144,53 @@ export const followUpStatus = pgEnum('follow_up_status', [
   'under_evaluation',
   'appointed',
   'rejected',
+]);
+
+export const projectStatus = pgEnum('project_status', [
+  'planning',
+  'active',
+  'on_hold',
+  'completed',
+  'cancelled',
+]);
+
+export const purchaseOrderStatus = pgEnum('purchase_order_status', [
+  'draft',
+  'sent',
+  'approved',
+  'delivered',
+  'cancelled',
+]);
+
+export const addressType = pgEnum('address_type', [
+  'business',
+  'billing',
+  'shipping',
+  'other',
+]);
+
+export const eventType = pgEnum('event_type', [
+  'meeting',
+  'deadline',
+  'reminder',
+  'milestone',
+  'other',
+]);
+
+export const reminderType = pgEnum('reminder_type', [
+  'general',
+  'tender_deadline',
+  'project_milestone',
+  'follow_up',
+  'meeting',
+]);
+
+export const notificationType = pgEnum('notification_type', [
+  'info',
+  'success',
+  'warning',
+  'error',
+  'reminder',
 ]);
 
 /* =========================
@@ -201,6 +263,246 @@ export const contract = pgTable('contract', {
   // Soft deletion fields
   deletedAt: timestamp('deleted_at'),
   deletedBy: text('deleted_by').references(() => user.id),
+});
+
+/* =========================
+   PROJECT MANAGEMENT
+========================= */
+export const project = pgTable('project', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+  status: projectStatus('status').default('planning').notNull(),
+  startDate: timestamp('start_date'),
+  endDate: timestamp('end_date'),
+  budget: text('budget'), // Store as string for precision
+  clientId: text('client_id').references(() => client.id),
+  tenderId: text('tender_id').references(() => tender.id), // Optional link to originating tender
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  createdBy: text('created_by')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  // Soft deletion fields
+  deletedAt: timestamp('deleted_at'),
+  deletedBy: text('deleted_by').references(() => user.id),
+});
+
+export const purchaseOrder = pgTable('purchase_order', {
+  id: text('id').primaryKey(),
+  orderNumber: text('order_number').notNull().unique(),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => project.id, { onDelete: 'cascade' }),
+  supplierId: text('supplier_id').references(() => client.id), // Reuse client table for suppliers
+  status: purchaseOrderStatus('status').default('draft').notNull(),
+  orderDate: timestamp('order_date').defaultNow().notNull(),
+  expectedDeliveryDate: timestamp('expected_delivery_date'),
+  totalAmount: text('total_amount'), // Calculated from items
+  notes: text('notes'),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  createdBy: text('created_by')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  // Soft deletion fields
+  deletedAt: timestamp('deleted_at'),
+  deletedBy: text('deleted_by').references(() => user.id),
+});
+
+export const purchaseOrderItem = pgTable('purchase_order_item', {
+  id: text('id').primaryKey(),
+  purchaseOrderId: text('purchase_order_id')
+    .notNull()
+    .references(() => purchaseOrder.id, { onDelete: 'cascade' }),
+  description: text('description').notNull(),
+  quantity: text('quantity').notNull(), // Store as string for precision
+  unitPrice: text('unit_price').notNull(),
+  totalPrice: text('total_price').notNull(), // quantity * unitPrice
+  unit: text('unit'), // e.g., 'pieces', 'kg', 'hours'
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/* =========================
+   CLIENT MANAGEMENT
+========================= */
+export const client = pgTable('client', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  companyRegistrationNumber: text('company_registration_number'),
+  taxNumber: text('tax_number'),
+  industry: text('industry'),
+  website: text('website'),
+  notes: text('notes'),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  createdBy: text('created_by')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  // Soft deletion fields
+  deletedAt: timestamp('deleted_at'),
+  deletedBy: text('deleted_by').references(() => user.id),
+});
+
+export const clientContact = pgTable('client_contact', {
+  id: text('id').primaryKey(),
+  clientId: text('client_id')
+    .notNull()
+    .references(() => client.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  email: text('email'),
+  phone: text('phone'),
+  position: text('position'),
+  isPrimary: boolean('is_primary').default(false).notNull(),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const clientAddress = pgTable('client_address', {
+  id: text('id').primaryKey(),
+  clientId: text('client_id')
+    .notNull()
+    .references(() => client.id, { onDelete: 'cascade' }),
+  type: addressType('type').default('business').notNull(),
+  street: text('street').notNull(),
+  city: text('city').notNull(),
+  state: text('state'),
+  postalCode: text('postal_code'),
+  country: text('country').notNull(),
+  isPrimary: boolean('is_primary').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/* =========================
+   CALENDAR & SCHEDULING
+========================= */
+export const calendarEvent = pgTable('calendar_event', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description'),
+  startDate: timestamp('start_date').notNull(),
+  endDate: timestamp('end_date'),
+  isAllDay: boolean('is_all_day').default(false).notNull(),
+  location: text('location'),
+  eventType: eventType('event_type').default('meeting').notNull(),
+  // Polymorphic relationships
+  relatedEntityType: text('related_entity_type'), // 'tender', 'project', 'client'
+  relatedEntityId: text('related_entity_id'),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  createdBy: text('created_by')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  // Soft deletion fields
+  deletedAt: timestamp('deleted_at'),
+  deletedBy: text('deleted_by').references(() => user.id),
+});
+
+export const reminder = pgTable('reminder', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  message: text('message'),
+  reminderDate: timestamp('reminder_date').notNull(),
+  isCompleted: boolean('is_completed').default(false).notNull(),
+  reminderType: reminderType('reminder_type').default('general').notNull(),
+  // Polymorphic relationships
+  relatedEntityType: text('related_entity_type'), // 'tender', 'project', 'calendar_event'
+  relatedEntityId: text('related_entity_id'),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/* =========================
+   USER PREFERENCES & NOTIFICATIONS
+========================= */
+export const userPreferences = pgTable('user_preferences', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  theme: text('theme').default('system').notNull(), // 'light', 'dark', 'system'
+  language: text('language').default('en').notNull(),
+  timezone: text('timezone').default('UTC').notNull(),
+  dateFormat: text('date_format').default('MM/dd/yyyy').notNull(),
+  timeFormat: text('time_format').default('12h').notNull(), // '12h', '24h'
+  dashboardLayout: text('dashboard_layout'), // JSON string
+  preferences: text('preferences'), // JSON for additional settings
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const notificationPreferences = pgTable('notification_preferences', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  emailNotifications: boolean('email_notifications').default(true).notNull(),
+  pushNotifications: boolean('push_notifications').default(true).notNull(),
+  smsNotifications: boolean('sms_notifications').default(false).notNull(),
+  tenderReminders: boolean('tender_reminders').default(true).notNull(),
+  projectUpdates: boolean('project_updates').default(true).notNull(),
+  calendarReminders: boolean('calendar_reminders').default(true).notNull(),
+  systemAlerts: boolean('system_alerts').default(true).notNull(),
+  marketingEmails: boolean('marketing_emails').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const userNotifications = pgTable('user_notifications', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  message: text('message').notNull(),
+  type: notificationType('type').default('info').notNull(),
+  isRead: boolean('is_read').default(false).notNull(),
+  actionUrl: text('action_url'),
+  // Polymorphic relationships
+  relatedEntityType: text('related_entity_type'),
+  relatedEntityId: text('related_entity_id'),
+  organizationId: text('organization_id').references(() => organization.id, {
+    onDelete: 'cascade',
+  }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  readAt: timestamp('read_at'),
+});
+
+/* =========================
+   ANALYTICS
+========================= */
+export const analytics = pgTable('analytics', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  metricType: text('metric_type').notNull(), // 'tender_count', 'project_value', 'client_count'
+  metricValue: text('metric_value').notNull(),
+  metricDate: timestamp('metric_date').defaultNow().notNull(),
+  dimensions: text('dimensions'), // JSON for additional metric dimensions
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 /* =========================
@@ -447,6 +749,160 @@ export const organizationSecuritySettingsRelations = relations(
 );
 
 /* =========================
+   NEW TABLE RELATIONS
+========================= */
+
+// Project Management Relations
+export const projectRelations = relations(project, ({ one, many }) => ({
+  organization: one(organization, {
+    fields: [project.organizationId],
+    references: [organization.id],
+  }),
+  createdByUser: one(user, {
+    fields: [project.createdBy],
+    references: [user.id],
+  }),
+  client: one(client, {
+    fields: [project.clientId],
+    references: [client.id],
+  }),
+  tender: one(tender, {
+    fields: [project.tenderId],
+    references: [tender.id],
+  }),
+  purchaseOrders: many(purchaseOrder),
+}));
+
+export const purchaseOrderRelations = relations(
+  purchaseOrder,
+  ({ one, many }) => ({
+    project: one(project, {
+      fields: [purchaseOrder.projectId],
+      references: [project.id],
+    }),
+    supplier: one(client, {
+      fields: [purchaseOrder.supplierId],
+      references: [client.id],
+    }),
+    organization: one(organization, {
+      fields: [purchaseOrder.organizationId],
+      references: [organization.id],
+    }),
+    createdByUser: one(user, {
+      fields: [purchaseOrder.createdBy],
+      references: [user.id],
+    }),
+    items: many(purchaseOrderItem),
+  })
+);
+
+export const purchaseOrderItemRelations = relations(
+  purchaseOrderItem,
+  ({ one }) => ({
+    purchaseOrder: one(purchaseOrder, {
+      fields: [purchaseOrderItem.purchaseOrderId],
+      references: [purchaseOrder.id],
+    }),
+  })
+);
+
+// Client Management Relations
+export const clientRelations = relations(client, ({ one, many }) => ({
+  organization: one(organization, {
+    fields: [client.organizationId],
+    references: [organization.id],
+  }),
+  createdByUser: one(user, {
+    fields: [client.createdBy],
+    references: [user.id],
+  }),
+  contacts: many(clientContact),
+  addresses: many(clientAddress),
+  projects: many(project),
+  purchaseOrders: many(purchaseOrder),
+}));
+
+export const clientContactRelations = relations(clientContact, ({ one }) => ({
+  client: one(client, {
+    fields: [clientContact.clientId],
+    references: [client.id],
+  }),
+}));
+
+export const clientAddressRelations = relations(clientAddress, ({ one }) => ({
+  client: one(client, {
+    fields: [clientAddress.clientId],
+    references: [client.id],
+  }),
+}));
+
+// Calendar & Scheduling Relations
+export const calendarEventRelations = relations(calendarEvent, ({ one }) => ({
+  organization: one(organization, {
+    fields: [calendarEvent.organizationId],
+    references: [organization.id],
+  }),
+  createdByUser: one(user, {
+    fields: [calendarEvent.createdBy],
+    references: [user.id],
+  }),
+}));
+
+export const reminderRelations = relations(reminder, ({ one }) => ({
+  user: one(user, {
+    fields: [reminder.userId],
+    references: [user.id],
+  }),
+  organization: one(organization, {
+    fields: [reminder.organizationId],
+    references: [organization.id],
+  }),
+}));
+
+// User Preferences Relations
+export const userPreferencesRelations = relations(
+  userPreferences,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userPreferences.userId],
+      references: [user.id],
+    }),
+  })
+);
+
+export const notificationPreferencesRelations = relations(
+  notificationPreferences,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [notificationPreferences.userId],
+      references: [user.id],
+    }),
+  })
+);
+
+export const userNotificationsRelations = relations(
+  userNotifications,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userNotifications.userId],
+      references: [user.id],
+    }),
+    organization: one(organization, {
+      fields: [userNotifications.organizationId],
+      references: [organization.id],
+    }),
+  })
+);
+
+// Analytics Relations
+export const analyticsRelations = relations(analytics, ({ one }) => ({
+  organization: one(organization, {
+    fields: [analytics.organizationId],
+    references: [organization.id],
+  }),
+}));
+
+/* =========================
    EXPORT SCHEMA
 ========================= */
 export const schema = {
@@ -467,7 +923,36 @@ export const schema = {
   contractRelations,
   controlCenter,
   controlCenterRelations,
-  // New advanced features
+  // Project Management
+  project,
+  projectRelations,
+  purchaseOrder,
+  purchaseOrderRelations,
+  purchaseOrderItem,
+  purchaseOrderItemRelations,
+  // Client Management
+  client,
+  clientRelations,
+  clientContact,
+  clientContactRelations,
+  clientAddress,
+  clientAddressRelations,
+  // Calendar & Scheduling
+  calendarEvent,
+  calendarEventRelations,
+  reminder,
+  reminderRelations,
+  // User Preferences & Notifications
+  userPreferences,
+  userPreferencesRelations,
+  notificationPreferences,
+  notificationPreferencesRelations,
+  userNotifications,
+  userNotificationsRelations,
+  // Analytics
+  analytics,
+  analyticsRelations,
+  // Advanced organization features
   ownershipTransfer,
   ownershipTransferRelations,
   securityAuditLog,
