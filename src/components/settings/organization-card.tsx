@@ -109,7 +109,6 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
         <div className="pt-2">
           {canManage ? (
             <Link
-              // @ts-expect-error - Dynamic route typing issue
               href={`/dashboard/settings/organisation/${organization.slug || organization.id}`}
             >
               <Button type="button" className="w-full">
