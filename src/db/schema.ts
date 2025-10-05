@@ -72,7 +72,7 @@ export const organization = pgTable('organization', {
   metadata: text('metadata'),
 });
 
-export const role = pgEnum('role', ['owner', 'admin', 'member']);
+export const role = pgEnum('role', ['owner', 'admin', 'manager', 'member']);
 export type Role = (typeof role.enumValues)[number];
 
 export const member = pgTable('member', {

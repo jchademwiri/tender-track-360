@@ -1,156 +1,159 @@
+import { Suspense } from 'react';
+import { getorganizations } from '@/server/organizations';
+import { OrganizationGrid } from '@/components/settings/organization-grid';
+import { OrganizationGridSkeleton } from '@/components/settings/organization-grid-skeleton';
+import { Building2, Users, Shield, TrendingUp } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 export const dynamic = 'force-dynamic';
+
+async function OrganizationContent() {
+  try {
+    const organizations = await getorganizations();
+
+    // Calculate summary statistics
+    const totalOrganizations = organizations.length;
+    const totalMembers = organizations.reduce(
+      (sum, org) => sum + org.memberCount,
+      0
+    );
+    const ownedOrganizations = organizations.filter(
+      (org) => org.userRole === 'owner'
+    ).length;
+    const managedOrganizations = organizations.filter((org) =>
+      ['owner', 'admin', 'manager'].includes(org.userRole)
+    ).length;
+
+    return (
+      <div className="space-y-8">
+        {/* Summary Statistics */}
+        {organizations.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Organizations
+                </CardTitle>
+                <Building2 className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{totalOrganizations}</div>
+                <p className="text-xs text-muted-foreground">
+                  Organizations you belong to
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Members
+                </CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{totalMembers}</div>
+                <p className="text-xs text-muted-foreground">
+                  Across all organizations
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Organizations Owned
+                </CardTitle>
+                <Shield className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{ownedOrganizations}</div>
+                <p className="text-xs text-muted-foreground">
+                  You have full control
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Management Access
+                </CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{managedOrganizations}</div>
+                <p className="text-xs text-muted-foreground">
+                  Can manage settings
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Organizations Grid */}
+        <OrganizationGrid organizations={organizations} />
+      </div>
+    );
+  } catch (error) {
+    console.error('Error loading organizations:', error);
+    return (
+      <div className="text-center py-12">
+        <div className="mx-auto w-24 h-24 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
+          <svg
+            className="w-12 h-12 text-red-600 dark:text-red-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
+          </svg>
+        </div>
+        <h3 className="text-lg font-semibold mb-2">
+          Failed to Load Organizations
+        </h3>
+        <p className="text-muted-foreground mb-4">
+          There was an error loading your organizations.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Please try refreshing the page or contact support if the problem
+          persists.
+        </p>
+      </div>
+    );
+  }
+}
 
 export default async function OrganisationSettingsPage() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Organisation Settings
-        </h1>
-        <p className="text-muted-foreground">
-          Manage your organisation information and business settings.
-        </p>
-      </div>
-
-      <div className="bg-muted/50 rounded-xl p-6">
-        <h2 className="text-xl font-semibold mb-4">Organisation Information</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Organisation Name
-            </label>
-            <input
-              type="text"
-              className="w-full p-2 border rounded-md bg-background"
-              placeholder="ABC Construction Ltd"
-            />
+    <div className="container mx-auto py-6 space-y-8 max-w-7xl">
+      {/* Header Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Building2 className="h-6 w-6 text-primary" />
           </div>
-
           <div>
-            <label className="block text-sm font-medium mb-2">
-              Registration Number
-            </label>
-            <input
-              type="text"
-              className="w-full p-2 border rounded-md bg-background"
-              placeholder="12345678"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium mb-2">
-              Business Address
-            </label>
-            <textarea
-              className="w-full p-2 border rounded-md bg-background"
-              rows={3}
-              placeholder="123 Business Street, City, State, ZIP Code"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Phone</label>
-            <input
-              type="tel"
-              className="w-full p-2 border rounded-md bg-background"
-              placeholder="+1 (555) 123-4567"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Website</label>
-            <input
-              type="url"
-              className="w-full p-2 border rounded-md bg-background"
-              placeholder="https://www.organisation.com"
-            />
+            <h1 className="text-3xl font-bold tracking-tight">
+              Organization Settings
+            </h1>
+            <p className="text-muted-foreground">
+              Manage your organizations, team members, and organizational
+              settings.
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="bg-muted/50 rounded-xl p-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Certifications & Licenses
-          </h2>
-          <div className="space-y-3">
-            <div className="bg-background rounded-lg p-3 border">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="font-medium">General Contractor License</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Expires: Dec 31, 2025
-                  </p>
-                </div>
-                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                  Active
-                </span>
-              </div>
-            </div>
-
-            <div className="bg-background rounded-lg p-3 border">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="font-medium">Safety Certification</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Expires: Jun 15, 2025
-                  </p>
-                </div>
-                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                  Active
-                </span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="w-full bg-primary text-primary-foreground py-2 rounded-md text-sm"
-            >
-              Add Certification
-            </button>
-          </div>
-        </div>
-
-        <div className="bg-muted/50 rounded-xl p-6">
-          <h2 className="text-xl font-semibold mb-4">Team Management</h2>
-          <div className="space-y-3">
-            <div className="bg-background rounded-lg p-3 border">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="font-medium">John Doe</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Owner • john@organisation.com
-                  </p>
-                </div>
-                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                  Admin
-                </span>
-              </div>
-            </div>
-
-            <div className="bg-background rounded-lg p-3 border">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="font-medium">Jane Smith</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Manager • jane@organisation.com
-                  </p>
-                </div>
-                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                  User
-                </span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="w-full bg-primary text-primary-foreground py-2 rounded-md text-sm"
-            >
-              Invite Team Member
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Content with Suspense */}
+      <Suspense fallback={<OrganizationGridSkeleton />}>
+        <OrganizationContent />
+      </Suspense>
     </div>
   );
 }
