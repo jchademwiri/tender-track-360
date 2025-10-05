@@ -8,6 +8,8 @@ import { getCurrentUser } from './users';
 import { getUserOrganizationMembership } from './organizations';
 import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'crypto';
+import { Resend } from 'resend';
+import OrganizationInvitation from '@/emails/organization-invitation';
 
 // Server Action Result type for consistent error handling
 export interface ServerActionResult<T = unknown> {
@@ -164,8 +166,28 @@ export async function inviteMember(
       };
     }
 
-    // TODO: Integrate with better-auth organization plugin for email sending
-    // For now, the invitation record is created and can be processed separately
+    // Send invitation email
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const inviteLink = `${process.env.NEXT_PUBLIC_URL}/api/accept-invitation/${newInvitation[0].id}`;
+
+      await resend.emails.send({
+        from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
+        to: email,
+        subject: `You're invited to join ${userMembership.organization.name}`,
+        react: OrganizationInvitation({
+          email: email,
+          invitedByUsername: currentUser.name || 'Someone',
+          invitedByEmail: currentUser.email,
+          teamName: userMembership.organization.name,
+          inviteLink,
+        }),
+      });
+    } catch (emailError) {
+      console.error('Error sending invitation email:', emailError);
+      // Don't fail the invitation creation if email fails
+      // The invitation record exists and can be resent later
+    }
 
     // Revalidate the organization page to show updated data
     revalidatePath(`/organizations/${userMembership.organization.slug}`);
@@ -361,8 +383,36 @@ export async function resendInvitation(
       })
       .where(eq(invitation.id, invitationId));
 
-    // TODO: Integrate with better-auth organization plugin for email sending
-    // For now, the invitation record is updated and can be processed separately
+    // Send invitation email
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const inviteLink = `${process.env.NEXT_PUBLIC_URL}/api/accept-invitation/${invitationId}`;
+
+      await resend.emails.send({
+        from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
+        to: invitationRecord.email,
+        subject: `You're invited to join ${userMembership.organization.name}`,
+        react: OrganizationInvitation({
+          email: invitationRecord.email,
+          invitedByUsername: currentUser.name || 'Someone',
+          invitedByEmail: currentUser.email,
+          teamName: userMembership.organization.name,
+          inviteLink,
+        }),
+      });
+    } catch (emailError) {
+      console.error('Error sending invitation email:', emailError);
+      // Return error if email fails on resend
+      return {
+        success: false,
+        error: {
+          code: 'EMAIL_SEND_FAILED',
+          message: 'Failed to send invitation email',
+          details:
+            emailError instanceof Error ? emailError.message : 'Unknown error',
+        },
+      };
+    }
 
     // Revalidate the organization page
     revalidatePath(`/organizations/${userMembership.organization.slug}`);
