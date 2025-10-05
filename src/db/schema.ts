@@ -139,6 +139,73 @@ export const notificationPreferences = pgTable('notification_preferences', {
 });
 
 /* =========================
+   OWNERSHIP TRANSFER
+========================= */
+export const ownershipTransfer = pgTable('ownership_transfer', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  fromUserId: text('from_user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  toUserId: text('to_user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  status: text('status').default('pending').notNull(), // pending, accepted, cancelled, expired
+  transferToken: text('transfer_token').unique().notNull(),
+  reason: text('reason'),
+  transferMessage: text('transfer_message'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  acceptedAt: timestamp('accepted_at'),
+  cancelledAt: timestamp('cancelled_at'),
+});
+
+/* =========================
+   SECURITY AUDIT LOG
+========================= */
+export const securityAuditLog = pgTable('security_audit_log', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  action: text('action').notNull(),
+  resourceType: text('resource_type').notNull(),
+  resourceId: text('resource_id'),
+  details: text('details'), // JSON string
+  severity: text('severity').default('info').notNull(), // info, warning, critical
+  sessionId: text('session_id'),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+/* =========================
+   SESSION TRACKING
+========================= */
+export const sessionTracking = pgTable('session_tracking', {
+  id: text('id').primaryKey(),
+  sessionId: text('session_id')
+    .notNull()
+    .references(() => session.id, { onDelete: 'cascade' }),
+  organizationId: text('organization_id').references(() => organization.id, {
+    onDelete: 'cascade',
+  }),
+  loginTime: timestamp('login_time').defaultNow().notNull(),
+  lastActivity: timestamp('last_activity').defaultNow().notNull(),
+  logoutTime: timestamp('logout_time'),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  deviceInfo: text('device_info'), // JSON string
+  locationInfo: text('location_info'), // JSON string
+  isSuspicious: boolean('is_suspicious').default(false).notNull(),
+});
+
+/* =========================
    RELATIONS
    ⚠️ Moved here AFTER all tables are defined
 ========================= */
@@ -160,6 +227,10 @@ export const memberRelations = relations(member, ({ one }) => ({
 export type NotificationPreferences =
   typeof notificationPreferences.$inferSelect;
 
+export type OwnershipTransfer = typeof ownershipTransfer.$inferSelect;
+export type SecurityAuditLog = typeof securityAuditLog.$inferSelect;
+export type SessionTracking = typeof sessionTracking.$inferSelect;
+
 // Notification Preferences Relations
 export const notificationPreferencesRelations = relations(
   notificationPreferences,
@@ -167,6 +238,55 @@ export const notificationPreferencesRelations = relations(
     user: one(user, {
       fields: [notificationPreferences.userId],
       references: [user.id],
+    }),
+  })
+);
+
+// Ownership Transfer Relations
+export const ownershipTransferRelations = relations(
+  ownershipTransfer,
+  ({ one }) => ({
+    organization: one(organization, {
+      fields: [ownershipTransfer.organizationId],
+      references: [organization.id],
+    }),
+    fromUser: one(user, {
+      fields: [ownershipTransfer.fromUserId],
+      references: [user.id],
+    }),
+    toUser: one(user, {
+      fields: [ownershipTransfer.toUserId],
+      references: [user.id],
+    }),
+  })
+);
+
+// Security Audit Log Relations
+export const securityAuditLogRelations = relations(
+  securityAuditLog,
+  ({ one }) => ({
+    organization: one(organization, {
+      fields: [securityAuditLog.organizationId],
+      references: [organization.id],
+    }),
+    user: one(user, {
+      fields: [securityAuditLog.userId],
+      references: [user.id],
+    }),
+  })
+);
+
+// Session Tracking Relations
+export const sessionTrackingRelations = relations(
+  sessionTracking,
+  ({ one }) => ({
+    session: one(session, {
+      fields: [sessionTracking.sessionId],
+      references: [session.id],
+    }),
+    organization: one(organization, {
+      fields: [sessionTracking.organizationId],
+      references: [organization.id],
     }),
   })
 );
@@ -183,7 +303,13 @@ export const schema = {
   member,
   invitation,
   notificationPreferences,
+  ownershipTransfer,
+  securityAuditLog,
+  sessionTracking,
   organizationRelations,
   memberRelations,
   notificationPreferencesRelations,
+  ownershipTransferRelations,
+  securityAuditLogRelations,
+  sessionTrackingRelations,
 };
