@@ -4,7 +4,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 import { db } from '@/db';
 import { schema } from '@/db/schema';
-import { ac, admin, member, owner } from '@/lib/auth/permissions';
+import { ac, admin, manager, member, owner } from '@/lib/auth/permissions';
 import { Resend } from 'resend';
 import ResetPasswordEmail from '@/emails/reset-password-email';
 import VerifyEmail from '@/emails/verify-email';
@@ -108,6 +108,7 @@ export const auth = betterAuth({
       roles: {
         owner,
         admin,
+        manager,
         member,
       },
     }),

@@ -102,7 +102,10 @@ export default async function OrganisationSettingsPage() {
               </div>
             </div>
 
-            <button className="w-full bg-primary text-primary-foreground py-2 rounded-md text-sm">
+            <button
+              type="button"
+              className="w-full bg-primary text-primary-foreground py-2 rounded-md text-sm"
+            >
               Add Certification
             </button>
           </div>
@@ -139,7 +142,10 @@ export default async function OrganisationSettingsPage() {
               </div>
             </div>
 
-            <button className="w-full bg-primary text-primary-foreground py-2 rounded-md text-sm">
+            <button
+              type="button"
+              className="w-full bg-primary text-primary-foreground py-2 rounded-md text-sm"
+            >
               Invite Team Member
             </button>
           </div>
