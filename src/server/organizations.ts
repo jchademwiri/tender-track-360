@@ -6,7 +6,7 @@ import type { Role } from '@/db/schema';
 
 type Organization = typeof organization.$inferSelect;
 
-import { eq, inArray, and } from 'drizzle-orm';
+import { eq, inArray, and, isNull } from 'drizzle-orm';
 import { count } from 'drizzle-orm';
 import { desc } from 'drizzle-orm';
 import { getCurrentUser } from './users';
@@ -34,13 +34,18 @@ export async function getorganizations(): Promise<OrganizationWithStats[]> {
       },
     });
 
-    if (userMemberships.length === 0) {
+    // Filter out soft-deleted organizations
+    const activeMemberships = userMemberships.filter(
+      (membership) => !membership.organization.deletedAt
+    );
+
+    if (activeMemberships.length === 0) {
       return [];
     }
 
-    // Get organizations with enhanced data (soft deletion filtering temporarily disabled until DB migration)
+    // Get organizations with enhanced data
     const organizationsWithStats: OrganizationWithStats[] = await Promise.all(
-      userMemberships.map(async (membership) => {
+      activeMemberships.map(async (membership) => {
         // Get member count for this organization
         const memberCountResult = await db
           .select({ count: count() })
@@ -71,12 +76,15 @@ export async function getOrganizationsForProvider() {
     where: eq(member.userId, currentUser?.id),
   });
   const organizations = await db.query.organization.findMany({
-    where: inArray(
-      organization.id,
-      members.map((m) => m.organizationId)
+    where: and(
+      inArray(
+        organization.id,
+        members.map((m) => m.organizationId)
+      ),
+      isNull(organization.deletedAt) // Filter out soft-deleted organizations
     ),
   });
-  // Map to match the expected type for OrganizationProvider (soft deletion filtering temporarily disabled)
+  // Map to match the expected type for OrganizationProvider
   return organizations.map((org) => ({
     id: org.id,
     slug: org.slug || org.id, // Use ID as fallback if slug is null

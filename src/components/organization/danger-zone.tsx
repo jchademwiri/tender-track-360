@@ -17,6 +17,12 @@ import { OrganizationDeletionModal } from './deletion-modal';
 import { OwnershipTransferModal } from './transfer-ownership-modal';
 import { DataExportModal } from './data-export-modal';
 import type { Role } from '@/db/schema';
+import {
+  initiateOrganizationDeletion,
+  initiateOwnershipTransfer,
+  exportOrganizationData,
+} from '@/server/organization-advanced-actions';
+import { toast } from 'sonner';
 
 interface DangerZoneProps {
   organizationId: string;
@@ -197,9 +203,32 @@ export function DangerZone({
           contractCount: 0, // This would be fetched from actual data
         }}
         onConfirm={async (confirmation) => {
-          // Handle deletion confirmation
-          console.log('Deletion confirmed:', confirmation);
-          setShowDeletionModal(false);
+          try {
+            const result = await initiateOrganizationDeletion(
+              organizationId,
+              confirmation
+            );
+
+            if (result.success) {
+              toast.success(
+                confirmation.deletionType === 'soft'
+                  ? 'Organization soft deletion initiated. You have 30 days to restore it.'
+                  : 'Organization permanently deleted.'
+              );
+              setShowDeletionModal(false);
+              // Redirect to organizations list after successful deletion
+              window.location.href = '/dashboard/settings/organisation';
+            } else {
+              toast.error(
+                result.error?.message || 'Failed to delete organization'
+              );
+            }
+          } catch (error) {
+            console.error('Error deleting organization:', error);
+            toast.error(
+              'An unexpected error occurred while deleting the organization'
+            );
+          }
         }}
       />
 
@@ -209,9 +238,25 @@ export function DangerZone({
         organizationId={organizationId}
         eligibleMembers={[]} // This would be fetched from actual data
         onTransfer={async (request) => {
-          // Handle ownership transfer
-          console.log('Transfer initiated:', request);
-          setShowTransferModal(false);
+          try {
+            const result = await initiateOwnershipTransfer(request);
+
+            if (result.success) {
+              toast.success(
+                'Ownership transfer initiated. The new owner will receive an email to confirm.'
+              );
+              setShowTransferModal(false);
+            } else {
+              toast.error(
+                result.error?.message || 'Failed to initiate ownership transfer'
+              );
+            }
+          } catch (error) {
+            console.error('Error initiating ownership transfer:', error);
+            toast.error(
+              'An unexpected error occurred while initiating the transfer'
+            );
+          }
         }}
       />
 
@@ -221,9 +266,23 @@ export function DangerZone({
         organizationId={organizationId}
         organizationName={organizationName}
         onExport={async (format) => {
-          // Handle data export
-          console.log('Export requested:', format);
-          setShowExportModal(false);
+          try {
+            const result = await exportOrganizationData(organizationId, format);
+
+            if (result.success && result.data?.exportUrl) {
+              toast.success('Data export completed successfully');
+              // Open the export URL in a new tab
+              window.open(result.data.exportUrl, '_blank');
+              setShowExportModal(false);
+            } else {
+              toast.error(
+                result.error?.message || 'Failed to export organization data'
+              );
+            }
+          } catch (error) {
+            console.error('Error exporting organization data:', error);
+            toast.error('An unexpected error occurred while exporting data');
+          }
         }}
       />
     </div>

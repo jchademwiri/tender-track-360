@@ -11,28 +11,27 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import {
   Shield,
-  AlertTriangle,
   Activity,
   Clock,
   User,
   Monitor,
   Smartphone,
   Globe,
-  Trash2,
   Download,
   Key,
   Lock,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Role } from '@/db/schema';
+import { DangerZone } from '@/components/organization/danger-zone';
 
 interface SecurityTabProps {
   organization: {
     id: string;
     name: string;
+    memberCount: number;
   };
   userRole: Role;
   currentUser: {
@@ -118,7 +117,6 @@ export function SecurityTab({
   const [isLoading, setIsLoading] = useState(true);
   const [require2FA, setRequire2FA] = useState(false);
   const [sessionTimeout, setSessionTimeout] = useState(true);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const canAccess = canAccessSecurity(userRole);
   const canDangerous = canPerformDangerousOperations(userRole);
@@ -155,18 +153,6 @@ export function SecurityTab({
     } catch (error) {
       console.error('Error terminating session:', error);
       toast.error('Failed to terminate session');
-    }
-  };
-
-  const handleDeleteOrganization = async () => {
-    try {
-      // TODO: Implement delete organization functionality
-      console.log('Deleting organization:', organization.id);
-      toast.success('Organization deletion initiated');
-      // In real implementation, this would redirect to a confirmation page
-    } catch (error) {
-      console.error('Error deleting organization:', error);
-      toast.error('Failed to delete organization');
     }
   };
 
@@ -436,58 +422,14 @@ export function SecurityTab({
 
       {/* Danger Zone - Owner Only */}
       {canDangerous && (
-        <Card className="border-red-200 dark:border-red-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
-              <AlertTriangle className="h-5 w-5" />
-              Danger Zone
-            </CardTitle>
-            <CardDescription>
-              Irreversible and destructive actions for this organization
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="p-4 border border-red-200 dark:border-red-800 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium text-red-600 dark:text-red-400">
-                      Delete Organization
-                    </h4>
-                    <p className="text-sm text-muted-foreground">
-                      Permanently delete this organization and all its data.
-                      This action cannot be undone.
-                    </p>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => setShowDeleteDialog(true)}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Organization
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <DangerZone
+          organizationId={organization.id}
+          userRole={userRole}
+          organizationName={organization.name}
+          memberCount={organization.memberCount}
+          hasActiveContracts={false} // TODO: Get real contract data
+        />
       )}
-
-      {/* Delete Organization Confirmation Dialog */}
-      <ConfirmationDialog
-        isOpen={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
-        onConfirm={async () => {
-          await handleDeleteOrganization();
-          setShowDeleteDialog(false);
-        }}
-        title="Delete Organization"
-        description={`Are you absolutely sure you want to delete "${organization.name}"? This will permanently delete the organization and all its data, including all members, settings, and associated documents. This action cannot be undone.`}
-        confirmText="Delete Organization"
-        variant="destructive"
-        icon="delete"
-      />
     </div>
   );
 }

@@ -252,7 +252,11 @@ export function OrganizationManagementTabs({
 
         <TabsContent value="security" className="space-y-6">
           <SecurityTab
-            organization={organization}
+            organization={{
+              id: organization.id,
+              name: organization.name,
+              memberCount: organization.memberCount,
+            }}
             userRole={userRole}
             currentUser={currentUser}
           />

@@ -119,9 +119,10 @@ export async function initiateOrganizationDeletion(
         );
       }
 
-      // Revalidate organization pages
+      // Revalidate organization pages and dashboard layout
       revalidatePath('/dashboard/settings/organisation');
       revalidatePath(`/dashboard/settings/organisation/${organizationId}`);
+      revalidatePath('/dashboard'); // Revalidate dashboard to update sidebar
 
       return createServerActionSuccess({
         deletionId: result.deletionId!,
@@ -144,8 +145,9 @@ export async function initiateOrganizationDeletion(
         );
       }
 
-      // Revalidate organization pages
+      // Revalidate organization pages and dashboard layout
       revalidatePath('/dashboard/settings/organisation');
+      revalidatePath('/dashboard'); // Revalidate dashboard to update sidebar
 
       return createServerActionSuccess({
         deletionId: result.deletionId || 'permanent',
