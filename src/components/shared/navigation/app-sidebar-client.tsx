@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { AppSidebar } from './app-sidebar';
 import type { OrganizationWithStats } from '@/server/organizations';
 import type { User } from '@/db/schema';
@@ -17,27 +17,15 @@ export function AppSidebarClient({
   initialUser,
   ...props
 }: AppSidebarClientProps) {
-  const [organizations, setOrganizations] = useState(initialOrganizations);
-  const [user, setUser] = useState(initialUser);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    setIsHydrated(true);
-    // Update state with initial props after hydration
-    setOrganizations(initialOrganizations);
-    setUser(initialUser);
-  }, [initialOrganizations, initialUser]);
-
-  // During SSR and before hydration, use initial data
-  if (!isHydrated) {
-    return (
+  // Always use the initial data to prevent hydration mismatches
+  // The data will be updated through page navigation/refresh after deletions
+  return (
+    <div suppressHydrationWarning>
       <AppSidebar
         organizations={initialOrganizations}
         user={initialUser}
         {...props}
       />
-    );
-  }
-
-  return <AppSidebar organizations={organizations} user={user} {...props} />;
+    </div>
+  );
 }

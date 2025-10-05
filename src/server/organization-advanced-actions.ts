@@ -148,6 +148,7 @@ export async function initiateOrganizationDeletion(
       // Revalidate organization pages and dashboard layout
       revalidatePath('/dashboard/settings/organisation');
       revalidatePath('/dashboard'); // Revalidate dashboard to update sidebar
+      revalidatePath('/dashboard/settings'); // Revalidate settings layout
 
       return createServerActionSuccess({
         deletionId: result.deletionId || 'permanent',
