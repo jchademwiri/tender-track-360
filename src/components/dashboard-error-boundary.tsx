@@ -17,21 +17,21 @@ import {
 } from 'lucide-react';
 
 interface DashboardErrorFallbackProps {
-  error: Error;
+  error?: Error;
   resetError: () => void;
   errorInfo?: React.ErrorInfo;
 }
 
 // Enhanced error categorization
-function categorizeError(error: Error): {
+function categorizeError(error?: Error): {
   type: 'network' | 'permission' | 'server' | 'client' | 'database' | 'unknown';
   icon: React.ReactNode;
   title: string;
   description: string;
   actionable: boolean;
 } {
-  const message = error.message.toLowerCase();
-  const stack = error.stack?.toLowerCase() || '';
+  const message = error?.message?.toLowerCase() || '';
+  const stack = error?.stack?.toLowerCase() || '';
 
   // Network errors
   if (
@@ -139,8 +139,8 @@ function DashboardErrorFallback({
   const handleReportError = () => {
     // In a real app, this would send error details to an error reporting service
     const errorDetails = {
-      message: error.message,
-      stack: error.stack,
+      message: error?.message || 'Unknown error',
+      stack: error?.stack || 'No stack trace available',
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
       url: window.location.href,
@@ -193,15 +193,15 @@ function DashboardErrorFallback({
                 <div>
                   <strong>Message:</strong>
                   <pre className="mt-1 text-destructive whitespace-pre-wrap">
-                    {error.message}
+                    {error?.message || 'Unknown error'}
                   </pre>
                 </div>
 
-                {error.stack && (
+                {error?.stack && (
                   <div>
                     <strong>Stack Trace:</strong>
                     <pre className="mt-1 text-xs text-muted-foreground whitespace-pre-wrap max-h-40 overflow-y-auto">
-                      {error.stack}
+                      {error?.stack}
                     </pre>
                   </div>
                 )}
@@ -314,7 +314,7 @@ export function ComponentErrorBoundary({
                     {componentName} Error
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {error.message || 'This component failed to load'}
+                    {error?.message || 'This component failed to load'}
                   </p>
                 </div>
               </div>

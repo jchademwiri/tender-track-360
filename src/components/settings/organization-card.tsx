@@ -175,20 +175,26 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
                 Organization Deleted
               </Button>
               {canManage && (
-                <Button type="button" variant="secondary" size="sm">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="cursor-pointer"
+                >
                   Restore
                 </Button>
               )}
             </div>
           ) : canManage ? (
-            <Link
-              href={`/dashboard/settings/organisation/${organization.slug || organization.id}`}
-            >
-              <Button type="button" className="w-full">
+            <Button size={'lg'} className="w-full cursor-pointer">
+              <Link
+                href={`/dashboard/settings/organisation/${organization.slug}`}
+                className="flex justify-between items-center"
+              >
                 Manage Organization
                 <ChevronRight className="h-4 w-4 ml-2" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           ) : (
             // <Link
             //   // @ts-expect-error - Dynamic route typing issue

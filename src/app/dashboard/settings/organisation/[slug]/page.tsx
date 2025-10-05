@@ -6,6 +6,7 @@ import {
   getUserOrganizationMembership,
 } from '@/server/organizations';
 import { OrganizationManagementTabs } from './components/organization-management-tabs';
+import { OrganizationSettingsWrapper } from '@/components/settings/organization-settings-wrapper';
 import { Building2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -45,11 +46,13 @@ async function OrganizationManagementContent({ slug }: { slug: string }) {
     }
 
     return (
-      <OrganizationManagementTabs
-        organization={organizationData}
-        userRole={userMembership.role}
-        currentUser={currentUser}
-      />
+      <OrganizationSettingsWrapper>
+        <OrganizationManagementTabs
+          organization={organizationData}
+          userRole={userMembership.role}
+          currentUser={currentUser}
+        />
+      </OrganizationSettingsWrapper>
     );
   } catch (error) {
     console.error('Error loading organization:', error);
