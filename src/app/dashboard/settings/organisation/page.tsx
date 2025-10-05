@@ -1,21 +1,23 @@
 export const dynamic = 'force-dynamic';
 
-export default async function CompanySettingsPage() {
+export default async function OrganisationSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Company Settings</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Organisation Settings
+        </h1>
         <p className="text-muted-foreground">
-          Manage your organization information and business settings.
+          Manage your organisation information and business settings.
         </p>
       </div>
 
       <div className="bg-muted/50 rounded-xl p-6">
-        <h2 className="text-xl font-semibold mb-4">Company Information</h2>
+        <h2 className="text-xl font-semibold mb-4">Organisation Information</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="block text-sm font-medium mb-2">
-              Company Name
+              Organisation Name
             </label>
             <input
               type="text"
@@ -60,7 +62,7 @@ export default async function CompanySettingsPage() {
             <input
               type="url"
               className="w-full p-2 border rounded-md bg-background"
-              placeholder="https://www.company.com"
+              placeholder="https://www.organisation.com"
             />
           </div>
         </div>
@@ -114,7 +116,7 @@ export default async function CompanySettingsPage() {
                 <div>
                   <h3 className="font-medium">John Doe</h3>
                   <p className="text-sm text-muted-foreground">
-                    Owner • john@company.com
+                    Owner • john@organisation.com
                   </p>
                 </div>
                 <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
@@ -128,7 +130,7 @@ export default async function CompanySettingsPage() {
                 <div>
                   <h3 className="font-medium">Jane Smith</h3>
                   <p className="text-sm text-muted-foreground">
-                    Manager • jane@company.com
+                    Manager • jane@organisation.com
                   </p>
                 </div>
                 <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">

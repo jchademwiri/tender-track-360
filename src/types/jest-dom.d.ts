@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/triple-slash-reference */
 /// <reference types="jest" />
 /// <reference types="@testing-library/jest-dom" />
 

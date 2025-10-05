@@ -51,9 +51,9 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
               </Text>
               <Text className="text-[16px] text-gray-700 leading-[24px] m-0 mb-[16px]">
                 <strong>{invitedByUsername}</strong> has invited you to join{' '}
-                <strong>{teamName}</strong>. You&apos;ll be able to collaborate with
-                the team and access all the tools and resources you need to get
-                started right away.
+                <strong>{teamName}</strong>. You&apos;ll be able to collaborate
+                with the team and access all the tools and resources you need to
+                get started right away.
               </Text>
 
               {/* Invitation Details Box */}
@@ -77,8 +77,8 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
 
               <Text className="text-[16px] text-gray-700 leading-[24px] m-0 mb-[24px]">
                 Click the button below to accept your invitation and create your
-                account. If you already have an account, you&apos;ll be added to the
-                organization automatically.
+                account. If you already have an account, you&apos;ll be added to
+                the organization automatically.
               </Text>
             </Section>
 
@@ -95,8 +95,8 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
             {/* Alternative Link */}
             <Section className="mb-[32px]">
               <Text className="text-[14px] text-gray-600 leading-[20px] m-0 mb-[8px]">
-                If the button doesn&apos;t work, you can copy and paste this link
-                into your browser:
+                If the button doesn&apos;t work, you can copy and paste this
+                link into your browser:
               </Text>
               <Link
                 href={inviteLink}
@@ -138,8 +138,8 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
                 {invitedByEmail}
               </Text>
               <Text className="text-[14px] text-gray-600 leading-[20px] m-0">
-                • If you didn&apos;t expect this invitation, you can safely ignore
-                this email
+                • If you didn&apos;t expect this invitation, you can safely
+                ignore this email
               </Text>
             </Section>
 
@@ -162,7 +162,8 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
                 Unsubscribe
               </Link>
               <Text className="text-[12px] text-gray-400 leading-[16px] m-0 inline">
-                © {new Date().getFullYear()} Your Company. All rights reserved.
+                © {new Date().getFullYear()} Your Organisation. All rights
+                reserved.
               </Text>
             </Section>
           </Container>
@@ -175,7 +176,7 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
 OrganizationInvitation.PreviewProps = {
   email: 'hello@jacobc.co.za',
   invitedByUsername: 'John Smith',
-  invitedByEmail: 'john.smith@company.com',
+  invitedByEmail: 'john.smith@organisation.com',
   teamName: 'Acme Corporation',
   inviteLink: 'https://yourapp.com/invite/accept?token=abc123xyz789',
 };

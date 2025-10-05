@@ -6,7 +6,7 @@ export default async function SettingsOverviewPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Settings Overview</h1>
         <p className="text-muted-foreground">
-          Manage your account, company, and system preferences.
+          Manage your account, organisation, and system preferences.
         </p>
       </div>
 
@@ -22,12 +22,12 @@ export default async function SettingsOverviewPage() {
         </div>
 
         <div className="bg-muted/50 rounded-xl p-6">
-          <h2 className="text-xl font-semibold mb-4">Company Settings</h2>
+          <h2 className="text-xl font-semibold mb-4">Organisation Settings</h2>
           <p className="text-muted-foreground mb-4">
-            Configure company information and organizational settings.
+            Configure organisation information and organizational settings.
           </p>
           <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm">
-            Manage Company
+            Manage Organisation
           </button>
         </div>
 
