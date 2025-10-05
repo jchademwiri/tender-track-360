@@ -14,6 +14,8 @@ import {
   Users,
 } from 'lucide-react';
 import { OrganizationDeletionModal } from './deletion-modal';
+import { OwnershipTransferModal } from './ownership-transfer-modal';
+import { DataExportModal } from './data-export-modal';
 import type { Role } from '@/db/schema';
 import {
   initiateOrganizationDeletion,
