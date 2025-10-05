@@ -19,9 +19,9 @@ graph TB
         Router[Next.js Router]
     end
 
-    subgraph "API Layer"
-        API[Next.js API Routes]
-        Middleware[Auth Middleware]
+    subgraph "Server Actions Layer"
+        Actions[Next.js Server Actions]
+        Auth[Auth Validation]
         Validation[Input Validation]
     end
 
@@ -41,10 +41,10 @@ graph TB
         PG[(PostgreSQL)]
     end
 
-    UI --> API
-    Forms --> Services
+    UI --> Actions
+    Forms --> Actions
     State --> Hooks
-    API --> Services
+    Actions --> Services
     Services --> ORM
     ORM --> PG
 ```
@@ -52,6 +52,7 @@ graph TB
 ### Technology Stack
 
 - **Frontend**: Next.js 14+ with App Router, React 18+, TypeScript
+- **Server Actions**: Next.js Server Actions for data mutations
 - **Styling**: Tailwind CSS with shadcn/ui components
 - **Forms**: React Hook Form with Zod validation
 - **Database**: PostgreSQL with Drizzle ORM
@@ -61,38 +62,34 @@ graph TB
 
 ## Components and Interfaces
 
-### Phase 1: Client Management Foundation
+### Phase 2: Client Management Foundation
 
 #### Core Components (MVP)
 
 - `ClientList` - Paginated, searchable client listing
-- `ClientForm` - Create/edit client with embedded primary contact
-- `ClientDetails` - Simple client view with primary contact information
+- `ClientForm` - Create/edit client with embedded contact
+- `ClientDetails` - Simple client view with contact information
 
-#### API Endpoints
+#### Server Actions
 
 ```typescript
-// Client CRUD
-GET / api / clients; // List clients with pagination/search
-POST / api / clients; // Create new client
-GET / api / clients / [id]; // Get client details
-PUT / api / clients / [id]; // Update client
-DELETE / api / clients / [id]; // Soft delete client
-
-// Client Contacts
-GET / api / clients / [id] / contacts; // List client contacts
-POST / api / clients / [id] / contacts; // Add contact
-PUT / api / clients / [id] / contacts / [contactId]; // Update contact
-DELETE / api / clients / [id] / contacts / [contactId]; // Delete contact
-
-// Client Addresses
-GET / api / clients / [id] / addresses; // List client addresses
-POST / api / clients / [id] / addresses; // Add address
-PUT / api / clients / [id] / addresses / [addressId]; // Update address
-DELETE / api / clients / [id] / addresses / [addressId]; // Delete address
+// Client CRUD Server Actions
+async function getClients(
+  organizationId: string,
+  search?: string,
+  page?: number
+);
+async function createClient(organizationId: string, data: ClientCreateInput);
+async function getClientById(organizationId: string, clientId: string);
+async function updateClient(
+  organizationId: string,
+  clientId: string,
+  data: Partial<ClientCreateInput>
+);
+async function deleteClient(organizationId: string, clientId: string); // Soft delete
 ```
 
-### Phase 2: Core Tender Management
+### Phase 3: Core Tender Management
 
 #### Core Components
 
@@ -102,70 +99,125 @@ DELETE / api / clients / [id] / addresses / [addressId]; // Delete address
 - `TenderStatusManager` - Status workflow management
 - `TenderSearch` - Advanced search and filtering
 
-#### API Endpoints
+#### Server Actions
 
 ```typescript
-// Tender CRUD
-GET    /api/tenders             // List tenders with advanced filtering
-POST   /api/tenders             // Create new tender
-GET    /api/tenders/[id]        // Get tender details with relations
-PUT    /api/tenders/[id]        // Update tender
-DELETE /api/tenders/[id]        // Soft delete tender
+// Tender CRUD Server Actions
+async function getTenders(organizationId: string, filters?: TenderFilters);
+async function createTender(organizationId: string, data: TenderCreateInput);
+async function getTenderById(organizationId: string, tenderId: string);
+async function updateTender(
+  organizationId: string,
+  tenderId: string,
+  data: Partial<TenderCreateInput>
+);
+async function deleteTender(organizationId: string, tenderId: string); // Soft delete
 
 // Tender Operations
-POST   /api/tenders/[id]/status // Update tender status
-GET    /api/tenders/search      // Advanced search endpoint
-POST   /api/tenders/export      // Export tender data
+async function updateTenderStatus(
+  organizationId: string,
+  tenderId: string,
+  status: TenderStatus
+);
+async function searchTenders(organizationId: string, query: string);
+async function exportTenderData(
+  organizationId: string,
+  filters?: TenderFilters
+);
 ```
 
-### Phase 3: Follow-up Management
+### Phase 4: Follow-up Management
 
 #### Core Components
 
 - `FollowUpList` - Timeline view of follow-ups
 - `FollowUpForm` - Create/edit follow-up records
-- `CommunicationLog` - Rich text communication tracking
-- `FollowUpCalendar` - Calendar integration for scheduling
-- `NotificationCenter` - Follow-up reminders and alerts
+- `FollowUpDetails` - Follow-up detail view with notes
 
-#### API Endpoints
+#### Server Actions
 
 ```typescript
-// Follow-up CRUD
-GET / api / tenders / [id] / followups; // List tender follow-ups
-POST / api / tenders / [id] / followups; // Create follow-up
-PUT / api / followups / [id]; // Update follow-up
-DELETE / api / followups / [id]; // Delete follow-up
+// Follow-up CRUD Server Actions
+async function getFollowUps(organizationId: string, tenderId: string);
+async function createFollowUp(
+  organizationId: string,
+  data: FollowUpCreateInput
+);
+async function updateFollowUp(
+  organizationId: string,
+  followUpId: string,
+  data: Partial<FollowUpCreateInput>
+);
+async function deleteFollowUp(organizationId: string, followUpId: string); // Soft delete
 
 // Follow-up Operations
-POST / api / followups / [id] / communications; // Add communication log
-GET / api / followups / upcoming; // Get upcoming follow-ups
-POST / api / followups / [id] / notifications; // Send notifications
+async function getUpcomingFollowUps(organizationId: string);
+async function searchFollowUps(organizationId: string, query: string);
 ```
 
-### Phase 4: Contract Management
+### Phase 5: Project Management
 
 #### Core Components
 
-- `ContractList` - Contract overview and management
-- `ContractForm` - Contract creation from tenders
-- `ContractDetails` - Contract lifecycle tracking
-- `ProjectConverter` - Convert contracts to projects
-- `ContractReports` - Contract analytics and reporting
+- `ProjectList` - Project overview and management
+- `ProjectForm` - Project creation from tenders
+- `ProjectDetails` - Project lifecycle tracking
+- `TenderToProjectConverter` - Convert tenders to projects
 
-#### API Endpoints
+#### Server Actions
 
 ```typescript
-// Contract CRUD
-GET / api / contracts; // List contracts
-POST / api / contracts; // Create contract from tender
-GET / api / contracts / [id]; // Get contract details
-PUT / api / contracts / [id]; // Update contract
-DELETE / api / contracts / [id]; // Soft delete contract
+// Project CRUD Server Actions
+async function getProjects(organizationId: string, filters?: ProjectFilters);
+async function createProject(organizationId: string, data: ProjectCreateInput);
+async function createProjectFromTender(
+  organizationId: string,
+  tenderId: string
+);
+async function getProjectById(organizationId: string, projectId: string);
+async function updateProject(
+  organizationId: string,
+  projectId: string,
+  data: Partial<ProjectCreateInput>
+);
+async function deleteProject(organizationId: string, projectId: string); // Soft delete
+```
 
-// Contract Operations
-POST / api / contracts / [id] / convert - to - project; // Convert to project
-GET / api / contracts / reports; // Contract reporting data
+### Phase 6: Purchase Order Management
+
+#### Core Components
+
+- `PurchaseOrderList` - Purchase order overview and management
+- `PurchaseOrderForm` - Purchase order creation for projects
+- `PurchaseOrderDetails` - Purchase order lifecycle tracking
+
+#### Server Actions
+
+```typescript
+// Purchase Order CRUD Server Actions
+async function getPurchaseOrders(organizationId: string, projectId?: string);
+async function createPurchaseOrder(
+  organizationId: string,
+  data: PurchaseOrderCreateInput
+);
+async function getPurchaseOrderById(organizationId: string, poId: string);
+async function updatePurchaseOrder(
+  organizationId: string,
+  poId: string,
+  data: Partial<PurchaseOrderCreateInput>
+);
+async function deletePurchaseOrder(organizationId: string, poId: string); // Soft delete
+
+// Purchase Order Operations
+async function updatePurchaseOrderStatus(
+  organizationId: string,
+  poId: string,
+  status: PurchaseOrderStatus
+);
+async function getProjectPurchaseOrders(
+  organizationId: string,
+  projectId: string
+);
 ```
 
 ## Data Models
@@ -173,15 +225,105 @@ GET / api / contracts / reports; // Contract reporting data
 ### Enhanced Data Models with Validation
 
 ```typescript
-// Client Management (MVP)
+// Database Table Definitions (5 New Tables)
+
+// 1. Client Table
+export const client = pgTable('client', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  notes: text('notes'),
+  contactName: text('contact_name'),
+  contactEmail: text('contact_email'),
+  contactPhone: text('contact_phone'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'),
+});
+
+// 2. Tender Table
+export const tender = pgTable('tender', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  tenderNumber: text('tender_number').notNull().unique(),
+  description: text('description'),
+  clientId: text('client_id')
+    .notNull()
+    .references(() => client.id, { onDelete: 'cascade' }),
+  submissionDate: timestamp('submission_date'),
+  value: text('value'),
+  status: text('status').default('draft').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'),
+});
+
+// 3. Project Table
+export const project = pgTable('project', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  projectNumber: text('project_number').notNull(),
+  description: text('description'),
+  tenderId: text('tender_id').references(() => tender.id),
+  clientId: text('client_id').references(() => client.id),
+  status: text('status').default('active').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'),
+});
+
+// 4. Purchase Order Table
+export const purchaseOrder = pgTable('purchase_order', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => project.id, { onDelete: 'cascade' }),
+  supplierName: text('supplier_name').notNull(),
+  description: text('description').notNull(),
+  totalAmount: text('total_amount').notNull(),
+  status: text('status').default('draft').notNull(),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'),
+});
+
+// 5. Follow-up Table
+export const followUp = pgTable('follow_up', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  tenderId: text('tender_id')
+    .notNull()
+    .references(() => tender.id, { onDelete: 'cascade' }),
+  notes: text('notes').notNull(),
+  contactPerson: text('contact_person'),
+  nextFollowUpDate: timestamp('next_follow_up_date'),
+  createdBy: text('created_by')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'),
+});
+
+// Input Interfaces
 interface ClientCreateInput {
   name: string;
   notes?: string;
-  // Primary contact information (embedded)
-  primaryContactName?: string;
-  primaryContactEmail?: string;
-  primaryContactPhone?: string;
-  primaryContactPosition?: string;
+  contactName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
 }
 
 // Tender Management (MVP)
@@ -299,119 +441,107 @@ const errorHandler = (error: Error, req: Request, res: Response) => {
 
 ## Implementation Phases
 
-### Phase 1: Database Schema Updates (Week 1)
+### Phase 1: Database Schema Creation
 
 **Production Ready Deliverables:**
 
-- Safe database migrations for all MVP features
-- Updated client table with primary contact fields
-- Updated tender table with tender number as primary identifier
-- Updated project table with project number and description fields
-- Updated purchase order table with supplier name defaulting logic
-- All existing data preserved and functionality maintained
+- 5 new database tables created (client, tender, project, purchaseOrder, followUp)
+- Proper foreign key relationships and organization isolation
+- Soft deletion support across all tables
+- Database indexes for search optimization
+- All existing tables remain unchanged
 
 **Technical Implementation:**
 
 - Database migrations with rollback capability
-- Schema validation and constraint updates
-- Data migration scripts for existing records
+- Schema validation and constraint creation
 - Database indexing for new fields
 - Comprehensive testing of schema changes
 
-### Phase 2: Core Tender Management (Week 3-4)
+### Phase 2: Client Management Foundation
 
 **Production Ready Deliverables:**
 
-- Full tender lifecycle management
-- Tender status workflow with history tracking
-- Advanced search and filtering
-- Tender-client relationship management
-- Bulk operations (export, status updates)
-- Dashboard with basic tender metrics
+- Complete client CRUD functionality with server actions
+- Embedded contact information management
+- Client search and filtering capabilities
+- Organization-scoped client management
+- Responsive client management UI
 
 **Technical Implementation:**
 
-- Tender CRUD API endpoints
+- Client server actions with validation
+- Client UI components and pages
+- Search and pagination functionality
+- Form validation and error handling
+
+### Phase 3: Core Tender Management
+
+**Production Ready Deliverables:**
+
+- Full tender lifecycle management with unique tender numbers
+- Tender status workflow with history tracking
+- Advanced search and filtering by tender number
+- Tender-client relationship management
+- Responsive tender management UI
+
+**Technical Implementation:**
+
+- Tender server actions with number validation
+- Tender UI components and workflows
 - Status workflow management
 - Advanced search with indexing
-- Bulk operation handling
-- Basic analytics queries
 
-### Phase 3: Follow-up Management (Week 5-6)
+### Phase 4: Follow-up Management
 
 **Production Ready Deliverables:**
 
-- Complete follow-up tracking system
-- Communication log management
-- Automated reminder system
-- Calendar integration for scheduling
-- Notification preferences management
-- Follow-up reporting and analytics
+- Complete follow-up tracking system for tenders
+- Chronological follow-up display and management
+- User attribution and timestamp tracking
+- Follow-up search and filtering
+- Responsive follow-up management UI
 
 **Technical Implementation:**
 
-- Follow-up CRUD operations
-- Notification system with email/SMS
-- Calendar API integration
-- Background job processing for reminders
-- Rich text editor for communication logs
+- Follow-up server actions with tender relationships
+- Follow-up UI components and pages
+- Timeline view and chronological sorting
+- User attribution and organization isolation
 
-### Phase 4: Contract Management (Week 7-8)
+### Phase 5: Project Management
 
 **Production Ready Deliverables:**
 
-- Contract creation from successful tenders
-- Contract lifecycle tracking
-- Document management system
-- Project conversion functionality
-- Contract reporting and analytics
-- Renewal reminder system
+- Project creation from won tenders with inheritance
+- Standalone project creation and management
+- Project number and description inheritance logic
+- Project-tender relationship tracking
+- Responsive project management UI
 
 **Technical Implementation:**
 
-- Contract CRUD operations
-- File upload and document management
-- Project conversion logic
-- Advanced reporting queries
-- Automated renewal notifications
+- Project server actions with inheritance logic
+- Tender-to-project conversion functionality
+- Project UI components and workflows
+- Inheritance validation and management
 
-### Phase 5: Dashboard and Analytics (Week 9-10)
+### Phase 6: Purchase Order Management
 
 **Production Ready Deliverables:**
 
-- Comprehensive tender dashboard
-- Advanced analytics and reporting
-- Customizable report generation
-- Data visualization with charts
-- Performance metrics tracking
-- Executive summary reports
+- Purchase order creation and management for projects
+- Supplier name defaulting to organization name
+- Purchase order status workflow tracking
+- Project-based purchase order organization
+- Responsive purchase order management UI
 
 **Technical Implementation:**
 
-- Analytics data aggregation
-- Chart.js/D3.js integration
-- Report generation system
-- Data export in multiple formats
-- Performance monitoring
-
-### Phase 6: Integration and Advanced Features (Week 11-12)
-
-**Production Ready Deliverables:**
-
-- Data import/export functionality
-- Calendar system integration
-- Advanced notification system
-- Audit trail and logging
-- Performance optimization
-- Mobile app support
-
-**Technical Implementation:**
-
-- Import/export processing
-- External API integrations
-- Comprehensive logging system
-- Performance optimization
-- Progressive Web App features
+- Purchase order server actions with project relationships
+- Supplier name defaulting and override logic
+- Purchase order UI components and workflows
+- Project-based organization and filtering
 
 ## Security Considerations
 
