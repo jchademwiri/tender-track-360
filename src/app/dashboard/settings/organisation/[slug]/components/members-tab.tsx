@@ -34,6 +34,15 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Role } from '@/db/schema';
+import {
+  getOrganizationMembers,
+  type OrganizationMember,
+} from '@/server/organizations';
+import {
+  updateMemberRole,
+  removeMemberFromOrganization,
+  bulkRemoveMembersFromOrganization,
+} from '@/server/organization-members';
 
 interface MembersTabProps {
   organization: {
@@ -48,17 +57,7 @@ interface MembersTabProps {
   };
 }
 
-// Mock member data - in real implementation, this would come from server
-interface Member {
-  id: string;
-  userId: string;
-  name: string;
-  email: string;
-  image?: string | null;
-  role: Role;
-  joinedAt: Date;
-  lastActive?: Date;
-}
+// Using OrganizationMember interface from server
 
 // Helper function to get role display info
 function getRoleDisplay(role: Role) {
@@ -140,73 +139,50 @@ export function MembersTab({
   userRole,
   currentUser,
 }: MembersTabProps) {
-  const [members, setMembers] = useState<Member[]>([]);
+  const [members, setMembers] = useState<OrganizationMember[]>([]);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [memberToRemove, setMemberToRemove] = useState<Member | null>(null);
+  const [memberToRemove, setMemberToRemove] =
+    useState<OrganizationMember | null>(null);
   const [showBulkRemoveDialog, setShowBulkRemoveDialog] = useState(false);
 
   const canManage = canManageMembers(userRole);
 
-  // Mock data - in real implementation, fetch from server
+  // Fetch real organization members from database
   useEffect(() => {
-    const mockMembers: Member[] = [
-      {
-        id: '1',
-        userId: currentUser.id,
-        name: currentUser.name,
-        email: currentUser.email,
-        role: userRole,
-        joinedAt: new Date('2024-01-15'),
-        lastActive: new Date(),
-      },
-      {
-        id: '2',
-        userId: '2',
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        role: 'admin',
-        joinedAt: new Date('2024-02-01'),
-        lastActive: new Date('2024-12-18'),
-      },
-      {
-        id: '3',
-        userId: '3',
-        name: 'Bob Johnson',
-        email: 'bob@example.com',
-        role: 'manager',
-        joinedAt: new Date('2024-03-10'),
-        lastActive: new Date('2024-12-17'),
-      },
-      {
-        id: '4',
-        userId: '4',
-        name: 'Alice Brown',
-        email: 'alice@example.com',
-        role: 'member',
-        joinedAt: new Date('2024-04-05'),
-        lastActive: new Date('2024-12-16'),
-      },
-    ];
+    const fetchMembers = async () => {
+      try {
+        setIsLoading(true);
+        const organizationMembers = await getOrganizationMembers(
+          organization.id
+        );
+        setMembers(organizationMembers);
+      } catch (error) {
+        console.error('Error fetching members:', error);
+        toast.error('Failed to load organization members');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    setTimeout(() => {
-      setMembers(mockMembers);
-      setIsLoading(false);
-    }, 500);
-  }, [currentUser, userRole]);
+    fetchMembers();
+  }, [organization.id]);
 
   const handleRoleChange = async (memberId: string, newRole: Role) => {
     try {
-      // TODO: Implement updateMemberRole server action
-      console.log('Updating member role:', { memberId, newRole });
+      const result = await updateMemberRole(organization.id, memberId, newRole);
 
-      setMembers((prev) =>
-        prev.map((member) =>
-          member.id === memberId ? { ...member, role: newRole } : member
-        )
-      );
-
-      toast.success('Member role updated successfully');
+      if (result.success) {
+        // Update local state optimistically
+        setMembers((prev) =>
+          prev.map((member) =>
+            member.id === memberId ? { ...member, role: newRole } : member
+          )
+        );
+        toast.success('Member role updated successfully');
+      } else {
+        toast.error(result.error?.message || 'Failed to update member role');
+      }
     } catch (error) {
       console.error('Error updating member role:', error);
       toast.error('Failed to update member role');
@@ -215,11 +191,18 @@ export function MembersTab({
 
   const handleRemoveMember = async (memberId: string) => {
     try {
-      // TODO: Implement removeMember server action
-      console.log('Removing member:', memberId);
+      const result = await removeMemberFromOrganization(
+        organization.id,
+        memberId
+      );
 
-      setMembers((prev) => prev.filter((member) => member.id !== memberId));
-      toast.success('Member removed successfully');
+      if (result.success) {
+        // Update local state optimistically
+        setMembers((prev) => prev.filter((member) => member.id !== memberId));
+        toast.success('Member removed successfully');
+      } else {
+        toast.error(result.error?.message || 'Failed to remove member');
+      }
     } catch (error) {
       console.error('Error removing member:', error);
       toast.error('Failed to remove member');
@@ -230,14 +213,21 @@ export function MembersTab({
     if (selectedMembers.length === 0) return;
 
     try {
-      // TODO: Implement bulkRemoveMembers server action
-      console.log('Bulk removing members:', selectedMembers);
-
-      setMembers((prev) =>
-        prev.filter((member) => !selectedMembers.includes(member.id))
+      const result = await bulkRemoveMembersFromOrganization(
+        organization.id,
+        selectedMembers
       );
-      setSelectedMembers([]);
-      toast.success(`${selectedMembers.length} members removed successfully`);
+
+      if (result.success) {
+        // Update local state optimistically
+        setMembers((prev) =>
+          prev.filter((member) => !selectedMembers.includes(member.id))
+        );
+        setSelectedMembers([]);
+        toast.success(`${selectedMembers.length} members removed successfully`);
+      } else {
+        toast.error(result.error?.message || 'Failed to remove members');
+      }
     } catch (error) {
       console.error('Error bulk removing members:', error);
       toast.error('Failed to remove members');

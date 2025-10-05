@@ -8,6 +8,7 @@ type Organization = typeof organization.$inferSelect;
 
 import { eq, inArray, and } from 'drizzle-orm/sql/expressions/conditions';
 import { count } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
 import { getCurrentUser } from './users';
 
 // Enhanced organization data with member counts and user roles
@@ -285,6 +286,18 @@ export async function getOrganizationsStats(
   }
 }
 
+// Organization member interface for member data
+export interface OrganizationMember {
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+  image?: string | null;
+  role: Role;
+  joinedAt: Date;
+  lastActive?: Date;
+}
+
 // Invitation interface for pending invitations
 export interface PendingInvitation {
   id: string;
@@ -294,6 +307,59 @@ export interface PendingInvitation {
   expiresAt: Date;
   invitedAt: Date;
   inviterName: string;
+}
+
+// Get all members of an organization
+export async function getOrganizationMembers(
+  organizationId: string
+): Promise<OrganizationMember[]> {
+  try {
+    const { currentUser } = await getCurrentUser();
+
+    if (!currentUser?.id) {
+      throw new Error('User not authenticated');
+    }
+
+    // Verify user has access to this organization
+    const userMembership = await getUserOrganizationMembership(
+      currentUser.id,
+      organizationId
+    );
+    if (!userMembership) {
+      throw new Error('Access denied to this organization');
+    }
+
+    // Fetch all members of the organization
+    const members = await db.query.member.findMany({
+      where: eq(member.organizationId, organizationId),
+      with: {
+        user: {
+          columns: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            createdAt: true,
+          },
+        },
+      },
+      orderBy: [desc(member.createdAt)],
+    });
+
+    return members.map((memberRecord) => ({
+      id: memberRecord.id,
+      userId: memberRecord.userId,
+      name: memberRecord.user.name,
+      email: memberRecord.user.email,
+      image: memberRecord.user.image,
+      role: memberRecord.role as Role,
+      joinedAt: memberRecord.createdAt,
+      lastActive: memberRecord.user.createdAt, // You might want to add a lastActive field to user table
+    }));
+  } catch (error) {
+    console.error('Error fetching organization members:', error);
+    throw new Error('Failed to fetch organization members');
+  }
 }
 
 // Get pending invitations for an organization

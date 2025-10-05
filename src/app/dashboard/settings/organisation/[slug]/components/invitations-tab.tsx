@@ -14,13 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+// Select components removed since role selection is no longer needed
 import {
   Form,
   FormControl,
@@ -51,6 +45,16 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Role } from '@/db/schema';
+import {
+  getPendingInvitations,
+  type PendingInvitation,
+} from '@/server/organizations';
+import {
+  inviteMember,
+  cancelInvitation,
+  resendInvitation,
+  bulkCancelInvitations,
+} from '@/server/invitations';
 
 interface InvitationsTabProps {
   organization: {
@@ -65,23 +69,11 @@ interface InvitationsTabProps {
   };
 }
 
-// Mock invitation data - in real implementation, this would come from server
-interface PendingInvitation {
-  id: string;
-  email: string;
-  role: Role;
-  status: 'pending' | 'expired' | 'accepted' | 'declined';
-  invitedAt: Date;
-  expiresAt: Date;
-  inviterName: string;
-}
+// Using PendingInvitation interface from server
 
-// Form schema for new invitation
+// Form schema for new invitation - role is hardcoded to 'member'
 const invitationSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
-  role: z.enum(['owner', 'admin', 'manager', 'member'] as const, {
-    required_error: 'Please select a role',
-  }),
 });
 
 type InvitationFormData = z.infer<typeof invitationSchema>;
@@ -170,7 +162,7 @@ function canManageInvitations(role: Role): boolean {
 export function InvitationsTab({
   organization,
   userRole,
-  currentUser,
+  currentUser: _currentUser, // eslint-disable-line @typescript-eslint/no-unused-vars
 }: InvitationsTabProps) {
   const [invitations, setInvitations] = useState<PendingInvitation[]>([]);
   const [selectedInvitations, setSelectedInvitations] = useState<string[]>([]);
@@ -186,47 +178,26 @@ export function InvitationsTab({
     resolver: zodResolver(invitationSchema),
     defaultValues: {
       email: '',
-      role: 'member',
     },
   });
 
-  // Mock data - in real implementation, fetch from server
+  // Fetch real pending invitations from database
   useEffect(() => {
-    const mockInvitations: PendingInvitation[] = [
-      {
-        id: '1',
-        email: 'john@example.com',
-        role: 'admin',
-        status: 'pending',
-        invitedAt: new Date('2024-12-15'),
-        expiresAt: new Date('2024-12-22'),
-        inviterName: currentUser.name,
-      },
-      {
-        id: '2',
-        email: 'sarah@example.com',
-        role: 'member',
-        status: 'pending',
-        invitedAt: new Date('2024-12-10'),
-        expiresAt: new Date('2024-12-17'),
-        inviterName: currentUser.name,
-      },
-      {
-        id: '3',
-        email: 'mike@example.com',
-        role: 'manager',
-        status: 'expired',
-        invitedAt: new Date('2024-12-01'),
-        expiresAt: new Date('2024-12-08'),
-        inviterName: 'Jane Smith',
-      },
-    ];
+    const fetchInvitations = async () => {
+      try {
+        setIsLoading(true);
+        const pendingInvitations = await getPendingInvitations(organization.id);
+        setInvitations(pendingInvitations);
+      } catch (error) {
+        console.error('Error fetching invitations:', error);
+        toast.error('Failed to load pending invitations');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    setTimeout(() => {
-      setInvitations(mockInvitations);
-      setIsLoading(false);
-    }, 500);
-  }, [currentUser.name]);
+    fetchInvitations();
+  }, [organization.id]);
 
   const onSubmit = async (data: InvitationFormData) => {
     if (!canManage) {
@@ -236,29 +207,20 @@ export function InvitationsTab({
 
     setIsSending(true);
     try {
-      // TODO: Implement inviteMember server action
-      console.log('Sending invitation:', {
-        organizationId: organization.id,
-        email: data.email,
-        role: data.role,
-      });
+      const result = await inviteMember(organization.id, data.email, 'member');
 
-      // Mock successful invitation
-      const newInvitation: PendingInvitation = {
-        id: Date.now().toString(),
-        email: data.email,
-        role: data.role,
-        status: 'pending',
-        invitedAt: new Date(),
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-        inviterName: currentUser.name,
-      };
+      if (result.success) {
+        // Refresh the invitations list
+        const updatedInvitations = await getPendingInvitations(organization.id);
+        setInvitations(updatedInvitations);
 
-      setInvitations((prev) => [newInvitation, ...prev]);
-      form.reset();
-      toast.success('Invitation sent successfully', {
-        description: `An invitation has been sent to ${data.email}`,
-      });
+        form.reset();
+        toast.success('Invitation sent successfully', {
+          description: `An invitation has been sent to ${data.email}`,
+        });
+      } else {
+        toast.error(result.error?.message || 'Failed to send invitation');
+      }
     } catch (error) {
       console.error('Error sending invitation:', error);
       toast.error('Failed to send invitation', {
@@ -271,22 +233,17 @@ export function InvitationsTab({
 
   const handleResendInvitation = async (invitationId: string) => {
     try {
-      // TODO: Implement resendInvitation server action
-      console.log('Resending invitation:', invitationId);
+      const result = await resendInvitation(invitationId);
 
-      setInvitations((prev) =>
-        prev.map((inv) =>
-          inv.id === invitationId
-            ? {
-                ...inv,
-                invitedAt: new Date(),
-                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-              }
-            : inv
-        )
-      );
+      if (result.success) {
+        // Refresh the invitations list
+        const updatedInvitations = await getPendingInvitations(organization.id);
+        setInvitations(updatedInvitations);
 
-      toast.success('Invitation resent successfully');
+        toast.success('Invitation resent successfully');
+      } else {
+        toast.error(result.error?.message || 'Failed to resend invitation');
+      }
     } catch (error) {
       console.error('Error resending invitation:', error);
       toast.error('Failed to resend invitation');
@@ -295,11 +252,15 @@ export function InvitationsTab({
 
   const handleCancelInvitation = async (invitationId: string) => {
     try {
-      // TODO: Implement cancelInvitation server action
-      console.log('Cancelling invitation:', invitationId);
+      const result = await cancelInvitation(invitationId);
 
-      setInvitations((prev) => prev.filter((inv) => inv.id !== invitationId));
-      toast.success('Invitation cancelled successfully');
+      if (result.success) {
+        // Update local state optimistically
+        setInvitations((prev) => prev.filter((inv) => inv.id !== invitationId));
+        toast.success('Invitation cancelled successfully');
+      } else {
+        toast.error(result.error?.message || 'Failed to cancel invitation');
+      }
     } catch (error) {
       console.error('Error cancelling invitation:', error);
       toast.error('Failed to cancel invitation');
@@ -310,16 +271,20 @@ export function InvitationsTab({
     if (selectedInvitations.length === 0) return;
 
     try {
-      // TODO: Implement bulkCancelInvitations server action
-      console.log('Bulk cancelling invitations:', selectedInvitations);
+      const result = await bulkCancelInvitations(selectedInvitations);
 
-      setInvitations((prev) =>
-        prev.filter((inv) => !selectedInvitations.includes(inv.id))
-      );
-      setSelectedInvitations([]);
-      toast.success(
-        `${selectedInvitations.length} invitations cancelled successfully`
-      );
+      if (result.success) {
+        // Update local state optimistically
+        setInvitations((prev) =>
+          prev.filter((inv) => !selectedInvitations.includes(inv.id))
+        );
+        setSelectedInvitations([]);
+        toast.success(
+          `${selectedInvitations.length} invitations cancelled successfully`
+        );
+      } else {
+        toast.error(result.error?.message || 'Failed to cancel invitations');
+      }
     } catch (error) {
       console.error('Error bulk cancelling invitations:', error);
       toast.error('Failed to cancel invitations');
@@ -387,56 +352,16 @@ export function InvitationsTab({
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Role</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a role" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="owner">
-                              <div className="flex items-center gap-2">
-                                <Crown className="h-4 w-4" />
-                                Owner
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="admin">
-                              <div className="flex items-center gap-2">
-                                <UserCheck className="h-4 w-4" />
-                                Admin
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="manager">
-                              <div className="flex items-center gap-2">
-                                <UserCog className="h-4 w-4" />
-                                Manager
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="member">
-                              <div className="flex items-center gap-2">
-                                <User className="h-4 w-4" />
-                                Member
-                              </div>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          The role the invited person will have in the
-                          organization.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Role is automatically set to 'member' - no selection needed */}
+                  <div className="text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      <span>
+                        New members will be invited with <strong>Member</strong>{' '}
+                        role by default
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <Button type="submit" disabled={isSending}>

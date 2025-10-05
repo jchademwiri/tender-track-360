@@ -32,6 +32,7 @@ import {
 import { Save, Bell, Users, Globe, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Role } from '@/db/schema';
+import { updateOrganizationSettings } from '@/server/organization-members';
 
 interface SettingsTabProps {
   organization: {
@@ -75,7 +76,7 @@ function canEditOwnerSettings(role: Role): boolean {
 export function SettingsTab({
   organization,
   userRole,
-  currentUser,
+  currentUser: _currentUser, // eslint-disable-line @typescript-eslint/no-unused-vars
 }: SettingsTabProps) {
   const [isLoading, setIsLoading] = useState(false);
   const canEdit = canEditSettings(userRole);
@@ -110,18 +111,17 @@ export function SettingsTab({
 
     setIsLoading(true);
     try {
-      // TODO: Implement updateOrganizationSettings server action
-      console.log('Organization settings update:', {
-        organizationId: organization.id,
-        settings: data,
-      });
+      const result = await updateOrganizationSettings(organization.id, data);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      toast.success('Organization settings updated successfully', {
-        description: 'Your settings have been saved.',
-      });
+      if (result.success) {
+        toast.success('Organization settings updated successfully', {
+          description: 'Your settings have been saved.',
+        });
+      } else {
+        toast.error(
+          result.error?.message || 'Failed to update organization settings'
+        );
+      }
     } catch (error) {
       console.error('Error updating organization settings:', error);
       toast.error('Failed to update organization settings', {

@@ -111,7 +111,7 @@ function getDeviceIcon(device: string) {
 export function SecurityTab({
   organization,
   userRole,
-  currentUser,
+  currentUser: _currentUser, // eslint-disable-line @typescript-eslint/no-unused-vars
 }: SecurityTabProps) {
   const [securityEvents, setSecurityEvents] = useState<SecurityEvent[]>([]);
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>([]);
@@ -123,67 +123,15 @@ export function SecurityTab({
   const canAccess = canAccessSecurity(userRole);
   const canDangerous = canPerformDangerousOperations(userRole);
 
-  // Mock data - in real implementation, fetch from server
+  // Security events and sessions - placeholder for future implementation
   React.useEffect(() => {
     if (!canAccess) return;
 
-    const mockEvents: SecurityEvent[] = [
-      {
-        id: '1',
-        type: 'login',
-        description: 'User logged in',
-        user: currentUser.name,
-        timestamp: new Date('2024-12-19T10:30:00'),
-        ipAddress: '192.168.1.100',
-        userAgent: 'Chrome 120.0.0.0',
-      },
-      {
-        id: '2',
-        type: 'role_change',
-        description: 'User role changed from Member to Admin',
-        user: 'Jane Smith',
-        timestamp: new Date('2024-12-18T15:45:00'),
-        ipAddress: '192.168.1.101',
-      },
-      {
-        id: '3',
-        type: 'member_added',
-        description: 'New member added to organization',
-        user: 'Bob Johnson',
-        timestamp: new Date('2024-12-17T09:15:00'),
-        ipAddress: '192.168.1.102',
-      },
-    ];
-
-    const mockSessions: ActiveSession[] = [
-      {
-        id: '1',
-        userId: currentUser.id,
-        userName: currentUser.name,
-        device: 'Chrome on Windows',
-        location: 'New York, US',
-        ipAddress: '192.168.1.100',
-        lastActive: new Date(),
-        current: true,
-      },
-      {
-        id: '2',
-        userId: '2',
-        userName: 'Jane Smith',
-        device: 'Safari on iPhone',
-        location: 'Los Angeles, US',
-        ipAddress: '192.168.1.101',
-        lastActive: new Date('2024-12-19T09:30:00'),
-        current: false,
-      },
-    ];
-
-    setTimeout(() => {
-      setSecurityEvents(mockEvents);
-      setActiveSessions(mockSessions);
-      setIsLoading(false);
-    }, 500);
-  }, [canAccess, currentUser]);
+    // For now, just set empty arrays - this would be replaced with real data fetching
+    setSecurityEvents([]);
+    setActiveSessions([]);
+    setIsLoading(false);
+  }, [canAccess]);
 
   const handleExportSecurityLog = async () => {
     try {

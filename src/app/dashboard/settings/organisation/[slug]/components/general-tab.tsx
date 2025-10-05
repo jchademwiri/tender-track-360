@@ -27,6 +27,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Building2, Save, Upload, Trash2, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Role } from '@/db/schema';
+import { updateOrganizationDetails } from '@/server/organization-members';
 
 interface GeneralTabProps {
   organization: {
@@ -75,7 +76,7 @@ function getOrganizationInitials(name: string): string {
 export function GeneralTab({
   organization,
   userRole,
-  currentUser,
+  currentUser: _currentUser, // eslint-disable-line @typescript-eslint/no-unused-vars
 }: GeneralTabProps) {
   const [isLoading, setIsLoading] = useState(false);
   const canEdit = canEditOrganization(userRole);
@@ -105,25 +106,22 @@ export function GeneralTab({
 
     setIsLoading(true);
     try {
-      // TODO: Implement updateOrganizationDetails server action
-      // For now, simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      console.log('Organization update data:', {
-        organizationId: organization.id,
+      const result = await updateOrganizationDetails(organization.id, {
         name: data.name,
         logo: data.logo,
-        metadata: {
-          description: data.description,
-          website: data.website,
-          phone: data.phone,
-          address: data.address,
-        },
+        description: data.description,
+        website: data.website,
+        phone: data.phone,
+        address: data.address,
       });
 
-      toast.success('Organization updated successfully', {
-        description: 'Your organization details have been saved.',
-      });
+      if (result.success) {
+        toast.success('Organization updated successfully', {
+          description: 'Your organization details have been saved.',
+        });
+      } else {
+        toast.error(result.error?.message || 'Failed to update organization');
+      }
     } catch (error) {
       console.error('Error updating organization:', error);
       toast.error('Failed to update organization', {
