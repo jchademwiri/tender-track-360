@@ -126,7 +126,7 @@ const VerifyEmail = (props: VerifyEmailProps) => {
 };
 
 VerifyEmail.PreviewProps = {
-  username: 'John Doe',
+  username: 'Jacob Chademwiri',
   verificationUrl: 'https://yourapp.com/verify-email?token=abc123xyz789',
 };
 

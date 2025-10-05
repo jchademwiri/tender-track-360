@@ -95,7 +95,7 @@ describe('OrganizationCard', () => {
   it('generates correct initials for organization name', () => {
     const orgWithLongName: Organization = {
       ...mockOrganization,
-      name: 'My Test Organization Company',
+      name: 'My Test Organisation',
     };
 
     render(<OrganizationCard organization={orgWithLongName} />);
