@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
-import { toast } from 'sonner';
+import { switchOrganization } from '@/lib/organization-utils';
 
 interface OrganizationProviderProps {
   children: React.ReactNode;
@@ -39,21 +39,15 @@ export function OrganizationProvider({
 
       if (urlOrganization) {
         // Switch to the organization that matches the URL
-        authClient.organization
-          .setActive({
-            organizationId: urlOrganization.id,
-          })
-          .then(({ error }) => {
-            if (error) {
-              console.error('Failed to sync organization with URL:', error);
-              toast.error('Failed to switch organization');
-              // Redirect to the correct organization URL
-              router.push(`/organization/${activeOrganization.slug}`);
-            } else {
-              // Refresh to ensure server components get updated context
-              router.refresh();
-            }
-          });
+        switchOrganization({
+          organizationId: urlOrganization.id,
+          organizationName: urlOrganization.name,
+          router,
+          showToast: false, // Don't show toast for automatic URL sync
+        }).catch(() => {
+          // Redirect to the correct organization URL on error
+          router.push(`/organization/${activeOrganization.slug}`);
+        });
       } else {
         // URL has invalid organization slug, redirect to active organization
         console.warn(`Invalid organization slug in URL: ${urlSlug}`);

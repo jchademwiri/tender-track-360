@@ -7,12 +7,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { Route } from 'next';
 import { authClient } from '@/lib/auth-client';
-import { toast } from 'sonner';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTransition } from 'react';
 import dynamic from 'next/dynamic';
+import { switchOrganization } from '@/lib/organization-utils';
 import type { OrganizationWithStats } from '@/server/organizations';
 
 interface OrganizationSwitcherProps {
@@ -30,68 +29,22 @@ function OrganizationSwitcherClient({
   const handleChangeOrganization = async (organizationId: string) => {
     const selectedOrg = organizations.find((org) => org.id === organizationId);
     if (!selectedOrg) {
-      toast.error('Organization not found');
       return;
     }
 
     startTransition(async () => {
-      try {
-        // First, switch the active organization in the session
-        console.log('Switching to organization:', organizationId);
-        const result = await authClient.organization.setActive({
-          organizationId,
-        });
-        console.log('Organization switch result:', result);
-        const { error } = result;
+      // Handle URL navigation based on current page
+      const newUrl = getUpdatedUrl(
+        pathname,
+        selectedOrg.slug || selectedOrg.id
+      );
 
-        if (error) {
-          // Handle empty error objects or errors without message
-          let errorMessage = 'Failed to switch organization';
-          if (error && typeof error === 'object') {
-            if ('message' in error && typeof error.message === 'string') {
-              errorMessage = error.message;
-            } else if ('error' in error && typeof error.error === 'string') {
-              errorMessage = error.error;
-            } else if (Object.keys(error).length === 0) {
-              errorMessage =
-                'Unknown error occurred while switching organization';
-            }
-          }
-
-          // Only log meaningful errors, not empty objects
-          if (Object.keys(error).length > 0) {
-            console.error('Organization switch error:', error);
-          } else {
-            console.error(
-              'Organization switch error: Empty error object received'
-            );
-          }
-
-          toast.error(errorMessage);
-          return;
-        }
-
-        // Handle URL navigation based on current page
-        const newUrl = getUpdatedUrl(
-          pathname,
-          selectedOrg.slug || selectedOrg.id
-        );
-
-        // Navigate to the new URL
-        router.push(newUrl as Route);
-
-        // Refresh to ensure all server components get the new organization context
-        router.refresh();
-
-        toast.success(`Switched to ${selectedOrg.name}`);
-      } catch (error) {
-        console.error('Organization switch error:', error);
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Failed to switch organization';
-        toast.error(errorMessage);
-      }
+      await switchOrganization({
+        organizationId: selectedOrg.id,
+        organizationName: selectedOrg.name,
+        router,
+        redirectUrl: newUrl,
+      });
     });
   };
 
