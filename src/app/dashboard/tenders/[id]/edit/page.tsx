@@ -6,9 +6,9 @@ import { notFound } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 
 interface EditTenderPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function EditTenderPage({ params }: EditTenderPageProps) {

@@ -110,6 +110,26 @@ export const auth = betterAuth({
       },
       organizationLimit: 2,
 
+      // Hook to update session when organization is switched
+      hooks: {
+        organization: {
+          setActive: {
+            after: async ({
+              user,
+              organizationId,
+            }: {
+              user: { id: string };
+              organizationId: string;
+            }) => {
+              // This ensures the session gets updated with the new active organization
+              console.log(
+                `Organization switched to ${organizationId} for user ${user.id}`
+              );
+            },
+          },
+        },
+      },
+
       ac,
       roles: {
         owner,

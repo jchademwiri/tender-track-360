@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Search,
@@ -96,24 +96,40 @@ export function TenderList({
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   // Fetch tenders with search and pagination
-  const fetchTenders = async (search?: string, page: number = 1) => {
-    setIsLoading(true);
-    try {
-      const result = await getTenders(
-        organizationId,
-        search,
-        page,
-        itemsPerPage
-      );
-      setTenders(result.tenders);
-      setTotalCount(result.totalCount);
-      setCurrentPage(result.currentPage);
-    } catch (error) {
-      console.error('Error fetching tenders:', error);
-    } finally {
-      setIsLoading(false);
+  const fetchTenders = useCallback(
+    async (search?: string, page: number = 1) => {
+      setIsLoading(true);
+      try {
+        const result = await getTenders(
+          organizationId,
+          search,
+          page,
+          itemsPerPage
+        );
+        setTenders(result.tenders);
+        setTotalCount(result.totalCount);
+        setCurrentPage(result.currentPage);
+      } catch (error) {
+        console.error('Error fetching tenders:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [organizationId]
+  );
+
+  // Reset and refetch data when organizationId changes
+  useEffect(() => {
+    // Reset search and filters
+    setSearchQuery('');
+    setStatusFilter('all');
+    setCurrentPage(1);
+
+    // Fetch fresh data for the new organization
+    if (organizationId) {
+      fetchTenders('', 1);
     }
-  };
+  }, [organizationId, fetchTenders]);
 
   // Handle search
   const handleSearch = (query: string) => {

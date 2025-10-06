@@ -4,7 +4,7 @@ import * as React from 'react';
 import { ChevronsUpDown, Plus, Building2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
-import { toast } from 'sonner';
+import { switchOrganization } from '@/lib/organization-utils';
 
 import {
   DropdownMenu,
@@ -58,25 +58,11 @@ export function TeamSwitcher({
   const handleOrganizationSwitch = async (
     organization: OrganizationWithStats
   ) => {
-    try {
-      // Switch the active organization
-      const result = await authClient.organization.setActive({
-        organizationId: organization.id,
-      });
-
-      if (result.error) {
-        toast.error('Failed to switch organization');
-        return;
-      }
-
-      // Stay on the current dashboard, just refresh to update the organization context
-      router.refresh();
-
-      toast.success(`Switched to ${organization.name}`);
-    } catch (error) {
-      console.error('Organization switch error:', error);
-      toast.error('Failed to switch organization');
-    }
+    await switchOrganization({
+      organizationId: organization.id,
+      organizationName: organization.name,
+      router,
+    });
   };
 
   if (!activeOrg) {
