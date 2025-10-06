@@ -10,9 +10,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui';
+import { Organization } from '@/db/schema';
 
 interface CreateOrgProps {
-  organizations: any[]; // Replace 'any' with your organization type
+  organizations: Organization[];
 }
 
 export default function CreateOrg({ organizations }: CreateOrgProps) {
@@ -85,8 +86,8 @@ export default function CreateOrg({ organizations }: CreateOrgProps) {
               <DialogHeader>
                 <DialogTitle>Upgrade Required</DialogTitle>
                 <DialogDescription>
-                  You've reached the maximum number of organizations for your
-                  plan.
+                  You&apos;ve reached the maximum number of organizations for
+                  your plan.
                 </DialogDescription>
               </DialogHeader>
             </DialogContent>
