@@ -1,6 +1,41 @@
+import { getCurrentUser } from '@/server';
+import { searchTenders } from '@/server/tenders';
+import { TenderList } from '@/components/tenders/tender-list';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FileText, Clock, Send } from 'lucide-react';
+
 export const dynamic = 'force-dynamic';
 
 export default async function SubmittedTendersPage() {
+  const { session } = await getCurrentUser();
+
+  if (!session.activeOrganizationId) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">
+            No Organization Selected
+          </h2>
+          <p className="text-gray-600">
+            Please select an organization to view submitted tenders.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Fetch submitted and pending tenders
+  const [submittedResult, pendingResult] = await Promise.all([
+    searchTenders(session.activeOrganizationId, { status: 'submitted' }, 1, 50),
+    searchTenders(session.activeOrganizationId, { status: 'pending' }, 1, 50),
+  ]);
+
+  const submittedTenders = submittedResult.success
+    ? submittedResult.tenders
+    : [];
+  const pendingTenders = pendingResult.success ? pendingResult.tenders : [];
+  const allSubmittedTenders = [...submittedTenders, ...pendingTenders];
+
   return (
     <div className="space-y-6">
       <div>
@@ -10,44 +45,71 @@ export default async function SubmittedTendersPage() {
         </p>
       </div>
 
-      <div className="bg-muted/50 rounded-xl p-6">
-        <h2 className="text-xl font-semibold mb-4">Recent Submissions</h2>
-        <div className="space-y-3">
-          <div className="bg-background rounded-lg p-4 border">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-medium">Office Building Renovation</h3>
-                <p className="text-sm text-muted-foreground">
-                  Submitted: Dec 15, 2024
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Client: ABC Corporation
-                </p>
-              </div>
-              <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded">
-                Pending
-              </span>
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Submitted</CardTitle>
+            <Send className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">
+              {submittedTenders.length}
             </div>
-          </div>
+            <p className="text-xs text-muted-foreground">Recently submitted</p>
+          </CardContent>
+        </Card>
 
-          <div className="bg-background rounded-lg p-4 border">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-medium">Warehouse Construction</h3>
-                <p className="text-sm text-muted-foreground">
-                  Submitted: Dec 10, 2024
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Client: XYZ Logistics
-                </p>
-              </div>
-              <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                Under Review
-              </span>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending</CardTitle>
+            <Clock className="h-4 w-4 text-yellow-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-600">
+              {pendingTenders.length}
             </div>
-          </div>
-        </div>
+            <p className="text-xs text-muted-foreground">Awaiting results</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {allSubmittedTenders.length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              All active submissions
+            </p>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Tender List */}
+      {allSubmittedTenders.length > 0 ? (
+        <TenderList
+          organizationId={session.activeOrganizationId}
+          initialTenders={allSubmittedTenders}
+          initialTotalCount={allSubmittedTenders.length}
+        />
+      ) : (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <FileText className="h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No Submitted Tenders
+            </h3>
+            <p className="text-gray-500 text-center">
+              You haven&apos;t submitted any tenders yet. Create and submit your
+              first tender to track it here.
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

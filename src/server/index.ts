@@ -4,3 +4,4 @@ export * from '@/server/members';
 export * from '@/server/permissions';
 export * from '@/server/invitations';
 export * from '@/server/clients';
+export * from '@/server/tenders';
