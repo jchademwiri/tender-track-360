@@ -150,7 +150,7 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
         </div>
 
         <div className="flex items-center space-x-2">
-          <h1 className="text-xl text-gray-600 font-bold">
+          <h1 className="text-xl text-foreground/80 font-bold">
             {tender.tenderNumber.toUpperCase()}
           </h1>
 
@@ -201,7 +201,7 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
+                  <label className="text-sm font-medium text-muted-foreground">
                     Tender Number
                   </label>
                   <p className="text-lg font-medium text-blue-600">
@@ -210,7 +210,7 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
+                  <label className="text-sm font-medium text-muted-foreground">
                     Status
                   </label>
                   <div className="mt-1">
@@ -225,7 +225,7 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
+                  <label className="text-sm font-medium text-muted-foreground">
                     Tender Value
                   </label>
                   <p className="text-lg font-medium">
@@ -234,10 +234,10 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
+                  <label className="text-sm font-medium text-muted-foreground">
                     Submission Date
                   </label>
-                  <p className="text-gray-900">
+                  <p className="text-foreground">
                     {formatDate(tender.submissionDate)}
                   </p>
                 </div>
@@ -245,10 +245,10 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
 
               {tender.description && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
+                  <label className="text-sm font-medium text-muted-foreground">
                     Description
                   </label>
-                  <p className="text-gray-900 whitespace-pre-wrap">
+                  <p className="text-foreground whitespace-pre-wrap">
                     {tender.description}
                   </p>
                 </div>
@@ -259,7 +259,9 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
                   <label className="text-sm font-medium text-gray-500">
                     Description
                   </label>
-                  <p className="text-gray-400 italic">No description added</p>
+                  <p className="text-muted-foreground italic">
+                    No description added
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -278,7 +280,7 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-500">
+                      <label className="text-sm font-medium text-muted-foreground">
                         Client Name
                       </label>
                       <p className="text-lg font-medium">
@@ -300,18 +302,18 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
                     tender.client.contactEmail ||
                     tender.client.contactPhone) && (
                     <div className="border-t pt-4">
-                      <h4 className="text-sm font-medium text-gray-500 mb-3">
+                      <h4 className="text-sm font-medium text-muted-foreground mb-3">
                         Contact Information
                       </h4>
                       <div className="space-y-3">
                         {tender.client.contactName && (
                           <div className="flex items-center space-x-3">
-                            <User className="h-4 w-4 text-gray-400" />
+                            <User className="h-4 w-4 text-muted-foreground" />
                             <div>
-                              <label className="text-sm font-medium text-gray-500">
+                              <label className="text-sm font-medium text-muted-foreground">
                                 Contact Person
                               </label>
-                              <p className="text-gray-900">
+                              <p className="text-foreground">
                                 {tender.client.contactName}
                               </p>
                             </div>
@@ -320,12 +322,12 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
 
                         {tender.client.contactEmail && (
                           <div className="flex items-center space-x-3">
-                            <Mail className="h-4 w-4 text-gray-400" />
+                            <Mail className="h-4 w-4 text-muted-foreground" />
                             <div>
-                              <label className="text-sm font-medium text-gray-500">
+                              <label className="text-sm font-medium text-muted-foreground">
                                 Email Address
                               </label>
-                              <p className="text-gray-900">
+                              <p className="text-foreground">
                                 <Link
                                   href={`mailto:${tender.client.contactEmail}`}
                                   className="text-blue-600 hover:text-blue-800 hover:underline"
@@ -339,12 +341,12 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
 
                         {tender.client.contactPhone && (
                           <div className="flex items-center space-x-3">
-                            <Phone className="h-4 w-4 text-gray-400" />
+                            <Phone className="h-4 w-4 text-muted-foreground" />
                             <div>
-                              <label className="text-sm font-medium text-gray-500">
+                              <label className="text-sm font-medium text-muted-foreground">
                                 Phone Number
                               </label>
-                              <p className="text-gray-900">
+                              <p className="text-foreground">
                                 <Link
                                   href={`tel:${tender.client.contactPhone}`}
                                   className="text-blue-600 hover:text-blue-800 hover:underline"
@@ -362,10 +364,10 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
               ) : (
                 <div className="text-center py-8">
                   <Building className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <h3 className="text-lg font-medium text-foreground mb-2">
                     No Client Information
                   </h3>
-                  <p className="text-gray-500">
+                  <p className="text-muted-foreground">
                     Client information is not available for this tender.
                   </p>
                 </div>
@@ -426,7 +428,7 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
               <CardTitle className="text-lg">Status Management</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="text-sm text-gray-500 mb-3">
+              <div className="text-sm text-muted-foreground mb-3">
                 Current Status:{' '}
                 <span className="font-medium">
                   {statusLabels[tender.status as keyof typeof statusLabels]}
@@ -493,29 +495,23 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <label className="text-sm font-medium text-gray-500">
+                <label className="text-sm font-medium text-muted-foreground">
                   Created
                 </label>
-                <p className="text-sm text-gray-900">
-                  {formatDate(tender.createdAt)}
-                </p>
+                <p className="text-sm">{formatDate(tender.createdAt)}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-500">
+                <label className="text-sm font-medium text-muted-foreground">
                   Last Updated
                 </label>
-                <p className="text-sm text-gray-900">
-                  {formatDate(tender.updatedAt)}
-                </p>
+                <p className="text-sm">{formatDate(tender.updatedAt)}</p>
               </div>
               {tender.submissionDate && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
+                  <label className="text-sm font-medium text-muted-foreground">
                     Submission Date
                   </label>
-                  <p className="text-sm text-gray-900">
-                    {formatDate(tender.submissionDate)}
-                  </p>
+                  <p className="text-sm">{formatDate(tender.submissionDate)}</p>
                 </div>
               )}
             </CardContent>

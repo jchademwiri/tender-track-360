@@ -154,7 +154,7 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
           <h1 className="text-2xl font-bold">
             {mode === 'create' ? 'Add New Tender' : 'Edit Tender'}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             {mode === 'create'
               ? 'Create a new tender with client and submission details'
               : 'Update tender information and details'}
@@ -308,7 +308,7 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
                   <Calendar className="h-5 w-5 mr-2 text-green-600" />
                   Submission Details
                 </CardTitle>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-muted-foreground mt-2">
                   Financial and timeline information (optional)
                 </p>
               </CardHeader>
@@ -321,7 +321,7 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
                       <FormLabel>Submission Date</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                          <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                           <Input
                             type="date"
                             className="pl-10 rounded-md"
@@ -356,7 +356,7 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
                       <FormLabel>Tender Value</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                           <Input
                             type="text"
                             placeholder="Enter tender value"
@@ -373,8 +373,8 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
 
                 {/* Client Information Display */}
                 {form.watch('clientId') && (
-                  <div className="bg-gray-50 rounded-md p-4">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">
+                  <div className="bg-accent rounded-md p-4">
+                    <h4 className="text-sm font-medium text-foreground mb-2">
                       Selected Client Information
                     </h4>
                     {(() => {
@@ -384,7 +384,7 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
                       if (!selectedClient) return null;
 
                       return (
-                        <div className="space-y-1 text-sm text-gray-600">
+                        <div className="space-y-1 text-sm text-muted-foreground">
                           <div className="flex items-center">
                             <User className="h-3 w-3 mr-1" />
                             {selectedClient.name}
