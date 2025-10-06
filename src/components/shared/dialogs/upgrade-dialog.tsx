@@ -45,8 +45,8 @@ export function UpgradeDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-100">
-            <Crown className="h-8 w-8 text-amber-600" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30">
+            <Crown className="h-8 w-8 text-amber-600 dark:text-amber-400" />
           </div>
           <DialogTitle className="text-xl font-bold">
             Organization Limit Reached
@@ -70,14 +70,14 @@ export function UpgradeDialog({
 
         <div className="space-y-4 pt-4">
           {/* Pro Features Preview */}
-          <div className="rounded-lg border bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+          <div className="rounded-lg border bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 p-4">
             <div className="flex items-center gap-2 mb-3">
-              <Zap className="h-4 w-4 text-blue-600" />
-              <span className="font-medium text-blue-900">
+              <Zap className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span className="font-medium text-blue-900 dark:text-blue-100">
                 Pro Plan Benefits
               </span>
             </div>
-            <ul className="space-y-1 text-sm text-blue-800">
+            <ul className="space-y-1 text-sm text-blue-800 dark:text-blue-200">
               <li>• Unlimited organizations</li>
               <li>• Advanced tender management</li>
               <li>• Priority support</li>
