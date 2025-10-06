@@ -108,7 +108,7 @@ export const auth = betterAuth({
         // Example: only verified users can create orgs
         return user.emailVerified;
       },
-      organizationLimit: 1,
+      organizationLimit: 2,
 
       ac,
       roles: {

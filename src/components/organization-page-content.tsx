@@ -18,6 +18,7 @@ import {
 import type { RecentActivity } from '@/types/activity';
 import type { OrganizationWithStats } from '@/server/organizations';
 import { CreateorganizationForm } from './forms';
+import { UpgradeDialog } from './shared/dialogs';
 import { OrganizationSearch } from './shared/search';
 
 interface OrganizationPageContentProps {
@@ -36,6 +37,7 @@ export function OrganizationPageContent({
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isQuickActionDialogOpen, setIsQuickActionDialogOpen] = useState(false);
+  const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -52,7 +54,12 @@ export function OrganizationPageContent({
   };
 
   const handleCreateOrganization = () => {
-    console.log('handleCreateOrganization called - opening dialog');
+    console.log('handleCreateOrganization called - checking limit');
+    if (organizations.length >= 2) {
+      setIsCreateDialogOpen(false); // Close create dialog first
+      setTimeout(() => setIsUpgradeDialogOpen(true), 100); // Small delay for smooth transition
+      return;
+    }
     setIsCreateDialogOpen(true);
   };
 
@@ -116,7 +123,14 @@ export function OrganizationPageContent({
           <Button
             size="lg"
             className="w-full"
-            onClick={() => setIsCreateDialogOpen(true)}
+            onClick={() => {
+              if (organizations.length >= 2) {
+                setIsCreateDialogOpen(false); // Close create dialog first
+                setTimeout(() => setIsUpgradeDialogOpen(true), 100); // Small delay for smooth transition
+                return;
+              }
+              setIsCreateDialogOpen(true);
+            }}
             aria-describedby="empty-state-heading"
           >
             Create Organization
@@ -139,7 +153,9 @@ export function OrganizationPageContent({
                   Please fill in the details to create a new organization.
                 </DialogDescription>
               </DialogHeader>
-              <CreateorganizationForm />
+              <CreateorganizationForm
+                currentOrganizationCount={organizations.length}
+              />
             </DialogContent>
           </Dialog>
         </div>
@@ -225,7 +241,9 @@ export function OrganizationPageContent({
                       Please fill in the details to create a new organization.
                     </DialogDescription>
                   </DialogHeader>
-                  <CreateorganizationForm />
+                  <CreateorganizationForm
+                    currentOrganizationCount={organizations.length}
+                  />
                 </DialogContent>
               </Dialog>
             </div>
@@ -252,7 +270,14 @@ export function OrganizationPageContent({
                   <Button
                     variant="outline"
                     className="w-full text-primary justify-start cursor-pointer "
-                    onClick={() => setIsQuickActionDialogOpen(true)}
+                    onClick={() => {
+                      if (organizations.length >= 2) {
+                        setIsQuickActionDialogOpen(false); // Close quick action dialog first
+                        setTimeout(() => setIsUpgradeDialogOpen(true), 100); // Small delay for smooth transition
+                        return;
+                      }
+                      setIsQuickActionDialogOpen(true);
+                    }}
                     aria-describedby="quick-actions-heading"
                   >
                     Create Organization
@@ -276,7 +301,9 @@ export function OrganizationPageContent({
                           organization.
                         </DialogDescription>
                       </DialogHeader>
-                      <CreateorganizationForm />
+                      <CreateorganizationForm
+                        currentOrganizationCount={organizations.length}
+                      />
                     </DialogContent>
                   </Dialog>
 
@@ -309,6 +336,14 @@ export function OrganizationPageContent({
           </div>
         </aside>
       </div>
+
+      {/* Upgrade Dialog */}
+      <UpgradeDialog
+        open={isUpgradeDialogOpen}
+        onOpenChange={setIsUpgradeDialogOpen}
+        currentCount={organizations.length}
+        maxCount={2}
+      />
     </div>
   );
 }

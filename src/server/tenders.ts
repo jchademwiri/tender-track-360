@@ -2,7 +2,7 @@
 
 import { db } from '@/db';
 import { tender, client } from '@/db/schema';
-import { eq, and, isNull, ilike, or, desc, gte, lte } from 'drizzle-orm';
+import { eq, and, isNull, ilike, or, desc, gte, lte, ne } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import {
@@ -101,7 +101,7 @@ export async function createTender(
       .from(tender)
       .where(
         and(
-          eq(tender.tenderNumber, validatedData.tenderNumber),
+          eq(tender.tenderNumber, validatedData.tenderNumber.toUpperCase()),
           eq(tender.organizationId, organizationId),
           isNull(tender.deletedAt)
         )
@@ -138,6 +138,7 @@ export async function createTender(
         id: crypto.randomUUID(),
         organizationId,
         ...validatedData,
+        tenderNumber: validatedData.tenderNumber.toUpperCase(),
       })
       .returning();
 
@@ -233,11 +234,11 @@ export async function updateTender(
         .from(tender)
         .where(
           and(
-            eq(tender.tenderNumber, validatedData.tenderNumber),
+            eq(tender.tenderNumber, validatedData.tenderNumber.toUpperCase()),
             eq(tender.organizationId, organizationId),
             isNull(tender.deletedAt),
             // Exclude current tender from uniqueness check
-            eq(tender.id, tenderId)
+            ne(tender.id, tenderId)
           )
         )
         .limit(1);
@@ -273,6 +274,9 @@ export async function updateTender(
       .update(tender)
       .set({
         ...validatedData,
+        tenderNumber: validatedData.tenderNumber
+          ? validatedData.tenderNumber.toUpperCase()
+          : undefined,
         updatedAt: new Date(),
       })
       .where(eq(tender.id, tenderId))

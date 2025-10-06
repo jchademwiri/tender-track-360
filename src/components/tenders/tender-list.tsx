@@ -275,7 +275,7 @@ export function TenderList({
                     >
                       <TableCell>
                         <div className="font-medium text-blue-600">
-                          {tender.tenderNumber}
+                          {tender.tenderNumber.toUpperCase()}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -381,7 +381,7 @@ export function TenderList({
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
                           <h3 className="font-medium text-blue-600 group-hover:text-blue-700 transition-colors">
-                            {tender.tenderNumber}
+                            {tender.tenderNumber.toUpperCase()}
                           </h3>
                           <Badge
                             className={

@@ -54,7 +54,13 @@ type SlugValidationState =
   | 'taken'
   | 'error';
 
-export function CreateorganizationForm() {
+interface CreateorganizationFormProps {
+  currentOrganizationCount?: number;
+}
+
+export function CreateorganizationForm({
+  currentOrganizationCount = 0,
+}: CreateorganizationFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [slugManuallyChanged, setSlugManuallyChanged] = useState(false);
@@ -152,11 +158,11 @@ export function CreateorganizationForm() {
       setIsSuccess(true);
       toast.success('Organization created successfully!');
 
-      // Wait for animation before navigation
+      // Wait for animation before navigation (reduced from 500ms to 200ms)
       setTimeout(() => {
-        router.push(`/organization/${values.slug}`);
+        router.push(`/dashboard/settings/organisation/${values.slug}`);
         router.refresh();
-      }, 1500);
+      }, 200);
     } catch (error: unknown) {
       console.error('Organization creation error:', error);
 
@@ -165,21 +171,32 @@ export function CreateorganizationForm() {
         typeof error === 'object' &&
         error &&
         'message' in error &&
-        typeof (error as { message: unknown }).message === 'string' &&
-        (error as { message: string }).message.includes('slug')
+        typeof (error as { message: unknown }).message === 'string'
       ) {
-        toast.error(
-          'This organization slug is already taken. Please choose a different one.'
-        );
-        setSlugValidation('taken');
-      } else if (
-        typeof error === 'object' &&
-        error &&
-        'message' in error &&
-        typeof (error as { message: unknown }).message === 'string' &&
-        (error as { message: string }).message.includes('name')
-      ) {
-        toast.error('An organization with this name already exists.');
+        const errorMessage = (
+          error as { message: string }
+        ).message.toLowerCase();
+
+        if (
+          errorMessage.includes('limit') ||
+          errorMessage.includes('maximum')
+        ) {
+          toast.error(
+            `You have reached the maximum number of organizations (${currentOrganizationCount}/2). Please contact support if you need to create more organizations.`,
+            {
+              duration: 6000, // Show longer for important message
+            }
+          );
+        } else if (errorMessage.includes('slug')) {
+          toast.error(
+            'This organization slug is already taken. Please choose a different one.'
+          );
+          setSlugValidation('taken');
+        } else if (errorMessage.includes('name')) {
+          toast.error('An organization with this name already exists.');
+        } else {
+          toast.error('Failed to create organization. Please try again.');
+        }
       } else {
         toast.error('Failed to create organization. Please try again.');
       }
@@ -221,36 +238,24 @@ export function CreateorganizationForm() {
 
   if (isSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center py-8 space-y-6 animate-in fade-in-0 zoom-in-95 duration-500">
+      <div className="flex flex-col items-center justify-center py-8 space-y-4 animate-in fade-in-0 zoom-in-95 duration-200">
         <div className="relative">
-          {/* Main success circle with enhanced animations */}
-          <div className="size-20 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center animate-bounce">
-            <Check className="size-10 text-green-600 animate-in zoom-in-50 duration-300 delay-200" />
+          {/* Main success circle with faster animations */}
+          <div className="size-16 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center">
+            <Check className="size-8 text-green-600 animate-in zoom-in-50 duration-150" />
           </div>
 
-          {/* Multiple ripple effects */}
-          <div className="absolute inset-0 size-20 bg-green-200 rounded-full animate-ping opacity-75"></div>
-          <div className="absolute inset-0 size-20 bg-green-300 rounded-full animate-ping opacity-50 animation-delay-150"></div>
-          <div className="absolute inset-0 size-20 bg-green-400 rounded-full animate-ping opacity-25 animation-delay-300"></div>
-
-          {/* Sparkle effects */}
-          <div className="absolute -top-2 -right-2 size-3 bg-yellow-400 rounded-full animate-pulse animation-delay-100"></div>
-          <div className="absolute -bottom-1 -left-2 size-2 bg-yellow-300 rounded-full animate-pulse animation-delay-200"></div>
-          <div className="absolute top-1 -left-3 size-1.5 bg-yellow-500 rounded-full animate-pulse animation-delay-300"></div>
+          {/* Simplified ripple effect */}
+          <div className="absolute inset-0 size-16 bg-green-200 rounded-full animate-ping opacity-75"></div>
         </div>
 
-        <div className="text-center space-y-3 animate-in slide-in-from-bottom-4 duration-500 delay-300">
-          <h3 className="text-xl font-bold text-green-900 animate-in fade-in-0 duration-300 delay-400">
+        <div className="text-center space-y-2 animate-in slide-in-from-bottom-2 duration-200">
+          <h3 className="text-lg font-bold text-green-900">
             🎉 Organization Created!
           </h3>
-          <p className="text-sm text-green-700 animate-in fade-in-0 duration-300 delay-500">
+          <p className="text-sm text-green-700">
             Redirecting you to your new organization...
           </p>
-
-          {/* Progress indicator */}
-          <div className="w-32 h-1 bg-green-100 rounded-full mx-auto overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full animate-pulse"></div>
-          </div>
         </div>
       </div>
     );
@@ -369,7 +374,7 @@ export function CreateorganizationForm() {
                       URL Preview:
                     </span>
                     <Badge variant="secondary" className="text-xs font-mono">
-                      /organization/{field.value}
+                      /dashboard/settings/organisation/{field.value}
                     </Badge>
                   </div>
                 )}

@@ -151,7 +151,7 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
 
         <div className="flex items-center space-x-2">
           <h1 className="text-xl text-gray-600 font-bold">
-            {tender.tenderNumber}
+            {tender.tenderNumber.toUpperCase()}
           </h1>
 
           <Button
@@ -205,7 +205,7 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
                     Tender Number
                   </label>
                   <p className="text-lg font-medium text-blue-600">
-                    {tender.tenderNumber}
+                    {tender.tenderNumber.toUpperCase()}
                   </p>
                 </div>
 

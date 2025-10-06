@@ -191,8 +191,12 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
                         <Input
                           placeholder="Enter unique tender number"
                           {...field}
+                          onChange={(e) => {
+                            const upperValue = e.target.value.toUpperCase();
+                            field.onChange(upperValue);
+                          }}
                           disabled={isPending}
-                          className="rounded-md"
+                          className="rounded-md uppercase"
                         />
                       </FormControl>
                       <FormMessage />
