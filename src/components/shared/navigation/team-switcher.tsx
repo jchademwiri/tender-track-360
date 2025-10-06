@@ -30,6 +30,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { CreateorganizationForm } from '@/components/forms';
+import { UpgradeDialog } from '@/components/shared/dialogs';
 import type { OrganizationWithStats } from '@/server/organizations';
 
 export function TeamSwitcher({
@@ -41,6 +42,7 @@ export function TeamSwitcher({
   const router = useRouter();
   const { data: activeOrganization } = authClient.useActiveOrganization();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
+  const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = React.useState(false);
 
   // Find the active organization from the list or use the first one as fallback
   const activeOrg = React.useMemo(() => {
@@ -141,6 +143,11 @@ export function TeamSwitcher({
                   className="gap-2 p-2"
                   onSelect={(e) => {
                     e.preventDefault();
+                    if (organizations.length >= 2) {
+                      setIsCreateDialogOpen(false); // Close create dialog first
+                      setTimeout(() => setIsUpgradeDialogOpen(true), 100); // Small delay for smooth transition
+                      return;
+                    }
                     setIsCreateDialogOpen(true);
                   }}
                 >
@@ -156,15 +163,26 @@ export function TeamSwitcher({
                 <DialogHeader>
                   <DialogTitle>Create Organization</DialogTitle>
                   <DialogDescription>
-                    Create a new organization to collaborate with your team.
+                    Create a new organization to collaborate with your team. (
+                    {organizations.length}/2 organizations used)
                   </DialogDescription>
                 </DialogHeader>
-                <CreateorganizationForm />
+                <CreateorganizationForm
+                  currentOrganizationCount={organizations.length}
+                />
               </DialogContent>
             </Dialog>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
+
+      {/* Upgrade Dialog */}
+      <UpgradeDialog
+        open={isUpgradeDialogOpen}
+        onOpenChange={setIsUpgradeDialogOpen}
+        currentCount={organizations.length}
+        maxCount={2}
+      />
     </SidebarMenu>
   );
 }

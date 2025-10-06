@@ -1,6 +1,49 @@
+import { getCurrentUser } from '@/server';
+import { getTenderStats } from '@/server/tenders';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FileText, CheckCircle, Clock, TrendingUp } from 'lucide-react';
+
 export const dynamic = 'force-dynamic';
 
 export default async function TendersOverviewPage() {
+  const { session } = await getCurrentUser();
+
+  if (!session.activeOrganizationId) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">
+            No Organization Selected
+          </h2>
+          <p className="text-gray-600">
+            Please select an organization to view tender overview.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Fetch tender statistics
+  const statsResult = await getTenderStats(session.activeOrganizationId);
+  const stats = statsResult.success
+    ? statsResult.stats
+    : {
+        totalTenders: 0,
+        statusCounts: {
+          draft: 0,
+          submitted: 0,
+          won: 0,
+          lost: 0,
+          pending: 0,
+        },
+        totalValue: 0,
+      };
+
+  const winRate =
+    stats.totalTenders > 0
+      ? Math.round((stats.statusCounts.won / stats.totalTenders) * 100)
+      : 0;
+
   return (
     <div className="space-y-6">
       <div>
@@ -12,90 +55,116 @@ export default async function TendersOverviewPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <div className="bg-muted/50 rounded-xl p-6">
-          <h2 className="text-xl font-semibold mb-2">Active Tenders</h2>
-          <p className="text-3xl font-bold text-blue-600">5</p>
-          <p className="text-sm text-muted-foreground">Currently applying</p>
-        </div>
+      {/* Statistics Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Tenders</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalTenders}</div>
+            <p className="text-xs text-muted-foreground">
+              All tender applications
+            </p>
+          </CardContent>
+        </Card>
 
-        <div className="bg-muted/50 rounded-xl p-6">
-          <h2 className="text-xl font-semibold mb-2">Submitted</h2>
-          <p className="text-3xl font-bold text-orange-600">12</p>
-          <p className="text-sm text-muted-foreground">Awaiting results</p>
-        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active</CardTitle>
+            <Clock className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">
+              {stats.statusCounts.draft +
+                stats.statusCounts.submitted +
+                stats.statusCounts.pending}
+            </div>
+            <p className="text-xs text-muted-foreground">Currently active</p>
+          </CardContent>
+        </Card>
 
-        <div className="bg-muted/50 rounded-xl p-6">
-          <h2 className="text-xl font-semibold mb-2">Win Rate</h2>
-          <p className="text-3xl font-bold text-green-600">68%</p>
-          <p className="text-sm text-muted-foreground">Last 6 months</p>
-        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Won</CardTitle>
+            <CheckCircle className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {stats.statusCounts.won}
+            </div>
+            <p className="text-xs text-muted-foreground">Successful tenders</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Win Rate</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{winRate}%</div>
+            <p className="text-xs text-muted-foreground">Success rate</p>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="bg-muted/50 rounded-xl p-6">
-        <h2 className="text-xl font-semibold mb-4">Recent Activities</h2>
-        <div className="space-y-3">
-          <div className="bg-background rounded-lg p-4 border">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-medium">Municipal Building Project</h3>
-                <p className="text-sm text-muted-foreground">
-                  Tender submitted successfully
-                </p>
-                <p className="text-xs text-muted-foreground">2 hours ago</p>
+      {/* Status Breakdown */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Status Breakdown</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-5">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-600">
+                {stats.statusCounts.draft}
               </div>
-              <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                Submitted
-              </span>
+              <p className="text-sm text-muted-foreground">Draft</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">
+                {stats.statusCounts.submitted}
+              </div>
+              <p className="text-sm text-muted-foreground">Submitted</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-yellow-600">
+                {stats.statusCounts.pending}
+              </div>
+              <p className="text-sm text-muted-foreground">Pending</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {stats.statusCounts.won}
+              </div>
+              <p className="text-sm text-muted-foreground">Won</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-red-600">
+                {stats.statusCounts.lost}
+              </div>
+              <p className="text-sm text-muted-foreground">Lost</p>
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="bg-background rounded-lg p-4 border">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-medium">School Renovation Tender</h3>
-                <p className="text-sm text-muted-foreground">
-                  Documents uploaded and reviewed
-                </p>
-                <p className="text-xs text-muted-foreground">1 day ago</p>
-              </div>
-              <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                In Progress
-              </span>
-            </div>
+      {/* Total Value */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Total Tender Value</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold">
+            ${stats.totalValue.toLocaleString()}
           </div>
-
-          <div className="bg-background rounded-lg p-4 border">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-medium">Hospital Extension</h3>
-                <p className="text-sm text-muted-foreground">
-                  New tender opportunity identified
-                </p>
-                <p className="text-xs text-muted-foreground">2 days ago</p>
-              </div>
-              <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-                New
-              </span>
-            </div>
-          </div>
-
-          <div className="bg-background rounded-lg p-4 border">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-medium">Office Complex Tender</h3>
-                <p className="text-sm text-muted-foreground">
-                  Awarded - contract signed
-                </p>
-                <p className="text-xs text-muted-foreground">3 days ago</p>
-              </div>
-              <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                Won
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+          <p className="text-sm text-muted-foreground">
+            Combined value of all tenders
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

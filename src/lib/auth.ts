@@ -104,6 +104,12 @@ export const auth = betterAuth({
           }),
         });
       },
+      allowUserToCreateOrganization: async (user) => {
+        // Example: only verified users can create orgs
+        return user.emailVerified;
+      },
+      organizationLimit: 2,
+
       ac,
       roles: {
         owner,
