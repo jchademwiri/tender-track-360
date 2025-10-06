@@ -1,3 +1,5 @@
+import CreateOrg from './create-org';
+
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +22,7 @@ export default async function DashboardPage() {
       {/* Quick Actions & Recent Activities */}
       <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min flex items-center justify-center">
         <span className="text-muted-foreground">
-          Quick Actions & Recent Activities
+          <CreateOrg organizations={[]} />
         </span>
       </div>
     </>
