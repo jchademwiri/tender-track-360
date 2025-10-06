@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "../styles/animations.css";
+/* FullCalendar v6 no longer ships CSS as importable package paths.
+   We rely on Tailwind for base styles and FullCalendar injects minimal inline styles.
+   If you need native styles, add them via CDN in a <link> tag or custom CSS. */
 
 @custom-variant dark (&:is(.dark *));
 

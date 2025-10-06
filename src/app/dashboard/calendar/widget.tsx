@@ -165,10 +165,14 @@ export function CalendarClient() {
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         headerToolbar={headerToolbar}
+        dayHeaderFormat={{ weekday: 'short' }}
         events={fcEvents}
         datesSet={onDatesSet}
         eventClick={onEventClick}
         height="auto"
+        contentHeight="auto"
+        expandRows
+        stickyHeaderDates
       />
     </div>
   );
