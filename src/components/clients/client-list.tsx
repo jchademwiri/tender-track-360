@@ -137,7 +137,7 @@ export function ClientList({
         {/* Search */}
         <div className="flex items-center space-x-2">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="Search clients by name, contact name, or email..."
               value={searchQuery}
@@ -151,15 +151,17 @@ export function ClientList({
       <CardContent>
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="text-sm text-gray-500">Loading clients...</div>
+            <div className="text-sm text-muted-foreground">
+              Loading clients...
+            </div>
           </div>
         ) : clients.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <User className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <User className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-2">
               No clients found
             </h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               {searchQuery
                 ? 'No clients match your search criteria.'
                 : 'Get started by adding your first client.'}
@@ -192,7 +194,7 @@ export function ClientList({
                   {clients.map((client) => (
                     <TableRow
                       key={client.id}
-                      className="cursor-pointer group rounded-md"
+                      className="cursor-pointer group rounded-md hover:bg-accent transition-colors duration-200"
                       onClick={() =>
                         router.push(`/dashboard/clients/${client.id}`)
                       }
@@ -214,32 +216,34 @@ export function ClientList({
                             {client.contactName}
                           </div>
                         ) : (
-                          <span className="text-gray-400">No contact</span>
+                          <span className="text-muted-foreground">
+                            No contact
+                          </span>
                         )}
                       </TableCell>
                       <TableCell>
                         <div className="space-y-1">
                           {client.contactEmail && (
-                            <div className="flex items-center text-sm">
-                              <Mail className="h-3 w-3 mr-1 text-gray-400" />
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <Mail className="h-3 w-3 mr-1" />
                               {client.contactEmail}
                             </div>
                           )}
                           {client.contactPhone && (
-                            <div className="flex items-center text-sm">
-                              <Phone className="h-3 w-3 mr-1 text-gray-400" />
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <Phone className="h-3 w-3 mr-1" />
                               {client.contactPhone}
                             </div>
                           )}
                           {!client.contactEmail && !client.contactPhone && (
-                            <span className="text-gray-400 text-sm">
+                            <span className="text-muted-foreground text-sm">
                               No contact info
                             </span>
                           )}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           {formatDate(client.createdAt)}
                         </span>
                       </TableCell>
@@ -296,45 +300,45 @@ export function ClientList({
               {clients.map((client) => (
                 <Card
                   key={client.id}
-                  className="cursor-pointer hover:bg-gray-50 transition-colors duration-150 group rounded-lg"
+                  className="cursor-pointer md:hover:bg-gray-50/30 md:transition-colors md:duration-200 group rounded-lg border md:hover:border-gray-200"
                   onClick={() => router.push(`/dashboard/clients/${client.id}`)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-medium group-hover:text-gray-900 transition-colors">
+                        <h3 className="font-medium group-hover:text-foreground transition-colors">
                           {client.name}
                         </h3>
                         {client.notes && (
-                          <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                             {client.notes}
                           </p>
                         )}
 
                         {client.contactName && (
-                          <div className="flex items-center mt-2 text-sm">
-                            <User className="h-4 w-4 mr-2 text-gray-400" />
+                          <div className="flex items-center mt-2 text-sm text-muted-foreground">
+                            <User className="h-4 w-4 mr-2" />
                             {client.contactName}
                           </div>
                         )}
 
                         <div className="mt-2 space-y-1">
                           {client.contactEmail && (
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Mail className="h-3 w-3 mr-1 text-gray-400" />
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <Mail className="h-3 w-3 mr-1" />
                               {client.contactEmail}
                             </div>
                           )}
                           {client.contactPhone && (
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Phone className="h-3 w-3 mr-1 text-gray-400" />
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <Phone className="h-3 w-3 mr-1" />
                               {client.contactPhone}
                             </div>
                           )}
                         </div>
 
                         <div className="mt-2">
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-muted-foreground">
                             Created {formatDate(client.createdAt)}
                           </span>
                         </div>
@@ -389,7 +393,7 @@ export function ClientList({
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between mt-6">
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-muted-foreground">
                   Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
                   {Math.min(currentPage * itemsPerPage, totalCount)} of{' '}
                   {totalCount} clients

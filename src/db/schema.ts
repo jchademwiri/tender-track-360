@@ -274,6 +274,9 @@ export const purchaseOrder = pgTable('purchase_order', {
   description: text('description').notNull(),
   totalAmount: text('total_amount').notNull(), // String for currency
   status: text('status').default('draft').notNull(), // draft, sent, delivered
+  // Calendar-related dates
+  expectedDeliveryDate: timestamp('expected_delivery_date'),
+  deliveredAt: timestamp('delivered_at'),
   notes: text('notes'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

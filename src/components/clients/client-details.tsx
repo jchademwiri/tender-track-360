@@ -153,7 +153,7 @@ export function ClientDetails({ client, organizationId }: ClientDetailsProps) {
                   <label className="text-sm font-medium text-gray-500">
                     Notes
                   </label>
-                  <p className="text-gray-900 whitespace-pre-wrap">
+                  <p className="text-foreground whitespace-pre-wrap">
                     {client.notes}
                   </p>
                 </div>
@@ -183,24 +183,24 @@ export function ClientDetails({ client, organizationId }: ClientDetailsProps) {
                 <div className="space-y-4">
                   {client.contactName && (
                     <div className="flex items-center space-x-3">
-                      <User className="h-4 w-4 text-gray-400" />
+                      <User className="h-4 w-4 text-muted-foreground" />
                       <div>
                         <label className="text-sm font-medium text-gray-500">
                           Contact Person
                         </label>
-                        <p className="text-gray-900">{client.contactName}</p>
+                        <p className="text-foreground">{client.contactName}</p>
                       </div>
                     </div>
                   )}
 
                   {client.contactEmail && (
                     <div className="flex items-center space-x-3">
-                      <Mail className="h-4 w-4 text-gray-400" />
+                      <Mail className="h-4 w-4 text-muted-foreground" />
                       <div>
                         <label className="text-sm font-medium text-gray-500">
                           Email Address
                         </label>
-                        <p className="text-gray-900">
+                        <p className="text-foreground">
                           <Link
                             href={`mailto:${client.contactEmail}`}
                             className="text-blue-600 hover:text-blue-800 hover:underline"
@@ -214,12 +214,12 @@ export function ClientDetails({ client, organizationId }: ClientDetailsProps) {
 
                   {client.contactPhone && (
                     <div className="flex items-center space-x-3">
-                      <Phone className="h-4 w-4 text-gray-400" />
+                      <Phone className="h-4 w-4 text-muted-foreground" />
                       <div>
                         <label className="text-sm font-medium text-gray-500">
                           Phone Number
                         </label>
-                        <p className="text-gray-900">
+                        <p className="text-foreground">
                           <Link
                             href={`tel:${client.contactPhone}`}
                             className="text-blue-600 hover:text-blue-800 hover:underline"
@@ -234,10 +234,10 @@ export function ClientDetails({ client, organizationId }: ClientDetailsProps) {
               ) : (
                 <div className="text-center py-8">
                   <Mail className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <h3 className="text-lg font-medium text-foreground mb-2">
                     No Contact Information
                   </h3>
-                  <p className="text-gray-500 mb-4">
+                  <p className="text-muted-foreground mb-4">
                     No contact person or contact details have been added for
                     this client.
                   </p>

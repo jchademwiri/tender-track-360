@@ -214,7 +214,7 @@ export function TenderList({
         {/* Search and Filters */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
           <div className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               placeholder="Search by tender number or description..."
               value={searchQuery}
@@ -241,15 +241,17 @@ export function TenderList({
       <CardContent>
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="text-sm text-gray-500">Loading tenders...</div>
+            <div className="text-sm text-muted-foreground">
+              Loading tenders...
+            </div>
           </div>
         ) : tenders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <FileText className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <FileText className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-2">
               No tenders found
             </h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               {searchQuery || statusFilter !== 'all'
                 ? 'No tenders match your search criteria.'
                 : 'Get started by creating your first tender.'}
@@ -284,7 +286,7 @@ export function TenderList({
                   {tenders.map((tender) => (
                     <TableRow
                       key={tender.id}
-                      className="cursor-pointer group rounded-md"
+                      className="cursor-pointer group rounded-md hover:bg-accent transition-colors duration-200"
                       onClick={() =>
                         router.push(`/dashboard/tenders/${tender.id}`)
                       }
@@ -300,7 +302,7 @@ export function TenderList({
                             {tender.client?.name || 'Unknown Client'}
                           </div>
                           {tender.client?.contactName && (
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-muted-foreground">
                               {tender.client.contactName}
                             </div>
                           )}
@@ -332,7 +334,7 @@ export function TenderList({
                         </span>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           {formatDate(tender.submissionDate)}
                         </span>
                       </TableCell>
@@ -389,7 +391,7 @@ export function TenderList({
               {tenders.map((tender) => (
                 <Card
                   key={tender.id}
-                  className="cursor-pointer hover:bg-gray-50 transition-colors duration-150 group rounded-lg"
+                  className="cursor-pointer hover:bg-accent transition-colors duration-200 group rounded-lg border hover:ring-1 hover:ring-ring"
                   onClick={() => router.push(`/dashboard/tenders/${tender.id}`)}
                 >
                   <CardContent className="p-4">
@@ -420,24 +422,24 @@ export function TenderList({
                         </div>
 
                         {tender.description && (
-                          <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                          <p className="text-sm text-foreground/80 mb-2 line-clamp-2">
                             {tender.description}
                           </p>
                         )}
 
                         <div className="space-y-1">
-                          <div className="flex items-center text-sm text-gray-600">
-                            <DollarSign className="h-3 w-3 mr-1 text-gray-400" />
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <DollarSign className="h-3 w-3 mr-1" />
                             {formatValue(tender.value)}
                           </div>
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Calendar className="h-3 w-3 mr-1 text-gray-400" />
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <Calendar className="h-3 w-3 mr-1" />
                             Submission: {formatDate(tender.submissionDate)}
                           </div>
                         </div>
 
                         <div className="mt-2">
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-muted-foreground">
                             Created {formatDate(tender.createdAt)}
                           </span>
                         </div>
@@ -492,7 +494,7 @@ export function TenderList({
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between mt-6">
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-muted-foreground">
                   Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
                   {Math.min(currentPage * itemsPerPage, totalCount)} of{' '}
                   {totalCount} tenders
