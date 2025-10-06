@@ -118,8 +118,8 @@ export const auth = betterAuth({
               user,
               organizationId,
             }: {
-              user: any;
-              organizationId: any;
+              user: { id: string };
+              organizationId: string;
             }) => {
               // This ensures the session gets updated with the new active organization
               console.log(
