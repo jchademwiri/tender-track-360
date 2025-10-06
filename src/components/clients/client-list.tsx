@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Plus, MoreHorizontal, Mail, Phone, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -47,24 +47,39 @@ export function ClientList({
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   // Fetch clients with search and pagination
-  const fetchClients = async (search?: string, page: number = 1) => {
-    setIsLoading(true);
-    try {
-      const result = await getClients(
-        organizationId,
-        search,
-        page,
-        itemsPerPage
-      );
-      setClients(result.clients);
-      setTotalCount(result.totalCount);
-      setCurrentPage(result.currentPage);
-    } catch (error) {
-      console.error('Error fetching clients:', error);
-    } finally {
-      setIsLoading(false);
+  const fetchClients = useCallback(
+    async (search?: string, page: number = 1) => {
+      setIsLoading(true);
+      try {
+        const result = await getClients(
+          organizationId,
+          search,
+          page,
+          itemsPerPage
+        );
+        setClients(result.clients);
+        setTotalCount(result.totalCount);
+        setCurrentPage(result.currentPage);
+      } catch (error) {
+        console.error('Error fetching clients:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [organizationId]
+  );
+
+  // Reset and refetch data when organizationId changes
+  useEffect(() => {
+    // Reset search and filters
+    setSearchQuery('');
+    setCurrentPage(1);
+
+    // Fetch fresh data for the new organization
+    if (organizationId) {
+      fetchClients('', 1);
     }
-  };
+  }, [organizationId, fetchClients]);
 
   // Handle search
   const handleSearch = (query: string) => {
