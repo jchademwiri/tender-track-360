@@ -131,7 +131,8 @@ export function TeamSwitcher({
                     e.preventDefault();
                     if (organizations.length >= 2) {
                       setIsCreateDialogOpen(false); // Close create dialog first
-                      setTimeout(() => setIsUpgradeDialogOpen(true), 100); // Small delay for smooth transition
+                      // Open upgrade dialog immediately to improve responsiveness
+                      setIsUpgradeDialogOpen(true);
                       return;
                     }
                     setIsCreateDialogOpen(true);

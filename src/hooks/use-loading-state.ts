@@ -70,54 +70,23 @@ export function useLoadingState(options: UseLoadingStateOptions = {}) {
         errorMessage?: string;
       } = {}
     ): Promise<T | null> => {
-      const {
-        showProgress = false,
-        progressSteps = 10,
-        errorMessage = 'Operation failed',
-      } = options;
+      const { showProgress = false, errorMessage = 'Operation failed' } =
+        options;
 
       try {
         setLoading(true);
 
         if (showProgress) {
-          setState((prev) => ({ ...prev, progress: 0 }));
-
-          // Simulate progress updates
-          const progressInterval = setInterval(() => {
-            setState((prev) => ({
-              ...prev,
-              progress:
-                prev.progress !== undefined
-                  ? Math.min(prev.progress + progressSteps, 90)
-                  : 0,
-            }));
-          }, 100);
-
+          // Removed artificial progress simulation; rely on real async completion
           const result = await asyncFn();
-
-          clearInterval(progressInterval);
-          setState((prev) => ({ ...prev, progress: 100 }));
-
-          // Brief delay to show completion
-          setTimeout(() => {
-            setState((prev) => ({ ...prev, progress: undefined }));
-          }, 500);
-
+          setState((prev) => ({ ...prev, progress: undefined }));
           setLoading(false);
-
-          if (onSuccess) {
-            onSuccess();
-          }
-
+          if (onSuccess) onSuccess();
           return result;
         } else {
           const result = await asyncFn();
           setLoading(false);
-
-          if (onSuccess) {
-            onSuccess();
-          }
-
+          if (onSuccess) onSuccess();
           return result;
         }
       } catch (error) {

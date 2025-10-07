@@ -83,17 +83,8 @@ export function ConfirmationDialog({
           currentOperation: 'Processing...',
         });
 
-        // Simulate progress updates if showing progress
-        const progressInterval = setInterval(() => {
-          setOperationState((prev) => ({
-            ...prev,
-            progress: Math.min(prev.progress + 10, 90),
-          }));
-        }, 200);
-
+        // Removed simulated progress; run the operation and mark complete
         await onConfirm();
-
-        clearInterval(progressInterval);
 
         setOperationState((prev) => ({
           ...prev,
@@ -105,10 +96,8 @@ export function ConfirmationDialog({
           },
         }));
 
-        // Auto-close after showing success
-        setTimeout(() => {
-          handleClose();
-        }, 1500);
+        // Close immediately after success for faster UX
+        handleClose();
       } else {
         setOperationState({
           isProcessing: true,
@@ -134,10 +123,8 @@ export function ConfirmationDialog({
       }));
 
       if (!showProgress) {
-        // If not showing progress, close dialog after error
-        setTimeout(() => {
-          handleClose();
-        }, 2000);
+        // Close immediately on error when not showing progress
+        handleClose();
       }
     }
   };

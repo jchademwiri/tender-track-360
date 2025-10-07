@@ -37,10 +37,7 @@ export function EmailSettings({
       // Refresh the page data to get updated verification status
       router.refresh();
 
-      // Small delay to allow for server-side data refresh
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // The verification status will be updated through the parent component re-render
+      // Removed artificial wait; rely on router.refresh() and parent re-render
     } catch (error) {
       console.error('Error checking verification status:', error);
     } finally {

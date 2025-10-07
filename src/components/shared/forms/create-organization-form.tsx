@@ -165,11 +165,9 @@ export function CreateorganizationForm({
       setIsSuccess(true);
       toast.success('Organization created successfully!');
 
-      // Wait for animation before navigation (reduced from 500ms to 200ms)
-      setTimeout(() => {
-        router.push(`/dashboard`);
-        router.refresh();
-      }, 200);
+      // Navigate immediately for production responsiveness
+      router.push(`/dashboard`);
+      router.refresh();
     } catch (error: unknown) {
       console.error('Organization creation error:', error);
 

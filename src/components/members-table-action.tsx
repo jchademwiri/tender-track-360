@@ -66,7 +66,7 @@ export default function MembersTableAction({
     try {
       setIsProcessing(true);
       // TODO: Implement role editing functionality
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      // Removed artificial delay; this will be wired to a real API
 
       handleInfo('Role editing functionality coming soon', {
         title: 'Feature Coming Soon',
@@ -88,7 +88,7 @@ export default function MembersTableAction({
     try {
       setIsProcessing(true);
       // TODO: Implement resend invitation functionality
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      // Removed artificial delay; this will be wired to a real API
 
       handleInfo('Resend invitation functionality coming soon', {
         title: 'Feature Coming Soon',
