@@ -51,7 +51,7 @@ export function LoginForm({
     if (success) {
       toast.success(message as string);
       // Use window.location.replace for full page refresh with auth state
-      window.location.replace('/');
+      window.location.replace('/dashboard');
     } else {
       toast.error(message as string);
     }

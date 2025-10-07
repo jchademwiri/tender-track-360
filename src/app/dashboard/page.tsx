@@ -42,7 +42,7 @@ export default async function DashboardPage() {
           </Link>
         </Button>
         <Button variant="outline" size="lg" asChild>
-          <Link href="/dashboard/clients/new" className="flex items-center">
+          <Link href="/dashboard/clients/create" className="flex items-center">
             <Plus className="mr-2 h-4 w-4" />
             Create Client
           </Link>
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
         </Button>
         <Button variant="outline" size="lg" asChild>
           <Link
-            href="/dashboard/settings/organisation"
+            href="/dashboard/settings/organisation/create"
             className="flex items-center"
           >
             <Building2 className="mr-2 h-4 w-4" />
