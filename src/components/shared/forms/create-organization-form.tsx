@@ -148,11 +148,18 @@ export function CreateorganizationForm({
 
     setIsLoading(true);
     try {
-      await authClient.organization.create({
+      const result = await authClient.organization.create({
         name: values.name,
         slug: values.slug,
         logo: values.logo || undefined,
       });
+
+      // Set the newly created organization as active
+      if (result.data?.id) {
+        await authClient.organization.setActive({
+          organizationId: result.data.id,
+        });
+      }
 
       // Show success state with animation
       setIsSuccess(true);
@@ -160,7 +167,7 @@ export function CreateorganizationForm({
 
       // Wait for animation before navigation (reduced from 500ms to 200ms)
       setTimeout(() => {
-        router.push(`/dashboard/settings/organisation/${values.slug}`);
+        router.push(`/dashboard`);
         router.refresh();
       }, 200);
     } catch (error: unknown) {

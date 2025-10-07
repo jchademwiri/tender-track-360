@@ -1,12 +1,24 @@
 import { Plus, Building2 } from 'lucide-react';
 import Link from 'next/link';
-import CreateOrg from './create-org';
+import { redirect } from 'next/navigation';
+// import CreateOrg from './create-org';
 import { Button } from '@/components/ui/button';
+import { checkUserSession } from '@/lib/session-check';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
+  // Check if user has an organization
+  const sessionCheck = await checkUserSession();
+
+  if (!sessionCheck.hasSession) {
+    redirect('/login');
+  }
+
+  if (!sessionCheck.hasOrganization) {
+    redirect('/onboarding');
+  }
   return (
     <>
       {/* Statistics Cards */}
