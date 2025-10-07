@@ -1,22 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSessionCookie } from 'better-auth/cookies';
 
 export async function middleware(request: NextRequest) {
-  const sessionCookie = getSessionCookie(request);
-  if (!sessionCookie) {
+  // Get session cookies - Better Auth uses multiple cookies
+  const sessionToken = request.cookies.get('better-auth.session_token')?.value;
+  const sessionDataCookie = request.cookies.get(
+    'better-auth.session_data'
+  )?.value;
+
+  // Debug: Log all cookies to see what's available
+  console.log(
+    'All cookies:',
+    Array.from(request.cookies.getAll()).map((c) => c.name)
+  );
+  console.log('Session token:', !!sessionToken);
+  console.log('Session data:', !!sessionDataCookie);
+
+  // If no session token, redirect to login
+  if (!sessionToken && !sessionDataCookie) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Handle dashboard redirects to organization-specific pages
-  if (request.nextUrl.pathname === '/dashboard') {
-    // For now, let the client-side handle the redirect to the active organization
-    // This could be enhanced to redirect server-side if we can access the active org from the session
-    return NextResponse.next();
-  }
+  // For now, let all authenticated users through to the dashboard
+  // The dashboard page will handle the organization check server-side
+  // This avoids the Edge Runtime limitation while still providing protection
+
+  console.log('Middleware Debug:', {
+    hasSessionToken: !!sessionToken,
+    hasSessionData: !!sessionDataCookie,
+    path: request.nextUrl.pathname,
+    action: 'allowing through - will check organization in page component',
+  });
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/dashboard', '/onboarding', '/profile', '/organization/:path*'],
+  matcher: ['/dashboard/:path*', '/onboarding', '/organization/:path*'],
 };
