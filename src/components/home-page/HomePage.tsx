@@ -1,43 +1,16 @@
-import { UserContext } from '@/types/home-page';
 import { Header } from './Header';
 import { HeroSection } from './HeroSection';
 import { FeaturesSection } from './FeaturesSection';
 import { FooterSection } from './FooterSection';
-import { HomeAuthenticatedUserDashboard } from './HomeAuthenticatedUserDashboard';
 import { BenefitsSection } from './BenefitsSection';
 import { TestimonialsSection } from './TestimonialsSection';
 
-interface HomePageProps {
-  userContext: UserContext;
-}
-
-export function HomePage({ userContext }: HomePageProps) {
+export function HomePage() {
   return (
     <div className="min-h-screen">
-      <Header
-        isAuthenticated={userContext.isAuthenticated}
-        userName={userContext.user?.name}
-      />
+      <Header />
       <main>
-        <HeroSection
-          isAuthenticated={userContext.isAuthenticated}
-          userName={userContext.user?.name}
-        />
-
-        {userContext.isAuthenticated && userContext.user && (
-          <HomeAuthenticatedUserDashboard
-            user={{
-              name: userContext.user.name,
-              organizationName: userContext.user.organizationName,
-            }}
-            recentActivity={{
-              upcomingDeadlines: 0,
-              submitedThisMonth: 0, // Placeholder - will be populated in later tasks
-              activeProjects: [],
-            }}
-          />
-        )}
-
+        <HeroSection />
         <FeaturesSection />
         <BenefitsSection />
         <TestimonialsSection />
