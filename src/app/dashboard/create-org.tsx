@@ -44,7 +44,8 @@ export default function CreateOrg({ organizations }: CreateOrgProps) {
             onClick={() => {
               if (organizations.length >= 2) {
                 setIsCreateDialogOpen(false);
-                setTimeout(() => setIsUpgradeDialogOpen(true), 100);
+                // Open upgrade dialog immediately to avoid artificial delay
+                setIsUpgradeDialogOpen(true);
                 return;
               }
               setIsCreateDialogOpen(true);

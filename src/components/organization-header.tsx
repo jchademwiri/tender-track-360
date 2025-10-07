@@ -152,8 +152,7 @@ export function OrganizationHeader({
       // setIsEditing(true);
       console.log('Edit organization clicked');
 
-      // Simulate async operation
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Removed simulated delay; this will be replaced with real async work
 
       handleSuccess('Edit mode enabled', {
         description: 'You can now edit organization details',
@@ -174,8 +173,7 @@ export function OrganizationHeader({
       // TODO: Navigate to organization settings
       console.log('Organization settings clicked');
 
-      // Simulate navigation or settings load
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Removed simulated delay; navigate immediately when implemented
 
       handleSuccess('Opening settings', {
         description: 'Redirecting to organization settings',

@@ -57,7 +57,8 @@ export function OrganizationPageContent({
     console.log('handleCreateOrganization called - checking limit');
     if (organizations.length >= 2) {
       setIsCreateDialogOpen(false); // Close create dialog first
-      setTimeout(() => setIsUpgradeDialogOpen(true), 100); // Small delay for smooth transition
+      // Open upgrade dialog immediately to avoid intentional delay
+      setIsUpgradeDialogOpen(true);
       return;
     }
     setIsCreateDialogOpen(true);
@@ -126,7 +127,8 @@ export function OrganizationPageContent({
             onClick={() => {
               if (organizations.length >= 2) {
                 setIsCreateDialogOpen(false); // Close create dialog first
-                setTimeout(() => setIsUpgradeDialogOpen(true), 100); // Small delay for smooth transition
+                // Open upgrade dialog immediately to avoid intentional delay
+                setIsUpgradeDialogOpen(true);
                 return;
               }
               setIsCreateDialogOpen(true);
@@ -273,7 +275,8 @@ export function OrganizationPageContent({
                     onClick={() => {
                       if (organizations.length >= 2) {
                         setIsQuickActionDialogOpen(false); // Close quick action dialog first
-                        setTimeout(() => setIsUpgradeDialogOpen(true), 100); // Small delay for smooth transition
+                        // Open upgrade dialog immediately to avoid intentional delay
+                        setIsUpgradeDialogOpen(true);
                         return;
                       }
                       setIsQuickActionDialogOpen(true);

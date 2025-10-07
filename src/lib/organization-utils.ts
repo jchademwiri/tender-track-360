@@ -112,14 +112,12 @@ export async function switchOrganizationWithReload({
     }
 
     // Step 3: Full page reload to ensure all data is fresh
-    // Small delay to allow toast to show
-    setTimeout(() => {
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-      } else {
-        window.location.reload();
-      }
-    }, 500);
+    // Removed artificial delay; navigate/reload immediately for responsiveness
+    if (redirectUrl) {
+      window.location.href = redirectUrl;
+    } else {
+      window.location.reload();
+    }
 
     return { success: true };
   } catch (error) {
