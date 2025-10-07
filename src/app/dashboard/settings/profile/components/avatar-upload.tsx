@@ -104,28 +104,12 @@ export function AvatarUpload({
     }
   };
 
-  const simulateUpload = (file: File): Promise<string> => {
-    return new Promise((resolve) => {
-      setIsUploading(true);
-      setUploadProgress(0);
-
-      // Simulate upload progress
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(interval);
-            // Simulate final processing
-            setTimeout(() => {
-              setUploadProgress(100);
-              setIsUploading(false);
-              resolve(URL.createObjectURL(file)); // In real app, this would be server URL
-            }, 500);
-            return 90;
-          }
-          return prev + Math.random() * 15;
-        });
-      }, 200);
-    });
+  // NOTE: Removed simulated upload delay/progress. Wire to real API when ready.
+  const simulateUpload = async (file: File): Promise<string> => {
+    setIsUploading(true);
+    setUploadProgress(100);
+    setIsUploading(false);
+    return URL.createObjectURL(file);
   };
 
   const handleConfirmUpload = async () => {

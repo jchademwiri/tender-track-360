@@ -66,17 +66,11 @@ export function BulkActionsToolbar({
         currentOperation: 'Removing members...',
       });
 
-      // Simulate progress updates
-      const progressInterval = setInterval(() => {
-        setOperationState((prev) => ({
-          ...prev,
-          progress: Math.min(prev.progress + 10, 90),
-        }));
-      }, 200);
+      // Removed simulated progress updates; rely on actual API completion
 
       const result = await bulkRemoveMembers(selectedMembers);
 
-      clearInterval(progressInterval);
+      // No simulated interval to clear
 
       setOperationState((prev) => ({
         ...prev,
@@ -123,14 +117,13 @@ export function BulkActionsToolbar({
         fallbackMessage: 'Failed to remove members',
       });
     } finally {
-      setTimeout(() => {
-        setOperationState({
-          isProcessing: false,
-          progress: 0,
-          currentOperation: '',
-        });
-        setShowRemoveMembersDialog(false);
-      }, 2000);
+      // Close immediately after operation completes to improve responsiveness
+      setOperationState({
+        isProcessing: false,
+        progress: 0,
+        currentOperation: '',
+      });
+      setShowRemoveMembersDialog(false);
     }
   };
 
@@ -144,17 +137,11 @@ export function BulkActionsToolbar({
         currentOperation: 'Cancelling invitations...',
       });
 
-      // Simulate progress updates
-      const progressInterval = setInterval(() => {
-        setOperationState((prev) => ({
-          ...prev,
-          progress: Math.min(prev.progress + 10, 90),
-        }));
-      }, 200);
+      // Removed simulated progress updates; rely on actual API completion
 
       const result = await bulkCancelInvitations(selectedInvitations);
 
-      clearInterval(progressInterval);
+      // No simulated interval to clear
 
       setOperationState((prev) => ({
         ...prev,
@@ -200,14 +187,13 @@ export function BulkActionsToolbar({
         fallbackMessage: 'Failed to cancel invitations',
       });
     } finally {
-      setTimeout(() => {
-        setOperationState({
-          isProcessing: false,
-          progress: 0,
-          currentOperation: '',
-        });
-        setShowCancelInvitationsDialog(false);
-      }, 2000);
+      // Close immediately after operation completes to improve responsiveness
+      setOperationState({
+        isProcessing: false,
+        progress: 0,
+        currentOperation: '',
+      });
+      setShowCancelInvitationsDialog(false);
     }
   };
 
