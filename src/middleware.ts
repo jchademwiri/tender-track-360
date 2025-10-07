@@ -7,10 +7,24 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
+  // Parse session cookie if possible
+  let sessionData: any = {};
+  try {
+    sessionData = JSON.parse(sessionCookie);
+  } catch {
+    // If parsing fails, treat as no organization
+    sessionData = {};
+  }
+  const hasOrganization = sessionData.activeOrganizationId;
+  const onboardingUrl = new URL('/onboarding', request.url);
+
+  // Redirect to onboarding if user does not have an organization and is not already on onboarding page
+  if (!hasOrganization && !request.nextUrl.pathname.startsWith('/onboarding')) {
+    return NextResponse.redirect(onboardingUrl);
+  }
+
   // Handle dashboard redirects to organization-specific pages
   if (request.nextUrl.pathname === '/dashboard') {
-    // For now, let the client-side handle the redirect to the active organization
-    // This could be enhanced to redirect server-side if we can access the active org from the session
     return NextResponse.next();
   }
 
