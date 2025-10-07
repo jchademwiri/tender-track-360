@@ -1,36 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  // Get session cookies - Better Auth uses multiple cookies
-  const sessionToken = request.cookies.get('better-auth.session_token')?.value;
-  const sessionDataCookie = request.cookies.get(
-    'better-auth.session_data'
-  )?.value;
+  const { pathname } = request.nextUrl;
 
-  // Debug: Log all cookies to see what's available
+  // Debug: Log all cookies
+  const allCookies = request.cookies.getAll();
+  console.log('=== MIDDLEWARE DEBUG ===');
+  console.log('Path:', pathname);
   console.log(
     'All cookies:',
-    Array.from(request.cookies.getAll()).map((c) => c.name)
+    allCookies.map((c) => `${c.name}=${c.value.substring(0, 20)}...`)
   );
-  console.log('Session token:', !!sessionToken);
-  console.log('Session data:', !!sessionDataCookie);
 
-  // If no session token, redirect to login
-  if (!sessionToken && !sessionDataCookie) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // Check for ANY better-auth cookie
+  const hasBetterAuthCookie = allCookies.some(
+    (cookie) =>
+      cookie.name.startsWith('better-auth') ||
+      cookie.name.includes('session') ||
+      cookie.name.includes('auth')
+  );
+
+  console.log('Has any auth cookie:', hasBetterAuthCookie);
+
+  // If no auth cookies at all, redirect to login
+  if (!hasBetterAuthCookie) {
+    console.log('❌ No auth cookies found - redirecting to login');
+    const loginUrl = new URL('/login', request.url);
+    return NextResponse.redirect(loginUrl);
   }
 
-  // For now, let all authenticated users through to the dashboard
-  // The dashboard page will handle the organization check server-side
-  // This avoids the Edge Runtime limitation while still providing protection
-
-  console.log('Middleware Debug:', {
-    hasSessionToken: !!sessionToken,
-    hasSessionData: !!sessionDataCookie,
-    path: request.nextUrl.pathname,
-    action: 'allowing through - will check organization in page component',
-  });
-
+  console.log('✅ Auth cookie found - allowing through');
   return NextResponse.next();
 }
 
