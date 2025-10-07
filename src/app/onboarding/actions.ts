@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { organization, member, user, session } from '@/db/schema';
+import { organization, member, session } from '@/db/schema';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import { cookies } from 'next/headers';

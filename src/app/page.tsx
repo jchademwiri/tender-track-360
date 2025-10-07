@@ -1,36 +1,21 @@
-'use client';
-
-import { HomePage } from '@/components/home-page/HomePage';
-import { UserContext } from '@/types/home-page';
-import { authClient } from '@/lib/auth-client';
+import { Header } from '@/components/home-page/Header';
+import { HeroSection } from '@/components/home-page/HeroSection';
+import { FeaturesSection } from '@/components/home-page/FeaturesSection';
+import { BenefitsSection } from '@/components/home-page/BenefitsSection';
+import { TestimonialsSection } from '@/components/home-page/TestimonialsSection';
+import { FooterSection } from '@/components/home-page/FooterSection';
 
 export default function Home() {
-  const { data: session, isPending } = authClient.useSession();
-  const { data: activeOrganization } = authClient.useActiveOrganization();
-
-  // Show loading state while checking authentication
-  if (isPending) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  // Build user context based on actual authentication state
-  const userContext: UserContext = {
-    isAuthenticated: !!session?.user,
-    user: session?.user
-      ? {
-          id: session.user.id,
-          name: session.user.name,
-          email: session.user.email,
-          organizationId: activeOrganization?.id || '',
-          organizationName: activeOrganization?.name || '',
-          role: 'member', // Default role - will be determined by server-side logic when needed
-        }
-      : undefined,
-  };
-
-  return <HomePage userContext={userContext} />;
+  return (
+    <div className="min-h-screen">
+      <Header />
+      <main>
+        <HeroSection />
+        <FeaturesSection />
+        <BenefitsSection />
+        <TestimonialsSection />
+        <FooterSection />
+      </main>
+    </div>
+  );
 }

@@ -1,15 +1,31 @@
-import { Button } from '@/components/ui/button';
+'use client';
+
 import Link from 'next/link';
-import Logout from '../ui/logout';
+import { useEffect, useState } from 'react';
+import AuthAwareNav from './AuthAwareNav';
 
-interface HeaderProps {
-  isAuthenticated: boolean;
-  userName?: string;
-}
+export function Header() {
+  const [scrolled, setScrolled] = useState(false);
 
-export function Header({ isAuthenticated, userName }: HeaderProps) {
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 8);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <header className="absolute top-0 left-0 right-0 z-50 bg-transparent">
+    <header
+      className={[
+        'fixed top-0 left-0 right-0 z-50 transition-colors duration-300',
+        'border-b',
+        scrolled
+          ? 'bg-background/60 supports-[backdrop-filter]:bg-background/40 backdrop-blur-md border-border/60'
+          : 'bg-transparent border-border/20',
+      ].join(' ')}
+    >
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
           <span className="text-xl font-bold text-foreground">
@@ -17,29 +33,8 @@ export function Header({ isAuthenticated, userName }: HeaderProps) {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-4">
-          {isAuthenticated ? (
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">
-                Welcome, {userName}
-              </span>
-              <Link href="/dashboard">
-                <Button variant="outline" size="sm">
-                  Dashboard
-                </Button>
-              </Link>
-              <Logout />
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" asChild size="sm">
-                <Link href="/login">Sign In</Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link href="/sign-up">Get Started</Link>
-              </Button>
-            </div>
-          )}
+        <nav className="flex items-center gap-3">
+          <AuthAwareNav />
         </nav>
       </div>
     </header>
