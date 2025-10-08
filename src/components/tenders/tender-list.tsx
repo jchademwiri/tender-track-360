@@ -258,7 +258,7 @@ export function TenderList({
             </p>
             {!searchQuery && statusFilter === 'all' && (
               <Button
-                onClick={() => router.push('/dashboard/tenders/new')}
+                onClick={() => router.push('/dashboard/tenders/create')}
                 className="cursor-pointer"
               >
                 <Plus className="h-4 w-4 mr-2" />

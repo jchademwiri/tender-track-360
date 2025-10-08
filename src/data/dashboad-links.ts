@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Settings2,
   Users,
+  Building2,
 } from 'lucide-react';
 export const dashboadLinks = {
   navMain: [
@@ -14,11 +15,6 @@ export const dashboadLinks = {
       icon: LayoutDashboard,
       isActive: true,
     },
-    // {
-    //   title: 'Opportunities',
-    //   url: '/dashboard/opportunities',
-    //   icon: Search,
-    // },
     {
       title: 'Tender Management',
       url: '#',
@@ -64,10 +60,10 @@ export const dashboadLinks = {
           title: 'Purchase Orders', // Can not be visible to the role of member
           url: '/dashboard/projects/purchase-orders',
         },
-        {
-          title: 'Contracts', // Can not be visible to the role of member
-          url: '/dashboard/projects/contracts',
-        },
+        // {
+        //   title: 'Contracts', // Can not be visible to the role of member
+        //   url: '/dashboard/projects/contracts',
+        // },
         // {
         //   title: 'PO Status Tracker',
         //   url: '/dashboard/projects/po-tracker',
@@ -108,6 +104,12 @@ export const dashboadLinks = {
       icon: Users,
     },
     {
+      title: 'Organisations', // Must be for Current Active Organisation: must be seen only of you are owner or admin
+      // Can not be visible to the role of member
+      url: '/dashboard/organisation',
+      icon: Building2,
+    },
+    {
       title: 'Settings',
       url: '/dashboard/settings/overview',
       icon: Settings2,
@@ -115,16 +117,6 @@ export const dashboadLinks = {
         {
           title: 'Overview',
           url: '/dashboard/settings/overview',
-        },
-        {
-          title: 'Profile', // must be your personal profile
-          url: '/dashboard/settings/profile',
-          //   /profile this is the personal profile page i created
-        },
-        {
-          title: 'Organisation', // Must be for Current Active Organisation: must be seen only of you are owner or admin
-          // Can not be visible to the role of member
-          url: '/dashboard/settings/organisation',
         },
         {
           title: 'Notifications', // your prefereance on notifications
