@@ -6,10 +6,10 @@ import {
   getUserOrganizationMembership,
 } from '@/server/organizations';
 import { OrganizationManagementTabs } from './components/organization-management-tabs';
-import { OrganizationSettingsWrapper } from '@/components/settings/organization-settings-wrapper';
 import { Building2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { OrganizationSettingsWrapper } from '@/components/organization/organization-settings-wrapper';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,13 +36,13 @@ async function OrganizationManagementContent({ slug }: { slug: string }) {
 
     if (!userMembership) {
       // User doesn't belong to this organization
-      redirect('/dashboard/settings/organisation');
+      redirect('/dashboard/organisation');
     }
 
     // If user is just a member, redirect to read-only view
     if (userMembership.role === 'member') {
       // @ts-expect-error - Dynamic route typing issue
-      redirect(`/dashboard/settings/organisation/${slug}/view`);
+      redirect(`/dashboard/organisation/${slug}/view`);
     }
 
     return (

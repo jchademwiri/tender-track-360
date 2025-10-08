@@ -3,9 +3,7 @@ import {
   ClipboardList,
   FolderKanban,
   LayoutDashboard,
-  Settings2,
   Users,
-  Building2,
 } from 'lucide-react';
 export const dashboadLinks = {
   navMain: [
@@ -102,27 +100,6 @@ export const dashboadLinks = {
       title: 'Clients',
       url: '/dashboard/clients',
       icon: Users,
-    },
-    {
-      title: 'Organisations', // Must be for Current Active Organisation: must be seen only of you are owner or admin
-      // Can not be visible to the role of member
-      url: '/dashboard/organisation',
-      icon: Building2,
-    },
-    {
-      title: 'Settings',
-      url: '/dashboard/settings/overview',
-      icon: Settings2,
-      items: [
-        {
-          title: 'Overview',
-          url: '/dashboard/settings/overview',
-        },
-        {
-          title: 'Notifications', // your prefereance on notifications
-          url: '/dashboard/settings/notifications',
-        },
-      ],
     },
   ],
 };

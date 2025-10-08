@@ -1,9 +1,9 @@
 import { Suspense } from 'react';
 import { getorganizations } from '@/server/organizations';
-import { OrganizationGrid } from '@/components/settings/organization-grid';
-import { OrganizationGridSkeleton } from '@/components/settings/organization-grid-skeleton';
 import { Building2, Users, Shield, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { OrganizationGrid } from '@/components/organization-grid';
+import { OrganizationGridSkeleton } from '@/components/shared/loading';
 
 export const dynamic = 'force-dynamic';
 
