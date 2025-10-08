@@ -2,7 +2,7 @@ import { getCurrentUser } from '@/server';
 import { searchTenders } from '@/server/tenders';
 import { TenderList } from '@/components/tenders/tender-list';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Clock, Send } from 'lucide-react';
+import { Clock, FileText, Send } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
