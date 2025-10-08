@@ -212,7 +212,7 @@ export default async function SettingsPage() {
               <div>• Manage team members</div>
               <div>• Configure organization settings</div>
             </div>
-            <Link href="/dashboard/settings/organisation">
+            <Link href="/dashboard/organisation">
               <Button type="button" className="w-full">
                 Manage Organizations
                 <ChevronRight className="h-4 w-4 ml-2" />

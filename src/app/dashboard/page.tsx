@@ -1,8 +1,5 @@
-import { Plus, Building2 } from 'lucide-react';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
-// import CreateOrg from './create-org';
-import { Button } from '@/components/ui/button';
+
 import { checkUserSession } from '@/lib/session-check';
 
 // Force dynamic rendering
@@ -34,7 +31,7 @@ export default async function DashboardPage() {
         </div>
       </div>
       {/* Quick Action Navigation */}
-      <nav className="flex flex-wrap justify-end gap-4 my-6">
+      {/* <nav className="flex flex-wrap justify-end gap-4 my-6">
         <Button variant="outline" size="lg" asChild>
           <Link href="/dashboard/tenders/create" className="flex items-center">
             <Plus className="mr-2 h-4 w-4" />
@@ -64,14 +61,14 @@ export default async function DashboardPage() {
         </Button>
         <Button variant="outline" size="lg" asChild>
           <Link
-            href="/dashboard/settings/organisation/create"
+            href="/dashboard/organisation/create"
             className="flex items-center"
           >
             <Building2 className="mr-2 h-4 w-4" />
             Create Organization
           </Link>
         </Button>
-      </nav>
+      </nav> */}
       {/* Quick Actions & Recent Activities */}
       <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min flex items-center justify-center">
         <span className="text-muted-foreground">

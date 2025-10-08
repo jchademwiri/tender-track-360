@@ -7,6 +7,8 @@ import {
   CreditCard,
   LogOut,
   Sparkles,
+  Settings2,
+  Building2,
 } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -29,6 +31,7 @@ import {
 import type { User } from '@/db/schema';
 import { signOut } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();
@@ -99,10 +102,19 @@ export function NavUser({ user }: { user: User }) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <a href="#" className="cursor-pointer">
+                <Link href="#" className="cursor-pointer">
                   <Sparkles />
                   Upgrade to Pro
-                </a>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/dashboard/settings/notifications"
+                  className="cursor-pointer"
+                >
+                  <Bell />
+                  Notifications
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
@@ -115,16 +127,22 @@ export function NavUser({ user }: { user: User }) {
                 Profile
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="#" className="cursor-pointer">
+                <Link href="#" className="cursor-pointer">
                   <CreditCard />
                   Billing
-                </a>
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="#" className="cursor-pointer">
-                  <Bell />
-                  Notifications
-                </a>
+                <Link href="/dashboard/settings" className="cursor-pointer">
+                  <Settings2 />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/organisation" className="cursor-pointer">
+                  <Building2 />
+                  Organizations
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
