@@ -56,6 +56,7 @@ export async function getPurchaseOrders(
     const purchaseOrders = await db
       .select({
         id: purchaseOrder.id,
+        poNumber: purchaseOrder.poNumber,
         supplierName: purchaseOrder.supplierName,
         description: purchaseOrder.description,
         totalAmount: purchaseOrder.totalAmount,
@@ -97,6 +98,34 @@ export async function getPurchaseOrders(
   }
 }
 
+// Generate unique PO number for organization
+async function generatePoNumber(organizationId: string): Promise<string> {
+  try {
+    // Get the latest PO number for this organization
+    const lastPO = await db
+      .select({ poNumber: purchaseOrder.poNumber })
+      .from(purchaseOrder)
+      .where(eq(purchaseOrder.organizationId, organizationId))
+      .orderBy(desc(purchaseOrder.createdAt))
+      .limit(1);
+
+    let nextNumber = 1;
+    if (lastPO.length > 0 && lastPO[0].poNumber) {
+      // Extract number from PO-XXX format
+      const match = lastPO[0].poNumber.match(/PO-(\d+)/);
+      if (match) {
+        nextNumber = parseInt(match[1]) + 1;
+      }
+    }
+
+    return `PO-${nextNumber.toString().padStart(3, '0')}`;
+  } catch (error) {
+    console.error('Error generating PO number:', error);
+    // Fallback to timestamp-based number
+    return `PO-${Date.now().toString().slice(-6)}`;
+  }
+}
+
 // Create a new purchase order
 export async function createPurchaseOrder(
   organizationId: string,
@@ -123,11 +152,32 @@ export async function createPurchaseOrder(
       return { success: false, error: 'Project not found' };
     }
 
+    // Generate unique PO number
+    let poNumber = await generatePoNumber(organizationId);
+
+    // Check if PO number is unique (extra safety check)
+    const existingPO = await db
+      .select()
+      .from(purchaseOrder)
+      .where(
+        and(
+          eq(purchaseOrder.poNumber, poNumber),
+          eq(purchaseOrder.organizationId, organizationId)
+        )
+      )
+      .limit(1);
+
+    // Regenerate if collision (very unlikely)
+    if (existingPO.length > 0) {
+      poNumber = await generatePoNumber(organizationId);
+    }
+
     const newPurchaseOrder = await db
       .insert(purchaseOrder)
       .values({
         id: crypto.randomUUID(),
         organizationId,
+        poNumber,
         ...validatedData,
       })
       .returning();
@@ -154,6 +204,7 @@ export async function getPurchaseOrderById(organizationId: string, poId: string)
     const poData = await db
       .select({
         id: purchaseOrder.id,
+        poNumber: purchaseOrder.poNumber,
         supplierName: purchaseOrder.supplierName,
         description: purchaseOrder.description,
         totalAmount: purchaseOrder.totalAmount,

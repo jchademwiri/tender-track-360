@@ -1,4 +1,5 @@
 import { getCurrentUser } from '@/server';
+import { POForm } from '@/components/purchase-orders/po-form';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,9 +26,11 @@ export default async function NewPurchaseOrderPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Create Purchase Order</h1>
         <p className="text-muted-foreground">
-          Purchase order functionality will be implemented soon.
+          Create a new purchase order for a project. All purchase orders must be linked to a specific project.
         </p>
       </div>
+
+      <POForm organizationId={session.activeOrganizationId} />
     </div>
   );
 }

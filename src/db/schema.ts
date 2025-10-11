@@ -270,6 +270,7 @@ export const purchaseOrder = pgTable('purchase_order', {
   projectId: text('project_id')
     .notNull()
     .references(() => project.id, { onDelete: 'cascade' }),
+  poNumber: text('po_number').notNull().unique(), // Unique PO number
   supplierName: text('supplier_name').notNull(), // Defaults to organization name
   description: text('description').notNull(),
   totalAmount: text('total_amount').notNull(), // String for currency
