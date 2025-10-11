@@ -99,33 +99,6 @@ export async function getPurchaseOrders(
   }
 }
 
-// Generate unique PO number for organization
-async function generatePoNumber(organizationId: string): Promise<string> {
-  try {
-    // Get the latest PO number for this organization
-    const lastPO = await db
-      .select({ poNumber: purchaseOrder.poNumber })
-      .from(purchaseOrder)
-      .where(eq(purchaseOrder.organizationId, organizationId))
-      .orderBy(desc(purchaseOrder.createdAt))
-      .limit(1);
-
-    let nextNumber = 1;
-    if (lastPO.length > 0 && lastPO[0].poNumber) {
-      // Extract number from PO-XXX format
-      const match = lastPO[0].poNumber.match(/PO-(\d+)/);
-      if (match) {
-        nextNumber = parseInt(match[1]) + 1;
-      }
-    }
-
-    return `PO-${nextNumber.toString().padStart(3, '0')}`;
-  } catch (error) {
-    console.error('Error generating PO number:', error);
-    // Fallback to timestamp-based number
-    return `PO-${Date.now().toString().slice(-6)}`;
-  }
-}
 
 // Create a new purchase order
 export async function createPurchaseOrder(
@@ -360,6 +333,28 @@ export async function updatePurchaseOrderStatus(
 
     if (existingPO.length === 0) {
       return { success: false, error: 'Purchase order not found' };
+    }
+
+    // Check if PO is already delivered - cannot change status once delivered
+    if (existingPO[0].status === 'delivered') {
+      return { success: false, error: 'Cannot change status of a delivered purchase order' };
+    }
+
+    // Check user permissions - only owner and admin can change status
+    const { auth } = await import('@/lib/auth');
+    const { headers } = await import('next/headers');
+
+    const { success: hasPermission, error: permissionError } = await auth.api.hasPermission({
+      headers: await headers(),
+      body: {
+        permissions: {
+          project: ['update'], // Admin/owner level permission
+        },
+      },
+    });
+
+    if (permissionError || !hasPermission) {
+      return { success: false, error: 'Insufficient permissions to change purchase order status' };
     }
 
     const updatedPO = await db

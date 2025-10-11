@@ -13,12 +13,11 @@ import {
   ChevronRight,
   Activity as ActivityIcon,
   FolderOpen,
-  FileText,
   Receipt,
   Truck,
 } from 'lucide-react';
 import type { RecentActivity } from '@/types/activity';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
 
 interface RecentActivitySectionProps {
   activities: RecentActivity[];
@@ -182,19 +181,16 @@ function ActivityItem({ activity }: ActivityItemProps) {
           >
             {formatActivityType(activity.type)}
           </Badge>
-          <div className="flex items-center text-xs text-muted-foreground">
-            <Clock className="h-3 w-3 mr-1" />
-            {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
-          </div>
         </div>
 
         <p className="text-sm text-foreground mb-2">{activity.description}</p>
 
-        <div className="flex flex-col">
-          <div className="text-xs text-muted-foreground">
-            in <span className="font-medium">{activity.organizationName}</span>
-          </div>
+        <div className="flex items-center text-xs text-muted-foreground">
+          <Clock className="h-3 w-3 mr-1" />
+          {format(activity.timestamp, 'dd MMM yyyy')} | {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
+        </div>
 
+        <div className="flex flex-col">
           {activity.userName && (
             <div className="flex  items-center space-x-2">
               <Avatar className="h-6 w-6">

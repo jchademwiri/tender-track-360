@@ -675,11 +675,13 @@ export async function getProjectStats(organizationId: string) {
       activePOStatuses.includes(po.status)
     ).length;
 
-    // Total PO amount
-    const totalPOAmount = poStats.reduce((sum, po) => {
-      const amount = parseFloat(po.totalAmount || '0');
-      return sum + (isNaN(amount) ? 0 : amount);
-    }, 0);
+    // Total PO amount (only active POs)
+    const totalPOAmount = poStats
+      .filter((po) => activePOStatuses.includes(po.status))
+      .reduce((sum, po) => {
+        const amount = parseFloat(po.totalAmount || '0');
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
 
     // Calculate growth (month-over-month project creation)
     const now = new Date();
