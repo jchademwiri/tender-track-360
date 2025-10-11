@@ -60,10 +60,11 @@ export default async function EditPurchaseOrderPage({ params }: EditPurchaseOrde
         initialData={{
           id: po.id,
           projectId: po.project?.id || '',
-          supplierName: po.supplierName,
+          supplierName: po.supplierName || undefined,
           description: po.description,
           totalAmount: po.totalAmount,
           status: po.status as 'draft' | 'sent' | 'delivered',
+          poDate: po.poDate || undefined,
           expectedDeliveryDate: po.expectedDeliveryDate || undefined,
           notes: po.notes || undefined,
         }}

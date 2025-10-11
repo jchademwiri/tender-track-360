@@ -27,10 +27,11 @@ import { deletePurchaseOrder, updatePurchaseOrderStatus } from '@/server/purchas
 interface PurchaseOrderWithProject {
   id: string;
   poNumber: string;
-  supplierName: string;
+  supplierName: string | null;
   description: string;
   totalAmount: string;
   status: string;
+  poDate: Date | null;
   expectedDeliveryDate: Date | null;
   deliveredAt: Date | null;
   notes: string | null;
@@ -224,7 +225,7 @@ export function PODetails({ po, organizationId }: PODetailsProps) {
                     Supplier Name
                   </label>
                   <p className="text-lg font-medium">
-                    {po.supplierName}
+                    {po.supplierName || 'Not specified'}
                   </p>
                 </div>
 
@@ -380,6 +381,14 @@ export function PODetails({ po, organizationId }: PODetailsProps) {
                 </label>
                 <p className="text-sm">{formatDate(po.createdAt)}</p>
               </div>
+              {po.poDate && (
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    PO Date
+                  </label>
+                  <p className="text-sm">{formatDate(po.poDate)}</p>
+                </div>
+              )}
               <div>
                 <label className="text-sm font-medium text-muted-foreground">
                   Last Updated

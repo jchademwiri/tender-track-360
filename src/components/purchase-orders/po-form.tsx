@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { ArrowLeft, FileText, Building, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -29,10 +30,11 @@ import { getProjects } from '@/server/projects';
 
 const poFormSchema = z.object({
   projectId: z.string().min(1, 'Project is required'),
-  supplierName: z.string().min(1, 'Supplier name is required'),
+  supplierName: z.string().optional(),
   description: z.string().min(1, 'Description is required'),
   totalAmount: z.string().min(1, 'Total amount is required'),
   status: z.enum(['draft', 'sent', 'delivered']),
+  poDate: z.date().optional(),
   expectedDeliveryDate: z.date().optional(),
   notes: z.string().optional(),
 });
@@ -44,10 +46,11 @@ interface POFormProps {
   initialData?: {
     id?: string;
     projectId: string;
-    supplierName: string;
+    supplierName?: string;
     description: string;
     totalAmount: string;
     status: 'draft' | 'sent' | 'delivered';
+    poDate?: Date;
     expectedDeliveryDate?: Date;
     notes?: string;
   };
@@ -69,6 +72,7 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
       description: initialData?.description || '',
       totalAmount: initialData?.totalAmount || '',
       status: initialData?.status || 'draft',
+      poDate: initialData?.poDate,
       expectedDeliveryDate: initialData?.expectedDeliveryDate,
       notes: initialData?.notes || '',
     },
@@ -126,191 +130,295 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>
-          {initialData?.id ? 'Edit Purchase Order' : 'Create Purchase Order'}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="projectId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Project *</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={loadingProjects}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a project" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {loadingProjects ? (
-                          <SelectItem value="loading" disabled>
-                            Loading projects...
-                          </SelectItem>
-                        ) : projects.length === 0 ? (
-                          <SelectItem value="none" disabled>
-                            No projects available
-                          </SelectItem>
-                        ) : (
-                          projects.map((project) => (
-                            <SelectItem key={project.id} value={project.id}>
-                              {project.projectNumber.toUpperCase()} - {project.description}
+    <div className="w-full max-w-none space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between space-x-4">
+        <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+        <div className="text-right">
+          <h1 className="text-2xl font-bold">
+            {initialData?.id ? 'Edit Purchase Order' : 'Create Purchase Order'}
+          </h1>
+          <p className="text-muted-foreground">
+            {initialData?.id
+              ? 'Update purchase order information and details'
+              : 'Create a new purchase order with project and supplier details'}
+          </p>
+        </div>
+      </div>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Basic Information */}
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center text-lg">
+                  <FileText className="h-5 w-5 mr-2 text-blue-600" />
+                  Purchase Order Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6 p-6">
+                <FormField
+                  control={form.control}
+                  name="projectId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={loadingProjects}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a project" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {loadingProjects ? (
+                            <SelectItem value="loading" disabled>
+                              Loading projects...
                             </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                          ) : projects.length === 0 ? (
+                            <SelectItem value="none" disabled>
+                              No projects available
+                            </SelectItem>
+                          ) : (
+                            projects.map((project) => (
+                              <SelectItem key={project.id} value={project.id}>
+                                {project.projectNumber.toUpperCase()}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="supplierName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Supplier Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter supplier name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description *</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Enter purchase order description"
-                      className="min-h-[80px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="totalAmount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Total Amount *</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormField
+                  control={form.control}
+                  name="supplierName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Supplier Name</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
+                        <Input placeholder="Enter supplier name" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="draft">Draft</SelectItem>
-                        <SelectItem value="sent">Sent</SelectItem>
-                        <SelectItem value="delivered">Delivered</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description *</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Enter purchase order description"
+                          rows={4}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="totalAmount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Total Amount *</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Status *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="draft">Draft</SelectItem>
+                            <SelectItem value="sent">Sent</SelectItem>
+                            <SelectItem value="delivered">Delivered</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="poDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>PO Date</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                          value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                          onChange={(e) => {
+                            const date = e.target.value ? new Date(e.target.value) : undefined;
+                            field.onChange(date);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="expectedDeliveryDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Expected Delivery Date</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                          value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                          onChange={(e) => {
+                            const date = e.target.value ? new Date(e.target.value) : undefined;
+                            field.onChange(date);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Additional notes (optional)"
+                          rows={4}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Related Information */}
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center text-lg">
+                  <Building className="h-5 w-5 mr-2 text-green-600" />
+                  Project Information
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Details of the selected project
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-6 p-6">
+                {form.watch('projectId') ? (
+                  <div className="bg-accent rounded-md p-4">
+                    <h4 className="text-sm font-medium text-foreground mb-2">
+                      Selected Project Details
+                    </h4>
+                    {(() => {
+                      const selectedProject = projects.find(p => p.id === form.watch('projectId'));
+                      if (!selectedProject) return null;
+
+                      return (
+                        <div className="space-y-2 text-sm text-muted-foreground">
+                          <div className="flex items-center">
+                            <FileText className="h-3 w-3 mr-1" />
+                            <span className="font-medium text-blue-600">
+                              {selectedProject.projectNumber.toUpperCase()}
+                            </span>
+                          </div>
+                          {selectedProject.description && (
+                            <div>
+                              <span className="font-medium">Description:</span> {selectedProject.description}
+                            </div>
+                          )}
+                          <div>
+                            <span className="font-medium">Status:</span> {selectedProject.status}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                ) : (
+                  <div className="bg-muted rounded-md p-4 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Select a project to view its details
+                    </p>
+                  </div>
                 )}
-              />
-            </div>
+              </CardContent>
+            </Card>
+          </div>
 
-            <FormField
-              control={form.control}
-              name="expectedDeliveryDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Expected Delivery Date</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="date"
-                      {...field}
-                      value={field.value ? field.value.toISOString().split('T')[0] : ''}
-                      onChange={(e) => {
-                        const date = e.target.value ? new Date(e.target.value) : undefined;
-                        field.onChange(date);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+          {/* Form Actions */}
+          <div className="flex items-center rounded-lg justify-end space-x-4 pt-8 border-t bg-card px-6 py-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.back()}
+              disabled={isPending}
+              className="cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isPending} className="min-w-[120px] cursor-pointer">
+              {isPending ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  {initialData?.id ? 'Updating...' : 'Creating...'}
+                </div>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  {initialData?.id ? 'Update Purchase Order' : 'Create Purchase Order'}
+                </>
               )}
-            />
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Notes</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Additional notes (optional)"
-                      className="min-h-[80px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex justify-end space-x-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.back()}
-                disabled={isPending}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending
-                  ? (initialData?.id ? 'Updating...' : 'Creating...')
-                  : (initialData?.id ? 'Update Purchase Order' : 'Create Purchase Order')
-                }
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 }

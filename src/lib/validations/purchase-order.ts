@@ -2,10 +2,11 @@ import { z } from 'zod';
 
 export const PurchaseOrderCreateSchema = z.object({
   projectId: z.string().min(1, 'Project is required'),
-  supplierName: z.string().min(1, 'Supplier name is required'),
+  supplierName: z.string().optional(),
   description: z.string().min(1, 'Description is required'),
   totalAmount: z.string().min(1, 'Total amount is required'),
   status: z.enum(['draft', 'sent', 'delivered']),
+  poDate: z.date().optional(),
   expectedDeliveryDate: z.date().optional(),
   deliveredAt: z.date().optional(),
   notes: z.string().optional(),

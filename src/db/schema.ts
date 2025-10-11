@@ -271,11 +271,12 @@ export const purchaseOrder = pgTable('purchase_order', {
     .notNull()
     .references(() => project.id, { onDelete: 'cascade' }),
   poNumber: text('po_number').notNull().unique(), // Unique PO number
-  supplierName: text('supplier_name').notNull(), // Defaults to organization name
+  supplierName: text('supplier_name'), // Optional supplier name
   description: text('description').notNull(),
   totalAmount: text('total_amount').notNull(), // String for currency
   status: text('status').default('draft').notNull(), // draft, sent, delivered
   // Calendar-related dates
+  poDate: timestamp('po_date'), // Purchase order date
   expectedDeliveryDate: timestamp('expected_delivery_date'),
   deliveredAt: timestamp('delivered_at'),
   notes: text('notes'),

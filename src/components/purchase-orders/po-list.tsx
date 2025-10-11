@@ -41,10 +41,11 @@ import { getPurchaseOrders, deletePurchaseOrder } from '@/server/purchase-orders
 interface PurchaseOrderWithProject {
   id: string;
   poNumber: string;
-  supplierName: string;
+  supplierName: string | null;
   description: string;
   totalAmount: string;
   status: string;
+  poDate: Date | null;
   expectedDeliveryDate: Date | null;
   deliveredAt: Date | null;
   notes: string | null;
@@ -289,7 +290,7 @@ export function POList({
                       </TableCell>
                       <TableCell>
                         <div className="font-medium">
-                          {po.supplierName}
+                          {po.supplierName || 'Not specified'}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -406,7 +407,7 @@ export function POList({
                         </div>
 
                         <div className="text-sm text-gray-900 mb-1">
-                          <strong>Supplier:</strong> {po.supplierName}
+                          <strong>Supplier:</strong> {po.supplierName || 'Not specified'}
                         </div>
 
                         <div className="text-sm text-gray-900 mb-1">
