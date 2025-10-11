@@ -127,9 +127,9 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
     if (!value) return 'Not set';
     const numValue = parseFloat(value);
     if (isNaN(numValue)) return value;
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-ZA', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'ZAR',
     }).format(numValue);
   };
 

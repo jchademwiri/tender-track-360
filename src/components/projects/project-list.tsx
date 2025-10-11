@@ -8,7 +8,7 @@ import {
   MoreHorizontal,
   FileText,
   Calendar,
-  DollarSign,
+  Building,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,14 +36,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { getTenders, deleteTender } from '@/server/tenders';
+import { getProjects, deleteProject } from '@/server/projects';
 
-interface TenderWithClient {
+interface ProjectWithRelations {
   id: string;
-  tenderNumber: string;
+  projectNumber: string;
   description: string | null;
-  submissionDate: Date | null;
-  value: string | null;
   status: string;
   createdAt: Date;
   updatedAt: Date;
@@ -54,38 +52,39 @@ interface TenderWithClient {
     contactEmail: string | null;
     contactPhone: string | null;
   } | null;
+  tender: {
+    id: string;
+    tenderNumber: string;
+    description: string | null;
+  } | null;
 }
 
-interface TenderListProps {
+interface ProjectListProps {
   organizationId: string;
-  initialTenders?: TenderWithClient[];
+  initialProjects?: ProjectWithRelations[];
   initialTotalCount?: number;
 }
 
 const statusColors = {
-  draft: 'bg-gray-100 text-gray-800',
-  submitted: 'bg-blue-100 text-blue-800',
-  won: 'bg-green-100 text-green-800',
-  lost: 'bg-red-100 text-red-800',
-  pending: 'bg-yellow-100 text-yellow-800',
+  active: 'bg-green-100 text-green-800',
+  completed: 'bg-blue-100 text-blue-800',
+  cancelled: 'bg-red-100 text-red-800',
 };
 
 const statusLabels = {
-  draft: 'Draft',
-  submitted: 'Submitted',
-  won: 'Won',
-  lost: 'Lost',
-  pending: 'Pending',
+  active: 'Active',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
 };
 
-export function TenderList({
+export function ProjectList({
   organizationId,
-  initialTenders = [],
+  initialProjects = [],
   initialTotalCount = 0,
-}: TenderListProps) {
+}: ProjectListProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [tenders, setTenders] = useState<TenderWithClient[]>(initialTenders);
+  const [projects, setProjects] = useState<ProjectWithRelations[]>(initialProjects);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -95,23 +94,23 @@ export function TenderList({
   const itemsPerPage = 10;
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
-  // Fetch tenders with search, status filter, and pagination
-  const fetchTenders = useCallback(
+  // Fetch projects with search and pagination
+  const fetchProjects = useCallback(
     async (search?: string, page: number = 1, status?: string) => {
       setIsLoading(true);
       try {
-        const result = await getTenders(
+        const result = await getProjects(
           organizationId,
           search,
           page,
           itemsPerPage,
           status
         );
-        setTenders(result.tenders);
+        setProjects(result.projects);
         setTotalCount(result.totalCount);
         setCurrentPage(result.currentPage);
       } catch (error) {
-        console.error('Error fetching tenders:', error);
+        console.error('Error fetching projects:', error);
       } finally {
         setIsLoading(false);
       }
@@ -128,43 +127,43 @@ export function TenderList({
 
     // Fetch fresh data for the new organization
     if (organizationId) {
-      fetchTenders('', 1);
+      fetchProjects('', 1);
     }
-  }, [organizationId, fetchTenders]);
+  }, [organizationId, fetchProjects]);
 
   // Handle search
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1);
-    fetchTenders(query, 1);
+    fetchProjects(query, 1, statusFilter);
   };
 
   // Handle status filter
   const handleStatusFilter = (status: string) => {
     setStatusFilter(status);
     setCurrentPage(1);
-    fetchTenders(searchQuery, 1, status);
+    fetchProjects(searchQuery, 1, status);
   };
 
   // Handle pagination
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    fetchTenders(searchQuery, page, statusFilter);
+    fetchProjects(searchQuery, page, statusFilter);
   };
 
-  // Handle delete tender
-  const handleDeleteTender = async (tenderId: string) => {
-    if (!confirm('Are you sure you want to delete this tender?')) {
+  // Handle delete project
+  const handleDeleteProject = async (projectId: string) => {
+    if (!confirm('Are you sure you want to delete this project?')) {
       return;
     }
 
     startTransition(async () => {
-      const result = await deleteTender(organizationId, tenderId);
+      const result = await deleteProject(organizationId, projectId);
       if (result.success) {
         // Refresh the current page
-        fetchTenders(searchQuery, currentPage, statusFilter);
+        fetchProjects(searchQuery, currentPage, statusFilter);
       } else {
-        alert(result.error || 'Failed to delete tender');
+        alert(result.error || 'Failed to delete project');
       }
     });
   };
@@ -179,28 +178,17 @@ export function TenderList({
     }).format(new Date(date));
   };
 
-  // Format currency value
-  const formatValue = (value: string | null) => {
-    if (!value) return 'Not set';
-    const numValue = parseFloat(value);
-    if (isNaN(numValue)) return value;
-    return new Intl.NumberFormat('en-ZA', {
-      style: 'currency',
-      currency: 'ZAR',
-    }).format(numValue);
-  };
-
   return (
     <Card className="rounded-lg shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Tenders</CardTitle>
+          <CardTitle>Projects</CardTitle>
           <Button
-            onClick={() => router.push('/dashboard/tenders/new')}
+            onClick={() => router.push('/dashboard/projects/create')}
             className="cursor-pointer"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Tender
+            Add Project
           </Button>
         </div>
 
@@ -209,7 +197,7 @@ export function TenderList({
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder="Search by tender number or description..."
+              placeholder="Search by project number or description..."
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
               className="pl-10"
@@ -221,11 +209,9 @@ export function TenderList({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="submitted">Submitted</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="won">Won</SelectItem>
-              <SelectItem value="lost">Lost</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -235,27 +221,27 @@ export function TenderList({
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <div className="text-sm text-muted-foreground">
-              Loading tenders...
+              Loading projects...
             </div>
           </div>
-        ) : tenders.length === 0 ? (
+        ) : projects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <FileText className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium text-foreground mb-2">
-              No tenders found
+              No projects found
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
               {searchQuery || statusFilter !== 'all'
-                ? 'No tenders match your search criteria.'
-                : 'Get started by creating your first tender.'}
+                ? 'No projects match your search criteria.'
+                : 'Get started by creating your first project.'}
             </p>
             {!searchQuery && statusFilter === 'all' && (
               <Button
-                onClick={() => router.push('/dashboard/tenders/create')}
+                onClick={() => router.push('/dashboard/projects/create')}
                 className="cursor-pointer"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Tender
+                Add Project
               </Button>
             )}
           </div>
@@ -266,69 +252,75 @@ export function TenderList({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Tender Number</TableHead>
+                    <TableHead>Project Number</TableHead>
                     <TableHead>Client</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Value</TableHead>
-                    <TableHead>Submission Date</TableHead>
+                    <TableHead>Tender</TableHead>
+                    <TableHead>Created</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tenders.map((tender) => (
+                  {projects.map((project) => (
                     <TableRow
-                      key={tender.id}
+                      key={project.id}
                       className="cursor-pointer group rounded-md hover:bg-accent transition-colors duration-200"
                       onClick={() =>
-                        router.push(`/dashboard/tenders/${tender.id}`)
+                        router.push(`/dashboard/projects/${project.id}`)
                       }
                     >
                       <TableCell>
                         <div className="font-medium text-blue-600">
-                          {tender.tenderNumber.toUpperCase()}
+                          {project.projectNumber.toUpperCase()}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div>
                           <div className="font-medium">
-                            {tender.client?.name || 'Unknown Client'}
+                            {project.client?.name || 'No Client'}
                           </div>
-                          {tender.client?.contactName && (
+                          {project.client?.contactName && (
                             <div className="text-sm text-muted-foreground">
-                              {tender.client.contactName}
+                              {project.client.contactName}
                             </div>
                           )}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="max-w-[200px] truncate">
-                          {tender.description || 'No description'}
+                          {project.description || 'No description'}
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge
                           className={
                             statusColors[
-                              tender.status as keyof typeof statusColors
+                              project.status as keyof typeof statusColors
                             ]
                           }
                         >
                           {
                             statusLabels[
-                              tender.status as keyof typeof statusLabels
+                              project.status as keyof typeof statusLabels
                             ]
                           }
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm">
-                          {formatValue(tender.value)}
-                        </span>
+                        <div className="text-sm">
+                          {project.tender ? (
+                            <span className="text-blue-600">
+                              {project.tender.tenderNumber.toUpperCase()}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">None</span>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">
-                          {formatDate(tender.submissionDate)}
+                          {formatDate(project.createdAt)}
                         </span>
                       </TableCell>
                       <TableCell>
@@ -345,7 +337,7 @@ export function TenderList({
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
-                                router.push(`/dashboard/tenders/${tender.id}`);
+                                router.push(`/dashboard/projects/${project.id}`);
                               }}
                             >
                               View Details
@@ -354,21 +346,21 @@ export function TenderList({
                               onClick={(e) => {
                                 e.stopPropagation();
                                 router.push(
-                                  `/dashboard/tenders/${tender.id}/edit`
+                                  `/dashboard/projects/${project.id}/edit`
                                 );
                               }}
                             >
-                              Edit Tender
+                              Edit Project
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDeleteTender(tender.id);
+                                handleDeleteProject(project.id);
                               }}
                               className="text-red-600"
                               disabled={isPending}
                             >
-                              Delete Tender
+                              Delete Project
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -381,29 +373,29 @@ export function TenderList({
 
             {/* Mobile Cards */}
             <div className="md:hidden space-y-4">
-              {tenders.map((tender) => (
+              {projects.map((project) => (
                 <Card
-                  key={tender.id}
+                  key={project.id}
                   className="cursor-pointer hover:bg-accent transition-colors duration-200 group rounded-lg border hover:ring-1 hover:ring-ring"
-                  onClick={() => router.push(`/dashboard/tenders/${tender.id}`)}
+                  onClick={() => router.push(`/dashboard/projects/${project.id}`)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
                           <h3 className="font-medium text-blue-600 group-hover:text-blue-700 transition-colors">
-                            {tender.tenderNumber.toUpperCase()}
+                            {project.projectNumber.toUpperCase()}
                           </h3>
                           <Badge
                             className={
                               statusColors[
-                                tender.status as keyof typeof statusColors
+                                project.status as keyof typeof statusColors
                               ]
                             }
                           >
                             {
                               statusLabels[
-                                tender.status as keyof typeof statusLabels
+                                project.status as keyof typeof statusLabels
                               ]
                             }
                           </Badge>
@@ -411,30 +403,24 @@ export function TenderList({
 
                         <div className="text-sm text-gray-900 mb-1">
                           <strong>Client:</strong>{' '}
-                          {tender.client?.name || 'Unknown Client'}
+                          {project.client?.name || 'No Client'}
                         </div>
 
-                        {tender.description && (
+                        {project.description && (
                           <p className="text-sm text-foreground/80 mb-2 line-clamp-2">
-                            {tender.description}
+                            {project.description}
                           </p>
                         )}
 
                         <div className="space-y-1">
                           <div className="flex items-center text-sm text-muted-foreground">
-                            <DollarSign className="h-3 w-3 mr-1" />
-                            {formatValue(tender.value)}
+                            <Building className="h-3 w-3 mr-1" />
+                            Tender: {project.tender?.tenderNumber.toUpperCase() || 'None'}
                           </div>
                           <div className="flex items-center text-sm text-muted-foreground">
                             <Calendar className="h-3 w-3 mr-1" />
-                            Submission: {formatDate(tender.submissionDate)}
+                            Created: {formatDate(project.createdAt)}
                           </div>
-                        </div>
-
-                        <div className="mt-2">
-                          <span className="text-xs text-muted-foreground">
-                            Created {formatDate(tender.createdAt)}
-                          </span>
                         </div>
                       </div>
 
@@ -451,7 +437,7 @@ export function TenderList({
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              router.push(`/dashboard/tenders/${tender.id}`);
+                              router.push(`/dashboard/projects/${project.id}`);
                             }}
                           >
                             View Details
@@ -460,21 +446,21 @@ export function TenderList({
                             onClick={(e) => {
                               e.stopPropagation();
                               router.push(
-                                `/dashboard/tenders/${tender.id}/edit`
+                                `/dashboard/projects/${project.id}/edit`
                               );
                             }}
                           >
-                            Edit Tender
+                            Edit Project
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDeleteTender(tender.id);
+                              handleDeleteProject(project.id);
                             }}
                             className="text-red-600"
                             disabled={isPending}
                           >
-                            Delete Tender
+                            Delete Project
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -490,7 +476,7 @@ export function TenderList({
                 <div className="text-sm text-muted-foreground">
                   Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
                   {Math.min(currentPage * itemsPerPage, totalCount)} of{' '}
-                  {totalCount} tenders
+                  {totalCount} projects
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
