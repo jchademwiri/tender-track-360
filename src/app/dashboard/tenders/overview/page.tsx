@@ -7,10 +7,9 @@ import {
 } from '@/server/tenders';
 import { getClients } from '@/server/clients';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, CheckCircle, Clock, TrendingUp, AlertTriangle, DollarSign } from 'lucide-react';
+import { FileText, Clock, TrendingUp } from 'lucide-react';
 import { RecentActivity } from '@/components/tenders/recent-activity';
 import { UpcomingDeadlines } from '@/components/tenders/upcoming-deadlines';
-import { StatusChart } from '@/components/tenders/status-chart';
 import { TendersOverviewClient } from './client-wrapper';
 
 export const dynamic = 'force-dynamic';
@@ -84,8 +83,8 @@ export default async function TendersOverviewPage() {
         </p>
       </div>
 
-      {/* Enhanced Statistics Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Key Statistics Cards */}
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Tenders</CardTitle>
@@ -120,68 +119,16 @@ export default async function TendersOverviewPage() {
             <p className="text-xs text-muted-foreground">Success rate</p>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${stats.totalValue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Combined tender value
-            </p>
-          </CardContent>
-        </Card>
       </div>
 
-      {/* Additional Metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Upcoming Deadlines</CardTitle>
-            <Clock className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{stats.upcomingDeadlines}</div>
-            <p className="text-xs text-muted-foreground">Next 30 days</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overdue</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.overdueCount}</div>
-            <p className="text-xs text-muted-foreground">Past due date</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${Math.round(stats.averageValue).toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Per tender</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Status Chart and Recent Activity */}
+      {/* Upcoming Deadlines and Recent Activity */}
       <div className="grid gap-6 md:grid-cols-2">
-        <StatusChart statusCounts={stats.statusCounts} />
+        <UpcomingDeadlines deadlines={deadlines} />
         <RecentActivity
           recentTenders={activity.recentTenders}
           recentChanges={activity.recentChanges}
         />
       </div>
-
-      {/* Upcoming Deadlines */}
-      <UpcomingDeadlines deadlines={deadlines} />
 
       {/* Tenders Table with Search/Filters */}
       <TendersOverviewClient
