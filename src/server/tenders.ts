@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/db';
-import { tender, client } from '@/db/schema';
+import { tender, client, project } from '@/db/schema';
 import { eq, and, isNull, ilike, or, desc, gte, lte, ne } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -21,7 +21,8 @@ export async function getTenders(
   organizationId: string,
   search?: string,
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  status?: string
 ) {
   try {
     const offset = (page - 1) * limit;
@@ -41,6 +42,11 @@ export async function getTenders(
           ilike(tender.description, searchTerm)
         )
       );
+    }
+
+    // Add status filter if provided
+    if (status && status !== 'all') {
+      whereCondition = and(whereCondition, eq(tender.status, status));
     }
 
     const tenders = await db
@@ -594,6 +600,74 @@ export async function getTendersWithSorting(
       currentPage: page,
       totalPages: 0,
     };
+  }
+}
+
+// Get tenders available for project creation (won status, not linked to projects)
+export async function getAvailableTendersForProjects(
+  organizationId: string,
+  clientId?: string,
+  page: number = 1,
+  limit: number = 100
+) {
+  try {
+    const offset = (page - 1) * limit;
+
+    let whereCondition = and(
+      eq(tender.organizationId, organizationId),
+      isNull(tender.deletedAt),
+      eq(tender.status, 'won'),
+      // Exclude tenders that are already linked to projects
+      isNull(project.tenderId)
+    );
+
+    // Add client filter if provided
+    if (clientId) {
+      whereCondition = and(whereCondition, eq(tender.clientId, clientId));
+    }
+
+    const tenders = await db
+      .select({
+        id: tender.id,
+        tenderNumber: tender.tenderNumber,
+        description: tender.description,
+        submissionDate: tender.submissionDate,
+        value: tender.value,
+        status: tender.status,
+        createdAt: tender.createdAt,
+        updatedAt: tender.updatedAt,
+        client: {
+          id: client.id,
+          name: client.name,
+          contactName: client.contactName,
+          contactEmail: client.contactEmail,
+          contactPhone: client.contactPhone,
+        },
+      })
+      .from(tender)
+      .leftJoin(client, eq(tender.clientId, client.id))
+      .leftJoin(project, eq(tender.id, project.tenderId))
+      .where(whereCondition)
+      .orderBy(desc(tender.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    // Get total count
+    const totalCount = await db
+      .select({ count: tender.id })
+      .from(tender)
+      .leftJoin(project, eq(tender.id, project.tenderId))
+      .where(whereCondition);
+
+    return {
+      tenders,
+      totalCount: totalCount.length,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount.length / limit),
+    };
+  } catch (error) {
+    console.error('Error fetching available tenders for projects:', error);
+    throw new Error('Failed to fetch available tenders');
   }
 }
 

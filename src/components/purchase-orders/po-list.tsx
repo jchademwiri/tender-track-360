@@ -7,8 +7,8 @@ import {
   Plus,
   MoreHorizontal,
   FileText,
-  Calendar,
   DollarSign,
+  Calendar,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,56 +36,56 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { getTenders, deleteTender } from '@/server/tenders';
+import { getPurchaseOrders, deletePurchaseOrder } from '@/server/purchase-orders';
 
-interface TenderWithClient {
+interface PurchaseOrderWithProject {
   id: string;
-  tenderNumber: string;
-  description: string | null;
-  submissionDate: Date | null;
-  value: string | null;
+  poNumber: string;
+  supplierName: string | null;
+  description: string;
+  totalAmount: string;
   status: string;
+  poDate: Date | null;
+  expectedDeliveryDate: Date | null;
+  deliveredAt: Date | null;
+  notes: string | null;
   createdAt: Date;
   updatedAt: Date;
-  client: {
+  project: {
     id: string;
-    name: string;
-    contactName: string | null;
-    contactEmail: string | null;
-    contactPhone: string | null;
+    projectNumber: string;
+    description: string | null;
   } | null;
 }
 
-interface TenderListProps {
+interface POListProps {
   organizationId: string;
-  initialTenders?: TenderWithClient[];
+  initialPOs?: PurchaseOrderWithProject[];
   initialTotalCount?: number;
+  projectId?: string; // Optional: filter by specific project
 }
 
 const statusColors = {
   draft: 'bg-gray-100 text-gray-800',
-  submitted: 'bg-blue-100 text-blue-800',
-  won: 'bg-green-100 text-green-800',
-  lost: 'bg-red-100 text-red-800',
-  pending: 'bg-yellow-100 text-yellow-800',
+  sent: 'bg-blue-100 text-blue-800',
+  delivered: 'bg-green-100 text-green-800',
 };
 
 const statusLabels = {
   draft: 'Draft',
-  submitted: 'Submitted',
-  won: 'Won',
-  lost: 'Lost',
-  pending: 'Pending',
+  sent: 'Sent',
+  delivered: 'Delivered',
 };
 
-export function TenderList({
+export function POList({
   organizationId,
-  initialTenders = [],
+  initialPOs = [],
   initialTotalCount = 0,
-}: TenderListProps) {
+  projectId,
+}: POListProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [tenders, setTenders] = useState<TenderWithClient[]>(initialTenders);
+  const [pos, setPos] = useState<PurchaseOrderWithProject[]>(initialPOs);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -95,76 +95,77 @@ export function TenderList({
   const itemsPerPage = 10;
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
-  // Fetch tenders with search, status filter, and pagination
-  const fetchTenders = useCallback(
+  // Fetch POs with search and pagination
+  const fetchPOs = useCallback(
     async (search?: string, page: number = 1, status?: string) => {
       setIsLoading(true);
       try {
-        const result = await getTenders(
+        const result = await getPurchaseOrders(
           organizationId,
           search,
           page,
           itemsPerPage,
-          status
+          projectId,
+          status === 'all' ? undefined : status
         );
-        setTenders(result.tenders);
+        setPos(result.purchaseOrders);
         setTotalCount(result.totalCount);
         setCurrentPage(result.currentPage);
       } catch (error) {
-        console.error('Error fetching tenders:', error);
+        console.error('Error fetching purchase orders:', error);
       } finally {
         setIsLoading(false);
       }
     },
-    [organizationId]
+    [organizationId, projectId]
   );
 
-  // Reset and refetch data when organizationId changes
+  // Reset and refetch data when organizationId or projectId changes
   useEffect(() => {
     // Reset search and filters
     setSearchQuery('');
     setStatusFilter('all');
     setCurrentPage(1);
 
-    // Fetch fresh data for the new organization
+    // Fetch fresh data
     if (organizationId) {
-      fetchTenders('', 1);
+      fetchPOs('', 1);
     }
-  }, [organizationId, fetchTenders]);
+  }, [organizationId, projectId, fetchPOs]);
 
   // Handle search
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1);
-    fetchTenders(query, 1);
+    fetchPOs(query, 1, statusFilter);
   };
 
   // Handle status filter
   const handleStatusFilter = (status: string) => {
     setStatusFilter(status);
     setCurrentPage(1);
-    fetchTenders(searchQuery, 1, status);
+    fetchPOs(searchQuery, 1, status);
   };
 
   // Handle pagination
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    fetchTenders(searchQuery, page, statusFilter);
+    fetchPOs(searchQuery, page, statusFilter);
   };
 
-  // Handle delete tender
-  const handleDeleteTender = async (tenderId: string) => {
-    if (!confirm('Are you sure you want to delete this tender?')) {
+  // Handle delete PO
+  const handleDeletePO = async (poId: string) => {
+    if (!confirm('Are you sure you want to delete this purchase order?')) {
       return;
     }
 
     startTransition(async () => {
-      const result = await deleteTender(organizationId, tenderId);
+      const result = await deletePurchaseOrder(organizationId, poId);
       if (result.success) {
         // Refresh the current page
-        fetchTenders(searchQuery, currentPage, statusFilter);
+        fetchPOs(searchQuery, currentPage, statusFilter);
       } else {
-        alert(result.error || 'Failed to delete tender');
+        alert(result.error || 'Failed to delete purchase order');
       }
     });
   };
@@ -194,13 +195,13 @@ export function TenderList({
     <Card className="rounded-lg shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Tenders</CardTitle>
+          <CardTitle>Purchase Orders</CardTitle>
           <Button
-            onClick={() => router.push('/dashboard/tenders/new')}
+            onClick={() => router.push('/dashboard/projects/purchase-orders/create')}
             className="cursor-pointer"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Tender
+            Add Purchase Order
           </Button>
         </div>
 
@@ -209,7 +210,7 @@ export function TenderList({
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder="Search by tender number or description..."
+              placeholder="Search by PO number, supplier, or description..."
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
               className="pl-10"
@@ -222,10 +223,8 @@ export function TenderList({
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="submitted">Submitted</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="won">Won</SelectItem>
-              <SelectItem value="lost">Lost</SelectItem>
+              <SelectItem value="sent">Sent</SelectItem>
+              <SelectItem value="delivered">Delivered</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -235,27 +234,27 @@ export function TenderList({
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <div className="text-sm text-muted-foreground">
-              Loading tenders...
+              Loading purchase orders...
             </div>
           </div>
-        ) : tenders.length === 0 ? (
+        ) : pos.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <FileText className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium text-foreground mb-2">
-              No tenders found
+              No purchase orders found
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
               {searchQuery || statusFilter !== 'all'
-                ? 'No tenders match your search criteria.'
-                : 'Get started by creating your first tender.'}
+                ? 'No purchase orders match your search criteria.'
+                : 'Get started by creating your first purchase order.'}
             </p>
             {!searchQuery && statusFilter === 'all' && (
               <Button
-                onClick={() => router.push('/dashboard/tenders/create')}
+                onClick={() => router.push('/dashboard/projects/purchase-orders/create')}
                 className="cursor-pointer"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Tender
+                Add Purchase Order
               </Button>
             )}
           </div>
@@ -266,69 +265,68 @@ export function TenderList({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Tender Number</TableHead>
-                    <TableHead>Client</TableHead>
-                    <TableHead>Description</TableHead>
+                    <TableHead>PO Number</TableHead>
+                    <TableHead>Supplier</TableHead>
+                    <TableHead>Project</TableHead>
+                    <TableHead>PO Date</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Value</TableHead>
-                    <TableHead>Submission Date</TableHead>
+                    <TableHead>Total Amount</TableHead>
+                    <TableHead>Expected Delivery</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tenders.map((tender) => (
+                  {pos.map((po) => (
                     <TableRow
-                      key={tender.id}
+                      key={po.id}
                       className="cursor-pointer group rounded-md hover:bg-accent transition-colors duration-200"
                       onClick={() =>
-                        router.push(`/dashboard/tenders/${tender.id}`)
+                        router.push(`/dashboard/projects/purchase-orders/${po.id}`)
                       }
                     >
                       <TableCell>
                         <div className="font-medium text-blue-600">
-                          {tender.tenderNumber.toUpperCase()}
+                          {po.poNumber}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div>
-                          <div className="font-medium">
-                            {tender.client?.name || 'Unknown Client'}
-                          </div>
-                          {tender.client?.contactName && (
-                            <div className="text-sm text-muted-foreground">
-                              {tender.client.contactName}
-                            </div>
-                          )}
+                        <div className="font-medium">
+                          {po.supplierName || 'Not specified'}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="max-w-[200px] truncate">
-                          {tender.description || 'No description'}
+                        <div className="font-medium text-green-600">
+                          {po.project?.projectNumber.toUpperCase() || 'Unknown Project'}
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-muted-foreground">
+                          {formatDate(po.poDate)}
+                        </span>
                       </TableCell>
                       <TableCell>
                         <Badge
                           className={
                             statusColors[
-                              tender.status as keyof typeof statusColors
+                              po.status as keyof typeof statusColors
                             ]
                           }
                         >
                           {
                             statusLabels[
-                              tender.status as keyof typeof statusLabels
+                              po.status as keyof typeof statusLabels
                             ]
                           }
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <span className="text-sm">
-                          {formatValue(tender.value)}
+                          {formatValue(po.totalAmount)}
                         </span>
                       </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">
-                          {formatDate(tender.submissionDate)}
+                          {formatDate(po.expectedDeliveryDate)}
                         </span>
                       </TableCell>
                       <TableCell>
@@ -345,7 +343,7 @@ export function TenderList({
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
-                                router.push(`/dashboard/tenders/${tender.id}`);
+                                router.push(`/dashboard/projects/purchase-orders/${po.id}`);
                               }}
                             >
                               View Details
@@ -353,22 +351,20 @@ export function TenderList({
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
-                                router.push(
-                                  `/dashboard/tenders/${tender.id}/edit`
-                                );
+                                router.push(`/dashboard/projects/purchase-orders/${po.id}/edit`);
                               }}
                             >
-                              Edit Tender
+                              Edit PO
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDeleteTender(tender.id);
+                                handleDeletePO(po.id);
                               }}
                               className="text-red-600"
                               disabled={isPending}
                             >
-                              Delete Tender
+                              Delete PO
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -381,59 +377,66 @@ export function TenderList({
 
             {/* Mobile Cards */}
             <div className="md:hidden space-y-4">
-              {tenders.map((tender) => (
+              {pos.map((po) => (
                 <Card
-                  key={tender.id}
+                  key={po.id}
                   className="cursor-pointer hover:bg-accent transition-colors duration-200 group rounded-lg border hover:ring-1 hover:ring-ring"
-                  onClick={() => router.push(`/dashboard/tenders/${tender.id}`)}
+                  onClick={() => router.push(`/dashboard/projects/purchase-orders/${po.id}`)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
                           <h3 className="font-medium text-blue-600 group-hover:text-blue-700 transition-colors">
-                            {tender.tenderNumber.toUpperCase()}
+                            {po.poNumber}
                           </h3>
                           <Badge
                             className={
                               statusColors[
-                                tender.status as keyof typeof statusColors
+                                po.status as keyof typeof statusColors
                               ]
                             }
                           >
                             {
                               statusLabels[
-                                tender.status as keyof typeof statusLabels
+                                po.status as keyof typeof statusLabels
                               ]
                             }
                           </Badge>
                         </div>
 
                         <div className="text-sm text-gray-900 mb-1">
-                          <strong>Client:</strong>{' '}
-                          {tender.client?.name || 'Unknown Client'}
+                          <strong>Supplier:</strong> {po.supplierName || 'Not specified'}
                         </div>
 
-                        {tender.description && (
+                        <div className="text-sm text-gray-900 mb-1">
+                          <strong>Project:</strong> {po.project?.projectNumber.toUpperCase() || 'Unknown'}
+                        </div>
+
+                        <div className="text-sm text-gray-900 mb-1">
+                          <strong>PO Date:</strong> {formatDate(po.poDate)}
+                        </div>
+
+                        {po.description && (
                           <p className="text-sm text-foreground/80 mb-2 line-clamp-2">
-                            {tender.description}
+                            {po.description}
                           </p>
                         )}
 
                         <div className="space-y-1">
                           <div className="flex items-center text-sm text-muted-foreground">
                             <DollarSign className="h-3 w-3 mr-1" />
-                            {formatValue(tender.value)}
+                            {formatValue(po.totalAmount)}
                           </div>
                           <div className="flex items-center text-sm text-muted-foreground">
                             <Calendar className="h-3 w-3 mr-1" />
-                            Submission: {formatDate(tender.submissionDate)}
+                            Expected: {formatDate(po.expectedDeliveryDate)}
                           </div>
                         </div>
 
                         <div className="mt-2">
                           <span className="text-xs text-muted-foreground">
-                            Created {formatDate(tender.createdAt)}
+                            Created {formatDate(po.createdAt)}
                           </span>
                         </div>
                       </div>
@@ -451,7 +454,7 @@ export function TenderList({
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              router.push(`/dashboard/tenders/${tender.id}`);
+                              router.push(`/dashboard/projects/purchase-orders/${po.id}`);
                             }}
                           >
                             View Details
@@ -459,22 +462,20 @@ export function TenderList({
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              router.push(
-                                `/dashboard/tenders/${tender.id}/edit`
-                              );
+                              router.push(`/dashboard/projects/purchase-orders/${po.id}/edit`);
                             }}
                           >
-                            Edit Tender
+                            Edit PO
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDeleteTender(tender.id);
+                              handleDeletePO(po.id);
                             }}
                             className="text-red-600"
                             disabled={isPending}
                           >
-                            Delete Tender
+                            Delete PO
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -490,7 +491,7 @@ export function TenderList({
                 <div className="text-sm text-muted-foreground">
                   Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
                   {Math.min(currentPage * itemsPerPage, totalCount)} of{' '}
-                  {totalCount} tenders
+                  {totalCount} purchase orders
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button

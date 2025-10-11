@@ -7,7 +7,12 @@ export type ActivityType =
   | 'organization_updated'
   | 'role_changed'
   | 'invitation_sent'
-  | 'invitation_accepted';
+  | 'invitation_accepted'
+  | 'project_created'
+  | 'project_status_changed'
+  | 'po_created'
+  | 'po_status_changed'
+  | 'po_delivered';
 
 export interface RecentActivity {
   id: string;

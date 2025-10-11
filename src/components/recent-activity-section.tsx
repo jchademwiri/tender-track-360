@@ -12,9 +12,12 @@ import {
   Clock,
   ChevronRight,
   Activity as ActivityIcon,
+  FolderOpen,
+  Receipt,
+  Truck,
 } from 'lucide-react';
 import type { RecentActivity } from '@/types/activity';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
 
 interface RecentActivitySectionProps {
   activities: RecentActivity[];
@@ -88,6 +91,16 @@ function ActivityItem({ activity }: ActivityItemProps) {
         return <Users className="h-4 w-4 text-blue-500" />;
       case 'invitation_accepted':
         return <Users className="h-4 w-4 text-green-500" />;
+      case 'project_created':
+        return <FolderOpen className="h-4 w-4 text-blue-600" />;
+      case 'project_status_changed':
+        return <FolderOpen className="h-4 w-4 text-orange-600" />;
+      case 'po_created':
+        return <Receipt className="h-4 w-4 text-green-600" />;
+      case 'po_status_changed':
+        return <Receipt className="h-4 w-4 text-yellow-600" />;
+      case 'po_delivered':
+        return <Truck className="h-4 w-4 text-green-700" />;
       default:
         return <ActivityIcon className="h-4 w-4 text-gray-600" />;
     }
@@ -108,6 +121,16 @@ function ActivityItem({ activity }: ActivityItemProps) {
         return 'bg-purple-100 text-purple-800 hover:bg-purple-100';
       case 'invitation_sent':
         return 'bg-blue-100 text-blue-800 hover:bg-blue-100';
+      case 'project_created':
+        return 'bg-blue-100 text-blue-800 hover:bg-blue-100';
+      case 'project_status_changed':
+        return 'bg-orange-100 text-orange-800 hover:bg-orange-100';
+      case 'po_created':
+        return 'bg-green-100 text-green-800 hover:bg-green-100';
+      case 'po_status_changed':
+        return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100';
+      case 'po_delivered':
+        return 'bg-green-200 text-green-900 hover:bg-green-200';
       default:
         return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
     }
@@ -129,6 +152,16 @@ function ActivityItem({ activity }: ActivityItemProps) {
         return 'Invitation Sent';
       case 'invitation_accepted':
         return 'Invitation Accepted';
+      case 'project_created':
+        return 'Project Created';
+      case 'project_status_changed':
+        return 'Project Status Changed';
+      case 'po_created':
+        return 'Purchase Order Created';
+      case 'po_status_changed':
+        return 'Purchase Order Status Changed';
+      case 'po_delivered':
+        return 'Purchase Order Delivered';
       default:
         return 'Activity';
     }
@@ -148,19 +181,16 @@ function ActivityItem({ activity }: ActivityItemProps) {
           >
             {formatActivityType(activity.type)}
           </Badge>
-          <div className="flex items-center text-xs text-muted-foreground">
-            <Clock className="h-3 w-3 mr-1" />
-            {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
-          </div>
         </div>
 
         <p className="text-sm text-foreground mb-2">{activity.description}</p>
 
-        <div className="flex flex-col">
-          <div className="text-xs text-muted-foreground">
-            in <span className="font-medium">{activity.organizationName}</span>
-          </div>
+        <div className="flex items-center text-xs text-muted-foreground">
+          <Clock className="h-3 w-3 mr-1" />
+          {format(activity.timestamp, 'dd MMM yyyy')} | {formatDistanceToNow(activity.timestamp, { addSuffix: true })}
+        </div>
 
+        <div className="flex flex-col">
           {activity.userName && (
             <div className="flex  items-center space-x-2">
               <Avatar className="h-6 w-6">
