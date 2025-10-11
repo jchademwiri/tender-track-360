@@ -268,6 +268,7 @@ export function POList({
                     <TableHead>PO Number</TableHead>
                     <TableHead>Supplier</TableHead>
                     <TableHead>Project</TableHead>
+                    <TableHead>PO Date</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Total Amount</TableHead>
                     <TableHead>Expected Delivery</TableHead>
@@ -294,16 +295,14 @@ export function POList({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div>
-                          <div className="font-medium text-green-600">
-                            {po.project?.projectNumber.toUpperCase() || 'Unknown Project'}
-                          </div>
-                          {po.project?.description && (
-                            <div className="text-sm text-muted-foreground">
-                              {po.project.description}
-                            </div>
-                          )}
+                        <div className="font-medium text-green-600">
+                          {po.project?.projectNumber.toUpperCase() || 'Unknown Project'}
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-muted-foreground">
+                          {formatDate(po.poDate)}
+                        </span>
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -412,6 +411,10 @@ export function POList({
 
                         <div className="text-sm text-gray-900 mb-1">
                           <strong>Project:</strong> {po.project?.projectNumber.toUpperCase() || 'Unknown'}
+                        </div>
+
+                        <div className="text-sm text-gray-900 mb-1">
+                          <strong>PO Date:</strong> {formatDate(po.poDate)}
                         </div>
 
                         {po.description && (

@@ -29,6 +29,7 @@ import { createPurchaseOrder, updatePurchaseOrder } from '@/server/purchase-orde
 import { getProjects } from '@/server/projects';
 
 const poFormSchema = z.object({
+  poNumber: z.string().min(1, 'PO Number is required'),
   projectId: z.string().min(1, 'Project is required'),
   supplierName: z.string().optional(),
   description: z.string().min(1, 'Description is required'),
@@ -45,6 +46,7 @@ interface POFormProps {
   organizationId: string;
   initialData?: {
     id?: string;
+    poNumber?: string;
     projectId: string;
     supplierName?: string;
     description: string;
@@ -67,6 +69,7 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
   const form = useForm<POFormValues>({
     resolver: zodResolver(poFormSchema),
     defaultValues: {
+      poNumber: initialData?.poNumber || '',
       projectId: initialData?.projectId || '',
       supplierName: initialData?.supplierName || '',
       description: initialData?.description || '',
@@ -161,6 +164,27 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6 p-6">
+                <FormField
+                  control={form.control}
+                  name="poNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>PO Number *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter PO number (e.g., PO-001)"
+                          {...field}
+                          onChange={(e) => {
+                            const upperValue = e.target.value.toUpperCase();
+                            field.onChange(upperValue);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="projectId"
@@ -377,6 +401,11 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
                           <div>
                             <span className="font-medium">Status:</span> {selectedProject.status}
                           </div>
+                          {selectedProject.client && (
+                            <div>
+                              <span className="font-medium">Client:</span> {selectedProject.client.name}
+                            </div>
+                          )}
                         </div>
                       );
                     })()}

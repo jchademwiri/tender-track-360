@@ -2,7 +2,7 @@
 
 import { db } from '@/db';
 import { purchaseOrder, project, client } from '@/db/schema';
-import { eq, and, isNull, ilike, or, desc } from 'drizzle-orm';
+import { eq, and, isNull, ilike, or, desc, ne } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import {
@@ -153,24 +153,20 @@ export async function createPurchaseOrder(
       return { success: false, error: 'Project not found' };
     }
 
-    // Generate unique PO number
-    let poNumber = await generatePoNumber(organizationId);
-
-    // Check if PO number is unique (extra safety check)
+    // Check if PO number is unique within organization
     const existingPO = await db
       .select()
       .from(purchaseOrder)
       .where(
         and(
-          eq(purchaseOrder.poNumber, poNumber),
+          eq(purchaseOrder.poNumber, validatedData.poNumber),
           eq(purchaseOrder.organizationId, organizationId)
         )
       )
       .limit(1);
 
-    // Regenerate if collision (very unlikely)
     if (existingPO.length > 0) {
-      poNumber = await generatePoNumber(organizationId);
+      return { success: false, error: 'PO Number already exists in this organization' };
     }
 
     const newPurchaseOrder = await db
@@ -178,7 +174,6 @@ export async function createPurchaseOrder(
       .values({
         id: crypto.randomUUID(),
         organizationId,
-        poNumber,
         ...validatedData,
       })
       .returning();
@@ -270,6 +265,27 @@ export async function updatePurchaseOrder(
 
     if (existingPO.length === 0) {
       return { success: false, error: 'Purchase order not found' };
+    }
+
+    // If PO number is being updated, check uniqueness
+    if (validatedData.poNumber) {
+      const duplicatePO = await db
+        .select()
+        .from(purchaseOrder)
+        .where(
+          and(
+            eq(purchaseOrder.poNumber, validatedData.poNumber),
+            eq(purchaseOrder.organizationId, organizationId),
+            isNull(purchaseOrder.deletedAt),
+            // Exclude current PO from uniqueness check
+            ne(purchaseOrder.id, poId)
+          )
+        )
+        .limit(1);
+
+      if (duplicatePO.length > 0) {
+        return { success: false, error: 'PO Number already exists in this organization' };
+      }
     }
 
     // If project is being updated, verify it exists and belongs to organization
