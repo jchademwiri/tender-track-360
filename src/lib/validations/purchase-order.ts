@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const PurchaseOrderCreateSchema = z.object({
+  poNumber: z.string().min(1, 'PO Number is required'),
   projectId: z.string().min(1, 'Project is required'),
   supplierName: z.string().optional(),
   description: z.string().min(1, 'Description is required'),

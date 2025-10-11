@@ -2,7 +2,7 @@
 
 import { db } from '@/db';
 import { purchaseOrder, project, client } from '@/db/schema';
-import { eq, and, isNull, ilike, or, desc } from 'drizzle-orm';
+import { eq, and, isNull, ilike, or, desc, ne } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import {
@@ -99,33 +99,6 @@ export async function getPurchaseOrders(
   }
 }
 
-// Generate unique PO number for organization
-async function generatePoNumber(organizationId: string): Promise<string> {
-  try {
-    // Get the latest PO number for this organization
-    const lastPO = await db
-      .select({ poNumber: purchaseOrder.poNumber })
-      .from(purchaseOrder)
-      .where(eq(purchaseOrder.organizationId, organizationId))
-      .orderBy(desc(purchaseOrder.createdAt))
-      .limit(1);
-
-    let nextNumber = 1;
-    if (lastPO.length > 0 && lastPO[0].poNumber) {
-      // Extract number from PO-XXX format
-      const match = lastPO[0].poNumber.match(/PO-(\d+)/);
-      if (match) {
-        nextNumber = parseInt(match[1]) + 1;
-      }
-    }
-
-    return `PO-${nextNumber.toString().padStart(3, '0')}`;
-  } catch (error) {
-    console.error('Error generating PO number:', error);
-    // Fallback to timestamp-based number
-    return `PO-${Date.now().toString().slice(-6)}`;
-  }
-}
 
 // Create a new purchase order
 export async function createPurchaseOrder(
@@ -153,24 +126,20 @@ export async function createPurchaseOrder(
       return { success: false, error: 'Project not found' };
     }
 
-    // Generate unique PO number
-    let poNumber = await generatePoNumber(organizationId);
-
-    // Check if PO number is unique (extra safety check)
+    // Check if PO number is unique within organization
     const existingPO = await db
       .select()
       .from(purchaseOrder)
       .where(
         and(
-          eq(purchaseOrder.poNumber, poNumber),
+          eq(purchaseOrder.poNumber, validatedData.poNumber),
           eq(purchaseOrder.organizationId, organizationId)
         )
       )
       .limit(1);
 
-    // Regenerate if collision (very unlikely)
     if (existingPO.length > 0) {
-      poNumber = await generatePoNumber(organizationId);
+      return { success: false, error: 'PO Number already exists in this organization' };
     }
 
     const newPurchaseOrder = await db
@@ -178,7 +147,6 @@ export async function createPurchaseOrder(
       .values({
         id: crypto.randomUUID(),
         organizationId,
-        poNumber,
         ...validatedData,
       })
       .returning();
@@ -272,6 +240,27 @@ export async function updatePurchaseOrder(
       return { success: false, error: 'Purchase order not found' };
     }
 
+    // If PO number is being updated, check uniqueness
+    if (validatedData.poNumber) {
+      const duplicatePO = await db
+        .select()
+        .from(purchaseOrder)
+        .where(
+          and(
+            eq(purchaseOrder.poNumber, validatedData.poNumber),
+            eq(purchaseOrder.organizationId, organizationId),
+            isNull(purchaseOrder.deletedAt),
+            // Exclude current PO from uniqueness check
+            ne(purchaseOrder.id, poId)
+          )
+        )
+        .limit(1);
+
+      if (duplicatePO.length > 0) {
+        return { success: false, error: 'PO Number already exists in this organization' };
+      }
+    }
+
     // If project is being updated, verify it exists and belongs to organization
     if (validatedData.projectId) {
       const projectExists = await db
@@ -344,6 +333,28 @@ export async function updatePurchaseOrderStatus(
 
     if (existingPO.length === 0) {
       return { success: false, error: 'Purchase order not found' };
+    }
+
+    // Check if PO is already delivered - cannot change status once delivered
+    if (existingPO[0].status === 'delivered') {
+      return { success: false, error: 'Cannot change status of a delivered purchase order' };
+    }
+
+    // Check user permissions - only owner and admin can change status
+    const { auth } = await import('@/lib/auth');
+    const { headers } = await import('next/headers');
+
+    const { success: hasPermission, error: permissionError } = await auth.api.hasPermission({
+      headers: await headers(),
+      body: {
+        permissions: {
+          project: ['update'], // Admin/owner level permission
+        },
+      },
+    });
+
+    if (permissionError || !hasPermission) {
+      return { success: false, error: 'Insufficient permissions to change purchase order status' };
     }
 
     const updatedPO = await db

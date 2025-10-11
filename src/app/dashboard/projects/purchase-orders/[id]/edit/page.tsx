@@ -59,6 +59,7 @@ export default async function EditPurchaseOrderPage({ params }: EditPurchaseOrde
         organizationId={session.activeOrganizationId}
         initialData={{
           id: po.id,
+          poNumber: po.poNumber,
           projectId: po.project?.id || '',
           supplierName: po.supplierName || undefined,
           description: po.description,
