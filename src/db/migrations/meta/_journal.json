@@ -71,6 +71,13 @@
       "when": 1759736487522,
       "tag": "0009_condemned_adam_warlock",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1760193473361,
+      "tag": "0010_daffy_lethal_legion",
+      "breakpoints": true
     }
   ]
 }

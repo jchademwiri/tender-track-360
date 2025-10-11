@@ -1,29 +1,47 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { FolderOpen } from 'lucide-react';
+import { getCurrentUser } from '@/server';
+import { getProjects } from '@/server/projects';
+import { ProjectList } from '@/components/projects/project-list';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ProjectsPage() {
+  const { session } = await getCurrentUser();
+
+  if (!session.activeOrganizationId) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">
+            No Organization Selected
+          </h2>
+          <p className="text-gray-600">
+            Please select an organization to view projects.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Fetch initial projects
+  const result = await getProjects(session.activeOrganizationId, '', 1, 10);
+
+  const initialProjects = result.projects;
+  const initialTotalCount = result.totalCount;
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Active Projects</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
         <p className="text-muted-foreground">
-          Manage and track all your active construction projects.
+          Manage and track all your construction projects.
         </p>
       </div>
 
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <FolderOpen className="h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No Projects Yet
-          </h3>
-          <p className="text-gray-500 text-center">
-            Project management functionality will be available once implemented.
-          </p>
-        </CardContent>
-      </Card>
+      <ProjectList
+        organizationId={session.activeOrganizationId}
+        initialProjects={initialProjects}
+        initialTotalCount={initialTotalCount}
+      />
     </div>
   );
 }

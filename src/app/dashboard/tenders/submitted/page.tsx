@@ -24,16 +24,18 @@ export default async function SubmittedTendersPage() {
     );
   }
 
-  // Fetch submitted and pending tenders
+  // Fetch submitted and pending tenders (exclude drafts)
   const [submittedResult, pendingResult] = await Promise.all([
     searchTenders(session.activeOrganizationId, { status: 'submitted' }, 1, 50),
     searchTenders(session.activeOrganizationId, { status: 'pending' }, 1, 50),
   ]);
 
   const submittedTenders = submittedResult.success
-    ? submittedResult.tenders
+    ? submittedResult.tenders.filter(t => t.status !== 'draft')
     : [];
-  const pendingTenders = pendingResult.success ? pendingResult.tenders : [];
+  const pendingTenders = pendingResult.success
+    ? pendingResult.tenders.filter(t => t.status !== 'draft')
+    : [];
   const allSubmittedTenders = [...submittedTenders, ...pendingTenders];
 
   return (
