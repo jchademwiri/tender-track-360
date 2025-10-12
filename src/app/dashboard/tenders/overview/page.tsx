@@ -1,7 +1,16 @@
 import { getCurrentUser } from '@/server';
-import { getTenderStats } from '@/server/tenders';
+import {
+  getTenderStats,
+  getRecentActivity,
+  getUpcomingDeadlines,
+  getTendersOverview
+} from '@/server/tenders';
+import { getClients } from '@/server/clients';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, CheckCircle, Clock, TrendingUp } from 'lucide-react';
+import { FileText, Clock, TrendingUp } from 'lucide-react';
+import { RecentActivity } from '@/components/tenders/recent-activity';
+import { UpcomingDeadlines } from '@/components/tenders/upcoming-deadlines';
+import { TendersOverviewClient } from './client-wrapper';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,26 +32,45 @@ export default async function TendersOverviewPage() {
     );
   }
 
-  // Fetch tender statistics
-  const statsResult = await getTenderStats(session.activeOrganizationId);
-  const stats = statsResult.success
-    ? statsResult.stats
-    : {
-        totalTenders: 0,
-        statusCounts: {
-          draft: 0,
-          submitted: 0,
-          won: 0,
-          lost: 0,
-          pending: 0,
-        },
-        totalValue: 0,
-      };
+  // Fetch all data in parallel
+  const [statsResult, activityResult, deadlinesResult, clientsResult, tendersResult] = await Promise.all([
+    getTenderStats(session.activeOrganizationId),
+    getRecentActivity(session.activeOrganizationId),
+    getUpcomingDeadlines(session.activeOrganizationId),
+    getClients(session.activeOrganizationId),
+    getTendersOverview(session.activeOrganizationId, {}, 1, 20)
+  ]);
 
-  const winRate =
-    stats.totalTenders > 0
-      ? Math.round((stats.statusCounts.won / stats.totalTenders) * 100)
-      : 0;
+  const stats = statsResult.success ? statsResult.stats : {
+    totalTenders: 0,
+    statusCounts: { draft: 0, submitted: 0, won: 0, lost: 0, pending: 0 },
+    totalValue: 0,
+    winRate: 0,
+    averageValue: 0,
+    upcomingDeadlines: 0,
+    overdueCount: 0,
+  };
+
+  const activity = activityResult.success ? activityResult.activity : {
+    recentTenders: [],
+    recentChanges: [],
+  };
+
+  const deadlines = deadlinesResult.success ? deadlinesResult.deadlines : [];
+
+  const clients = clientsResult.clients.map(c => ({
+    id: c.id,
+    name: c.name,
+  }));
+
+  const tendersData = tendersResult.success ? tendersResult : {
+    tenders: [],
+    totalCount: 0,
+    currentPage: 1,
+    totalPages: 0,
+  };
+
+  const activeCount = stats.statusCounts.draft + stats.statusCounts.submitted + stats.statusCounts.pending;
 
   return (
     <div className="space-y-6">
@@ -55,8 +83,8 @@ export default async function TendersOverviewPage() {
         </p>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Key Statistics Cards */}
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Tenders</CardTitle>
@@ -72,29 +100,12 @@ export default async function TendersOverviewPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active</CardTitle>
+            <CardTitle className="text-sm font-medium">Active Tenders</CardTitle>
             <Clock className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {stats.statusCounts.draft +
-                stats.statusCounts.submitted +
-                stats.statusCounts.pending}
-            </div>
-            <p className="text-xs text-muted-foreground">Currently active</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Won</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {stats.statusCounts.won}
-            </div>
-            <p className="text-xs text-muted-foreground">Successful tenders</p>
+            <div className="text-2xl font-bold text-blue-600">{activeCount}</div>
+            <p className="text-xs text-muted-foreground">Currently in progress</p>
           </CardContent>
         </Card>
 
@@ -104,67 +115,30 @@ export default async function TendersOverviewPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{winRate}%</div>
+            <div className="text-2xl font-bold text-green-600">{Math.round(stats.winRate * 100)}%</div>
             <p className="text-xs text-muted-foreground">Success rate</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Status Breakdown */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Status Breakdown</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-5">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-600">
-                {stats.statusCounts.draft}
-              </div>
-              <p className="text-sm text-muted-foreground">Draft</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
-                {stats.statusCounts.submitted}
-              </div>
-              <p className="text-sm text-muted-foreground">Submitted</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">
-                {stats.statusCounts.pending}
-              </div>
-              <p className="text-sm text-muted-foreground">Pending</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
-                {stats.statusCounts.won}
-              </div>
-              <p className="text-sm text-muted-foreground">Won</p>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-red-600">
-                {stats.statusCounts.lost}
-              </div>
-              <p className="text-sm text-muted-foreground">Lost</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Upcoming Deadlines and Recent Activity */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <UpcomingDeadlines deadlines={deadlines} />
+        <RecentActivity
+          recentTenders={activity.recentTenders}
+          recentChanges={activity.recentChanges}
+        />
+      </div>
 
-      {/* Total Value */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Total Tender Value</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">
-            ${stats.totalValue.toLocaleString()}
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Combined value of all tenders
-          </p>
-        </CardContent>
-      </Card>
+      {/* Tenders Table with Search/Filters */}
+      <TendersOverviewClient
+        initialTenders={tendersData.tenders}
+        initialTotalCount={tendersData.totalCount}
+        initialCurrentPage={tendersData.currentPage}
+        initialTotalPages={tendersData.totalPages}
+        clients={clients}
+        organizationId={session.activeOrganizationId}
+      />
     </div>
   );
 }
