@@ -678,6 +678,8 @@ export async function getTenderStats(organizationId: string) {
       .select({
         status: tender.status,
         value: tender.value,
+        submissionDate: tender.submissionDate,
+        createdAt: tender.createdAt,
       })
       .from(tender)
       .where(
@@ -699,6 +701,26 @@ export async function getTenderStats(organizationId: string) {
       return sum + (isNaN(value) ? 0 : value);
     }, 0);
 
+    // Calculate win rate
+    const winRate = totalTenders > 0 ? (statusCounts.won || 0) / totalTenders : 0;
+
+    // Calculate average value
+    const averageValue = totalTenders > 0 ? totalValue / totalTenders : 0;
+
+    // Count upcoming deadlines (next 30 days)
+    const now = new Date();
+    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const upcomingDeadlines = stats.filter(tender =>
+      tender.submissionDate &&
+      tender.submissionDate > now &&
+      tender.submissionDate <= thirtyDaysFromNow
+    ).length;
+
+    // Count overdue tenders
+    const overdueCount = stats.filter(tender =>
+      tender.submissionDate && tender.submissionDate < now
+    ).length;
+
     return {
       success: true,
       stats: {
@@ -711,6 +733,10 @@ export async function getTenderStats(organizationId: string) {
           pending: statusCounts.pending || 0,
         },
         totalValue,
+        winRate,
+        averageValue,
+        upcomingDeadlines,
+        overdueCount,
       },
     };
   } catch (error) {
@@ -728,7 +754,243 @@ export async function getTenderStats(organizationId: string) {
           pending: 0,
         },
         totalValue: 0,
+        winRate: 0,
+        averageValue: 0,
+        upcomingDeadlines: 0,
+        overdueCount: 0,
       },
+    };
+  }
+}
+
+// Get recent activity for dashboard
+export async function getRecentActivity(organizationId: string, limit: number = 10) {
+  try {
+    // Get recent tenders
+    const recentTenders = await db
+      .select({
+        id: tender.id,
+        tenderNumber: tender.tenderNumber,
+        description: tender.description,
+        status: tender.status,
+        createdAt: tender.createdAt,
+        updatedAt: tender.updatedAt,
+        client: {
+          name: client.name,
+        },
+      })
+      .from(tender)
+      .leftJoin(client, eq(tender.clientId, client.id))
+      .where(
+        and(eq(tender.organizationId, organizationId), isNull(tender.deletedAt))
+      )
+      .orderBy(desc(tender.createdAt))
+      .limit(limit);
+
+    // Get recent status changes (tenders updated in last 7 days)
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const recentChanges = await db
+      .select({
+        id: tender.id,
+        tenderNumber: tender.tenderNumber,
+        description: tender.description,
+        status: tender.status,
+        createdAt: tender.createdAt,
+        updatedAt: tender.updatedAt,
+        client: {
+          name: client.name,
+        },
+      })
+      .from(tender)
+      .leftJoin(client, eq(tender.clientId, client.id))
+      .where(
+        and(
+          eq(tender.organizationId, organizationId),
+          isNull(tender.deletedAt),
+          gte(tender.updatedAt, sevenDaysAgo)
+        )
+      )
+      .orderBy(desc(tender.updatedAt))
+      .limit(limit);
+
+    return {
+      success: true,
+      activity: {
+        recentTenders,
+        recentChanges,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching recent activity:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch recent activity',
+      activity: {
+        recentTenders: [],
+        recentChanges: [],
+      },
+    };
+  }
+}
+
+// Get upcoming deadlines for dashboard
+export async function getUpcomingDeadlines(organizationId: string, limit: number = 10) {
+  try {
+    const now = new Date();
+    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+    const upcomingTenders = await db
+      .select({
+        id: tender.id,
+        tenderNumber: tender.tenderNumber,
+        description: tender.description,
+        submissionDate: tender.submissionDate,
+        status: tender.status,
+        value: tender.value,
+        client: {
+          name: client.name,
+        },
+      })
+      .from(tender)
+      .leftJoin(client, eq(tender.clientId, client.id))
+      .where(
+        and(
+          eq(tender.organizationId, organizationId),
+          isNull(tender.deletedAt),
+          gte(tender.submissionDate, now),
+          lte(tender.submissionDate, thirtyDaysFromNow)
+        )
+      )
+      .orderBy(tender.submissionDate)
+      .limit(limit);
+
+    // Calculate days until deadline for each tender
+    const tendersWithDays = upcomingTenders.map(tender => ({
+      ...tender,
+      daysUntilDeadline: tender.submissionDate
+        ? Math.ceil((tender.submissionDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+        : null,
+    }));
+
+    return {
+      success: true,
+      deadlines: tendersWithDays,
+    };
+  } catch (error) {
+    console.error('Error fetching upcoming deadlines:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch upcoming deadlines',
+      deadlines: [],
+    };
+  }
+}
+
+// Get filtered tenders for overview table
+export async function getTendersOverview(
+  organizationId: string,
+  filters: {
+    status?: string;
+    clientId?: string;
+    search?: string;
+    sortBy?: 'tenderNumber' | 'createdAt' | 'submissionDate' | 'status';
+    sortOrder?: 'asc' | 'desc';
+  },
+  page: number = 1,
+  limit: number = 20
+) {
+  try {
+    const offset = (page - 1) * limit;
+
+    let whereCondition = and(
+      eq(tender.organizationId, organizationId),
+      isNull(tender.deletedAt)
+    );
+
+    // Add filters
+    if (filters.status && filters.status !== 'all') {
+      whereCondition = and(whereCondition, eq(tender.status, filters.status));
+    }
+
+    if (filters.clientId) {
+      whereCondition = and(whereCondition, eq(tender.clientId, filters.clientId));
+    }
+
+    if (filters.search && filters.search.trim()) {
+      const searchTerm = `%${filters.search.trim()}%`;
+      whereCondition = and(
+        whereCondition,
+        or(
+          ilike(tender.tenderNumber, searchTerm),
+          ilike(tender.description, searchTerm)
+        )
+      );
+    }
+
+    // Determine sort column
+    const sortBy = filters.sortBy || 'createdAt';
+    const sortOrder = filters.sortOrder || 'desc';
+    let sortColumn;
+    switch (sortBy) {
+      case 'tenderNumber':
+        sortColumn = tender.tenderNumber;
+        break;
+      case 'submissionDate':
+        sortColumn = tender.submissionDate;
+        break;
+      case 'status':
+        sortColumn = tender.status;
+        break;
+      default:
+        sortColumn = tender.createdAt;
+    }
+
+    const tenders = await db
+      .select({
+        id: tender.id,
+        tenderNumber: tender.tenderNumber,
+        description: tender.description,
+        submissionDate: tender.submissionDate,
+        value: tender.value,
+        status: tender.status,
+        createdAt: tender.createdAt,
+        updatedAt: tender.updatedAt,
+        client: {
+          id: client.id,
+          name: client.name,
+        },
+      })
+      .from(tender)
+      .leftJoin(client, eq(tender.clientId, client.id))
+      .where(whereCondition)
+      .orderBy(sortOrder === 'desc' ? desc(sortColumn) : sortColumn)
+      .limit(limit)
+      .offset(offset);
+
+    // Get total count for pagination
+    const totalCountResult = await db
+      .select({ count: tender.id })
+      .from(tender)
+      .where(whereCondition);
+
+    const totalCount = totalCountResult.length;
+
+    return {
+      success: true,
+      tenders,
+      totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+    };
+  } catch (error) {
+    console.error('Error fetching tenders overview:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch tenders overview',
+      tenders: [],
+      totalCount: 0,
+      currentPage: page,
+      totalPages: 0,
     };
   }
 }
