@@ -2,7 +2,15 @@ import { getCurrentUser } from '@/server';
 import { getProjectStats, getRecentProjectActivities } from '@/server/projects';
 import { RecentActivitySection } from '@/components/recent-activity-section';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FolderOpen, Receipt, DollarSign, TrendingUp } from 'lucide-react';
+import {
+  FolderOpen,
+  Receipt,
+  DollarSign,
+  TrendingUp,
+  Plus,
+} from 'lucide-react';
+import { Button } from '@/components/ui';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,36 +33,61 @@ export default async function ProjectsOverviewPage() {
   }
 
   const statsResult = await getProjectStats(session.activeOrganizationId);
-  const stats = statsResult.success ? statsResult.stats : {
-    totalProjects: 0,
-    statusCounts: { active: 0, completed: 0, cancelled: 0 },
-    activePOs: 0,
-    totalPOAmount: 0,
-    growth: 0,
-  };
+  const stats = statsResult.success
+    ? statsResult.stats
+    : {
+        totalProjects: 0,
+        statusCounts: { active: 0, completed: 0, cancelled: 0 },
+        activePOs: 0,
+        totalPOAmount: 0,
+        growth: 0,
+      };
 
-  const activities = await getRecentProjectActivities(session.activeOrganizationId, 10);
+  const activities = await getRecentProjectActivities(
+    session.activeOrganizationId,
+    10
+  );
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Project Management Overview
-        </h1>
-        <p className="text-muted-foreground">
-          Manage active projects, contracts, and purchase orders.
-        </p>
-      </div>
+      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Project Management Overview
+          </h1>
+          <p className="text-muted-foreground">
+            Manage active projects, contracts, and purchase orders.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button asChild size={'lg'}>
+            <Link href="/dashboard/projects/create">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Project
+            </Link>
+          </Button>
+          <Button asChild size={'lg'}>
+            <Link href="/dashboard/projects/purchase-orders/create">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Purchase Order
+            </Link>
+          </Button>
+        </div>
+      </header>
 
       {/* Statistics Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Active Projects
+            </CardTitle>
             <FolderOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.statusCounts.active}</div>
+            <div className="text-2xl font-bold">
+              {stats.statusCounts.active}
+            </div>
             <p className="text-xs text-muted-foreground">Currently active</p>
           </CardContent>
         </Card>
@@ -66,17 +99,23 @@ export default async function ProjectsOverviewPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.activePOs}</div>
-            <p className="text-xs text-muted-foreground">Active purchase orders</p>
+            <p className="text-xs text-muted-foreground">
+              Active purchase orders
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total PO Amount</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total PO Amount
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R{stats.totalPOAmount.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              R{stats.totalPOAmount.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">Combined PO value</p>
           </CardContent>
         </Card>
@@ -84,13 +123,20 @@ export default async function ProjectsOverviewPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Growth</CardTitle>
-            <TrendingUp className={`h-4 w-4 ${stats.growth >= 0 ? 'text-green-600' : 'text-red-600'}`} />
+            <TrendingUp
+              className={`h-4 w-4 ${stats.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}
+            />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${stats.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {stats.growth >= 0 ? '+' : ''}{stats.growth}%
+            <div
+              className={`text-2xl font-bold ${stats.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}
+            >
+              {stats.growth >= 0 ? '+' : ''}
+              {stats.growth}%
             </div>
-            <p className="text-xs text-muted-foreground">Monthly project growth</p>
+            <p className="text-xs text-muted-foreground">
+              Monthly project growth
+            </p>
           </CardContent>
         </Card>
       </div>

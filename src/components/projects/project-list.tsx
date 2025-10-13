@@ -84,7 +84,8 @@ export function ProjectList({
 }: ProjectListProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [projects, setProjects] = useState<ProjectWithRelations[]>(initialProjects);
+  const [projects, setProjects] =
+    useState<ProjectWithRelations[]>(initialProjects);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -183,13 +184,6 @@ export function ProjectList({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Projects</CardTitle>
-          <Button
-            onClick={() => router.push('/dashboard/projects/create')}
-            className="cursor-pointer"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Project
-          </Button>
         </div>
 
         {/* Search and Filters */}
@@ -337,7 +331,9 @@ export function ProjectList({
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
-                                router.push(`/dashboard/projects/${project.id}`);
+                                router.push(
+                                  `/dashboard/projects/${project.id}`
+                                );
                               }}
                             >
                               View Details
@@ -377,7 +373,9 @@ export function ProjectList({
                 <Card
                   key={project.id}
                   className="cursor-pointer hover:bg-accent transition-colors duration-200 group rounded-lg border hover:ring-1 hover:ring-ring"
-                  onClick={() => router.push(`/dashboard/projects/${project.id}`)}
+                  onClick={() =>
+                    router.push(`/dashboard/projects/${project.id}`)
+                  }
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
@@ -415,7 +413,9 @@ export function ProjectList({
                         <div className="space-y-1">
                           <div className="flex items-center text-sm text-muted-foreground">
                             <Building className="h-3 w-3 mr-1" />
-                            Tender: {project.tender?.tenderNumber.toUpperCase() || 'None'}
+                            Tender:{' '}
+                            {project.tender?.tenderNumber.toUpperCase() ||
+                              'None'}
                           </div>
                           <div className="flex items-center text-sm text-muted-foreground">
                             <Calendar className="h-3 w-3 mr-1" />

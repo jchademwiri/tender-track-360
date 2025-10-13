@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/select';
 
 import { getTenders, deleteTender } from '@/server/tenders';
+import Link from 'next/link';
 
 interface TenderWithClient {
   id: string;
@@ -195,13 +196,6 @@ export function TenderList({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Tenders</CardTitle>
-          <Button
-            onClick={() => router.push('/dashboard/tenders/new')}
-            className="cursor-pointer"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Tender
-          </Button>
         </div>
 
         {/* Search and Filters */}
@@ -250,12 +244,11 @@ export function TenderList({
                 : 'Get started by creating your first tender.'}
             </p>
             {!searchQuery && statusFilter === 'all' && (
-              <Button
-                onClick={() => router.push('/dashboard/tenders/create')}
-                className="cursor-pointer"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Tender
+              <Button asChild size={'lg'}>
+                <Link href="/dashboard/tenders/create">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Tender
+                </Link>
               </Button>
             )}
           </div>

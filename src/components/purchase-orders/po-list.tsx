@@ -36,7 +36,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { getPurchaseOrders, deletePurchaseOrder } from '@/server/purchase-orders';
+import {
+  getPurchaseOrders,
+  deletePurchaseOrder,
+} from '@/server/purchase-orders';
+import Link from 'next/link';
 
 interface PurchaseOrderWithProject {
   id: string;
@@ -196,13 +200,6 @@ export function POList({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Purchase Orders</CardTitle>
-          <Button
-            onClick={() => router.push('/dashboard/projects/purchase-orders/create')}
-            className="cursor-pointer"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Purchase Order
-          </Button>
         </div>
 
         {/* Search and Filters */}
@@ -249,12 +246,11 @@ export function POList({
                 : 'Get started by creating your first purchase order.'}
             </p>
             {!searchQuery && statusFilter === 'all' && (
-              <Button
-                onClick={() => router.push('/dashboard/projects/purchase-orders/create')}
-                className="cursor-pointer"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Purchase Order
+              <Button asChild size={'lg'}>
+                <Link href="/dashboard/projects/purchase-orders/create">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Purchase Order
+                </Link>
               </Button>
             )}
           </div>
@@ -281,7 +277,9 @@ export function POList({
                       key={po.id}
                       className="cursor-pointer group rounded-md hover:bg-accent transition-colors duration-200"
                       onClick={() =>
-                        router.push(`/dashboard/projects/purchase-orders/${po.id}`)
+                        router.push(
+                          `/dashboard/projects/purchase-orders/${po.id}`
+                        )
                       }
                     >
                       <TableCell>
@@ -296,7 +294,8 @@ export function POList({
                       </TableCell>
                       <TableCell>
                         <div className="font-medium text-green-600">
-                          {po.project?.projectNumber.toUpperCase() || 'Unknown Project'}
+                          {po.project?.projectNumber.toUpperCase() ||
+                            'Unknown Project'}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -307,16 +306,10 @@ export function POList({
                       <TableCell>
                         <Badge
                           className={
-                            statusColors[
-                              po.status as keyof typeof statusColors
-                            ]
+                            statusColors[po.status as keyof typeof statusColors]
                           }
                         >
-                          {
-                            statusLabels[
-                              po.status as keyof typeof statusLabels
-                            ]
-                          }
+                          {statusLabels[po.status as keyof typeof statusLabels]}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -343,7 +336,9 @@ export function POList({
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
-                                router.push(`/dashboard/projects/purchase-orders/${po.id}`);
+                                router.push(
+                                  `/dashboard/projects/purchase-orders/${po.id}`
+                                );
                               }}
                             >
                               View Details
@@ -351,7 +346,9 @@ export function POList({
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();
-                                router.push(`/dashboard/projects/purchase-orders/${po.id}/edit`);
+                                router.push(
+                                  `/dashboard/projects/purchase-orders/${po.id}/edit`
+                                );
                               }}
                             >
                               Edit PO
@@ -381,7 +378,9 @@ export function POList({
                 <Card
                   key={po.id}
                   className="cursor-pointer hover:bg-accent transition-colors duration-200 group rounded-lg border hover:ring-1 hover:ring-ring"
-                  onClick={() => router.push(`/dashboard/projects/purchase-orders/${po.id}`)}
+                  onClick={() =>
+                    router.push(`/dashboard/projects/purchase-orders/${po.id}`)
+                  }
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
@@ -406,11 +405,13 @@ export function POList({
                         </div>
 
                         <div className="text-sm text-gray-900 mb-1">
-                          <strong>Supplier:</strong> {po.supplierName || 'Not specified'}
+                          <strong>Supplier:</strong>{' '}
+                          {po.supplierName || 'Not specified'}
                         </div>
 
                         <div className="text-sm text-gray-900 mb-1">
-                          <strong>Project:</strong> {po.project?.projectNumber.toUpperCase() || 'Unknown'}
+                          <strong>Project:</strong>{' '}
+                          {po.project?.projectNumber.toUpperCase() || 'Unknown'}
                         </div>
 
                         <div className="text-sm text-gray-900 mb-1">
@@ -454,7 +455,9 @@ export function POList({
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              router.push(`/dashboard/projects/purchase-orders/${po.id}`);
+                              router.push(
+                                `/dashboard/projects/purchase-orders/${po.id}`
+                              );
                             }}
                           >
                             View Details
@@ -462,7 +465,9 @@ export function POList({
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              router.push(`/dashboard/projects/purchase-orders/${po.id}/edit`);
+                              router.push(
+                                `/dashboard/projects/purchase-orders/${po.id}/edit`
+                              );
                             }}
                           >
                             Edit PO
