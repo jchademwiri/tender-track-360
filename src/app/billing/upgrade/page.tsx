@@ -18,6 +18,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { get } from 'http';
 
 // Enhanced TypeScript interfaces
 interface PricingTier {
@@ -160,6 +161,7 @@ export default function UpgradePage() {
       pricingTiers.find((tier) => tier.id === selectedPlan) || pricingTiers[0]
     );
   };
+  getSelectedTier(); //TODO: remove?
 
   const handleGoBack = () => {
     router.back();
