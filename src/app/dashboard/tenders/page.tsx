@@ -9,6 +9,7 @@ import {
   Clock,
   DollarSign,
   Plus,
+  Filter,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -33,9 +34,9 @@ export default async function TendersPage() {
     );
   }
 
-  // Fetch initial tenders and stats
+  // Fetch initial draft tenders and stats (show only drafts by default)
   const [tendersResult, statsResult] = await Promise.all([
-    getTenders(session.activeOrganizationId, '', 1, 10),
+    getTenders(session.activeOrganizationId, '', 1, 10, 'draft'),
     getTenderStats(session.activeOrganizationId),
   ]);
 
@@ -148,6 +149,9 @@ export default async function TendersPage() {
         organizationId={session.activeOrganizationId}
         initialTenders={tendersResult.tenders}
         initialTotalCount={tendersResult.totalCount}
+        defaultStatusFilter="draft"
+        showStatusToggle={true}
+        pageType="active"
       />
     </div>
   );

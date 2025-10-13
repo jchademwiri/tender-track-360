@@ -9,6 +9,7 @@ import {
   FileText,
   Calendar,
   DollarSign,
+  Filter,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -61,6 +62,9 @@ interface TenderListProps {
   organizationId: string;
   initialTenders?: TenderWithClient[];
   initialTotalCount?: number;
+  defaultStatusFilter?: string;
+  showStatusToggle?: boolean;
+  pageType?: 'active' | 'submitted';
 }
 
 const statusColors = {
@@ -83,18 +87,27 @@ export function TenderList({
   organizationId,
   initialTenders = [],
   initialTotalCount = 0,
+  defaultStatusFilter = 'all',
+  showStatusToggle = false,
+  pageType = 'active',
 }: TenderListProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [tenders, setTenders] = useState<TenderWithClient[]>(initialTenders);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>(defaultStatusFilter);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(initialTotalCount);
   const [isLoading, setIsLoading] = useState(false);
+  const [showAllStatuses, setShowAllStatuses] = useState(defaultStatusFilter === 'all');
+
+  // Filter tenders based on status filter for submitted-pending option
+  const filteredTenders = statusFilter === 'submitted-pending'
+    ? tenders.filter(t => t.status === 'submitted' || t.status === 'pending')
+    : tenders;
 
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const totalPages = Math.ceil(filteredTenders.length / itemsPerPage);
 
   // Fetch tenders with search, status filter, and pagination
   const fetchTenders = useCallback(
@@ -124,14 +137,15 @@ export function TenderList({
   useEffect(() => {
     // Reset search and filters
     setSearchQuery('');
-    setStatusFilter('all');
+    setStatusFilter(defaultStatusFilter);
+    setShowAllStatuses(defaultStatusFilter === 'all');
     setCurrentPage(1);
 
     // Fetch fresh data for the new organization
     if (organizationId) {
-      fetchTenders('', 1);
+      fetchTenders('', 1, defaultStatusFilter === 'all' ? undefined : defaultStatusFilter);
     }
-  }, [organizationId, fetchTenders]);
+  }, [organizationId, fetchTenders, defaultStatusFilter]);
 
   // Handle search
   const handleSearch = (query: string) => {
@@ -144,7 +158,23 @@ export function TenderList({
   const handleStatusFilter = (status: string) => {
     setStatusFilter(status);
     setCurrentPage(1);
-    fetchTenders(searchQuery, 1, status);
+
+    // Handle special submitted-pending filter
+    if (status === 'submitted-pending') {
+      // For submitted page, filter to only submitted and pending
+      fetchTenders(searchQuery, 1, undefined); // Will be filtered client-side
+    } else {
+      fetchTenders(searchQuery, 1, status === 'all' ? undefined : status);
+    }
+  };
+
+  // Handle status toggle for active tenders page
+  const handleStatusToggle = () => {
+    const newShowAll = !showAllStatuses;
+    setShowAllStatuses(newShowAll);
+    setStatusFilter(newShowAll ? 'all' : 'draft');
+    setCurrentPage(1);
+    fetchTenders(searchQuery, 1, newShowAll ? undefined : 'draft');
   };
 
   // Handle pagination
@@ -209,17 +239,46 @@ export function TenderList({
               className="pl-10"
             />
           </div>
+
+          {/* Status Toggle for Active Tenders */}
+          {showStatusToggle && pageType === 'active' && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleStatusToggle}
+              className="flex items-center gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              {showAllStatuses ? 'Show Drafts Only' : 'Show All Tenders'}
+            </Button>
+          )}
+
           <Select value={statusFilter} onValueChange={handleStatusFilter}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="submitted">Submitted</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="won">Won</SelectItem>
-              <SelectItem value="lost">Lost</SelectItem>
+              {pageType === 'submitted' ? (
+                // Submitted page: show submitted & pending by default, but allow all
+                <>
+                  <SelectItem value="submitted-pending">Default</SelectItem>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="submitted">Submitted</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="won">Won</SelectItem>
+                  <SelectItem value="lost">Lost</SelectItem>
+                </>
+              ) : (
+                // Active tenders page: all statuses
+                <>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="submitted">Submitted</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="won">Won</SelectItem>
+                  <SelectItem value="lost">Lost</SelectItem>
+                </>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -232,7 +291,7 @@ export function TenderList({
               Loading tenders...
             </div>
           </div>
-        ) : tenders.length === 0 ? (
+        ) : filteredTenders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <FileText className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium text-foreground mb-2">
@@ -269,7 +328,7 @@ export function TenderList({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tenders.map((tender) => (
+                  {filteredTenders.map((tender) => (
                     <TableRow
                       key={tender.id}
                       className="cursor-pointer group rounded-md hover:bg-accent transition-colors duration-200"
@@ -374,7 +433,7 @@ export function TenderList({
 
             {/* Mobile Cards */}
             <div className="md:hidden space-y-4">
-              {tenders.map((tender) => (
+              {filteredTenders.map((tender) => (
                 <Card
                   key={tender.id}
                   className="cursor-pointer hover:bg-accent transition-colors duration-200 group rounded-lg border hover:ring-1 hover:ring-ring"
@@ -482,8 +541,8 @@ export function TenderList({
               <div className="flex items-center justify-between mt-6">
                 <div className="text-sm text-muted-foreground">
                   Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                  {Math.min(currentPage * itemsPerPage, totalCount)} of{' '}
-                  {totalCount} tenders
+                  {Math.min(currentPage * itemsPerPage, filteredTenders.length)} of{' '}
+                  {filteredTenders.length} tenders
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -501,7 +560,7 @@ export function TenderList({
                     variant="outline"
                     size="sm"
                     onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages || isLoading}
+                    disabled={currentPage >= totalPages || isLoading}
                   >
                     Next
                   </Button>
