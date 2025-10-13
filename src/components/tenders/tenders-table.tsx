@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -72,13 +71,6 @@ function getStatusColor(status: string): string {
   }
 }
 
-function formatCurrency(value: string | null): string {
-  if (!value) return '-';
-  const numValue = parseFloat(value);
-  if (isNaN(numValue)) return '-';
-  // Use consistent formatting to avoid hydration mismatches
-  return `$${numValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-}
 
 function formatDate(date: Date | null): string {
   if (!date) return '-';

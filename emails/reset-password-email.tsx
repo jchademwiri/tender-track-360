@@ -66,7 +66,7 @@ const ResetPasswordEmail = (props: ResetPasswordEmailProps) => {
             {/* Alternative Link */}
             <Section className="mb-[32px]">
               <Text className="text-[14px] text-gray-600 leading-[20px] mb-[8px]">
-                If the button above doesn&apos;t work, copy and paste this link
+                If the button above doesn&#x27;t work, copy and paste this link
                 into your browser:
               </Text>
               <Text className="text-[14px] text-blue-600 break-all">
@@ -85,7 +85,7 @@ const ResetPasswordEmail = (props: ResetPasswordEmailProps) => {
                 • This password reset was requested from your account
               </Text>
               <Text className="text-[14px] text-gray-600 leading-[20px] mb-[8px]">
-                • If you didn&apos;t request this reset, you can safely ignore
+                • If you didn&#x27;t request this reset, you can safely ignore
                 this email
               </Text>
               <Text className="text-[14px] text-gray-600 leading-[20px] mb-[8px]">
@@ -105,7 +105,7 @@ const ResetPasswordEmail = (props: ResetPasswordEmailProps) => {
                 Need assistance?
               </Text>
               <Text className="text-[14px] text-gray-600 leading-[20px]">
-                If you&apos;re having trouble with your account or didn&apos;t
+                If you&#x27;re having trouble with your account or didn&#x27;t
                 request this reset, please contact our support team at
                 support@tendertrack360.com
               </Text>

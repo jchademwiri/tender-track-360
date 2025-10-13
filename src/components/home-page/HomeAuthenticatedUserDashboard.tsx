@@ -15,8 +15,8 @@ export function HomeAuthenticatedUserDashboard({
               Welcome back, {user.name}!
             </h2>
             <p className="text-muted-foreground">
-              Here&apos;s what&apos;s happening with {user.organizationName}
-              &apos;s tenders
+              Here&#x27;s what&#x27;s happening with {user.organizationName}
+              &#x27;s tenders
             </p>
           </div>
 

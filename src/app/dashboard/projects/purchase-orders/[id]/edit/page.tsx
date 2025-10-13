@@ -37,7 +37,7 @@ export default async function EditPurchaseOrderPage({ params }: EditPurchaseOrde
             Purchase Order Not Found
           </h2>
           <p className="text-gray-600">
-            The purchase order you&apos;re trying to edit doesn&apos;t exist or you don&apos;t have access to it.
+            The purchase order you&#x27;re trying to edit doesn&#x27;t exist or you don&#x27;t have access to it.
           </p>
         </div>
       </div>

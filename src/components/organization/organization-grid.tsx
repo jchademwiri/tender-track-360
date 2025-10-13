@@ -35,7 +35,7 @@ export function OrganizationGrid({ organizations }: OrganizationGridProps) {
         </div>
         <h3 className="text-lg font-semibold mb-2">No Organizations Found</h3>
         <p className="text-muted-foreground mb-4">
-          You don&apos;t belong to any organizations yet.
+          You don&#x27;t belong to any organizations yet.
         </p>
         <p className="text-sm text-muted-foreground">
           Contact your administrator to be added to an organization.

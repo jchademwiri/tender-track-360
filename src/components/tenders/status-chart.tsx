@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { BarChart3 } from 'lucide-react';
 
 interface StatusChartProps {
@@ -49,8 +48,14 @@ function getStatusLabel(status: string): string {
   }
 }
 
-export function StatusChart({ statusCounts, className = '' }: StatusChartProps) {
-  const total = Object.values(statusCounts).reduce((sum, count) => sum + count, 0);
+export function StatusChart({
+  statusCounts,
+  className = '',
+}: StatusChartProps) {
+  const total = Object.values(statusCounts).reduce(
+    (sum, count) => sum + count,
+    0
+  );
 
   if (total === 0) {
     return (
@@ -90,15 +95,15 @@ export function StatusChart({ statusCounts, className = '' }: StatusChartProps) 
             <div key={status} className="flex items-center justify-between">
               <div className="flex items-center gap-3 flex-1">
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <div className={`w-3 h-3 rounded-full ${getStatusColor(status)}`} />
+                  <div
+                    className={`w-3 h-3 rounded-full ${getStatusColor(status)}`}
+                  />
                   <span className="text-sm font-medium truncate">
                     {getStatusLabel(status)}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">
-                    {count}
-                  </span>
+                  <span className="text-sm text-muted-foreground">{count}</span>
                   <span className="text-xs text-muted-foreground">
                     ({percentage}%)
                   </span>

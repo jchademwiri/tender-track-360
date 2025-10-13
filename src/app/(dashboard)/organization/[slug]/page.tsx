@@ -36,8 +36,8 @@ function OrganizationNotFound({ slug }: { slug: string }) {
         </CardHeader>
         <CardContent className="space-y-4 text-center">
           <p className="text-muted-foreground">
-            The organization &quot;{slug}&quot; could not be found or you
-            don&apos;t have access to it.
+            The organization "{slug}" could not be found or you
+            don&#x27;t have access to it.
           </p>
           <div className="flex flex-col sm:flex-row gap-2">
             <Button

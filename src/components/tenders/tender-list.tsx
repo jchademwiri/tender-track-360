@@ -97,8 +97,8 @@ export function TenderList({
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>(defaultStatusFilter);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(initialTotalCount);
   const [isLoading, setIsLoading] = useState(false);
+  const [totalCount, setTotalCount] = useState(initialTotalCount);
   const [showAllStatuses, setShowAllStatuses] = useState(defaultStatusFilter === 'all');
 
   // Filter tenders based on status filter for submitted-pending option

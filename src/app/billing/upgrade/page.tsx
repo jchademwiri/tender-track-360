@@ -4,15 +4,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Crown,
   ArrowLeft,
-  Zap,
   Check,
   Star,
   Users,
-  TrendingUp,
   Shield,
   Clock,
   Building2,
-  Mail,
   AlertCircle,
   CreditCard,
   Lock,
@@ -20,7 +17,6 @@ import {
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Enhanced TypeScript interfaces
@@ -176,11 +172,11 @@ export default function UpgradePage() {
     if (tier.enterprise) {
       await handleContactSales();
     } else {
-      await handleUpgradeToPro(planId);
+      await handleUpgradeToPro();
     }
   };
 
-  const handleUpgradeToPro = async (planId: string) => {
+  const handleUpgradeToPro = async () => {
     setIsUpgrading(true);
     try {
       // TODO: Implement actual upgrade flow with payment provider (Stripe, etc.)
@@ -236,7 +232,6 @@ export default function UpgradePage() {
     );
   }
 
-  const selectedTier = getSelectedTier();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -284,7 +279,7 @@ export default function UpgradePage() {
 
             <div className="space-y-4">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Unlock Your Team&apos;s Full Potential
+                Unlock Your Team&#x27;s Full Potential
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
                 Join thousands of organizations already using our platform to
@@ -427,7 +422,7 @@ export default function UpgradePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 dark:text-gray-300 mb-4 italic">
-                      &quot;{testimonial.content}&quot;
+                      "{testimonial.content}"
                     </p>
                     <div className="text-sm">
                       <span className="font-semibold text-gray-900 dark:text-white">
@@ -511,7 +506,7 @@ export default function UpgradePage() {
                   Do you offer refunds?
                 </h4>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
-                  Yes, we offer a 30-day money-back guarantee if you&apos;re not
+                  Yes, we offer a 30-day money-back guarantee if you&#x27;re not
                   satisfied with your upgrade.
                 </p>
               </div>

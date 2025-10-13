@@ -232,7 +232,7 @@ function EmptyActivityState({ className }: { className?: string }) {
           </h3>
           <p className="text-sm text-muted-foreground max-w-sm mx-auto">
             When you or your team members perform actions in your organizations,
-            they&apos;ll appear here to keep you updated.
+            they&#x27;ll appear here to keep you updated.
           </p>
         </div>
       </CardContent>
