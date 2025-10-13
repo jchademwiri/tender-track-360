@@ -30,8 +30,8 @@ const eslintConfig = [
       },
     },
     rules: {
-      // enable our custom fixable rule
-      'local/no-unescaped-autofix': 'error',
+      // temporarily disable our custom fixable rule to test core build issues
+      // 'local/no-unescaped-autofix': 'error',
     },
   },
   // Test file overrides

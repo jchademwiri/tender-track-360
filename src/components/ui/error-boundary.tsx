@@ -97,7 +97,7 @@ function DefaultErrorFallback({
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground text-center">
             We encountered an unexpected error. This has been logged and
-            we&apos;ll look into it.
+            we&#x27;ll look into it.
           </p>
 
           {process.env.NODE_ENV === 'development' && error && (

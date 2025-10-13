@@ -120,7 +120,7 @@ export default async function SubmittedTendersPage() {
               No Submitted Tenders
             </h3>
             <p className="text-muted-foreground text-center">
-              You haven&apos;t submitted any tenders yet. Create and submit your
+              You haven&#x27;t submitted any tenders yet. Create and submit your
               first tender to track it here.
             </p>
           </CardContent>

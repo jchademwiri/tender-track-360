@@ -243,7 +243,7 @@ export function EmailSettings({
                     </div>
                     {lastResendTime && (
                       <p className="text-xs text-amber-600 mt-2">
-                        Verification email sent. If you don&apos;t see it, check
+                        Verification email sent. If you don&#x27;t see it, check
                         your spam folder. Status will refresh automatically.
                       </p>
                     )}
