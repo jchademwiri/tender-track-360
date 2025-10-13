@@ -1,9 +1,45 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CreateorganizationForm } from '@/components/shared/forms/create-organization-form';
-
-export const dynamic = 'force-dynamic';
+import { authClient } from '@/lib/auth-client';
+import { useEffect, useState } from 'react';
 
 export default function CreateOrganizationPage() {
+  const [organizations, setOrganizations] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrganizations = async () => {
+      try {
+        const result = await authClient.organization.list();
+        if (result.data) {
+          setOrganizations(result.data);
+        }
+      } catch (error) {
+        console.error('Error fetching organizations:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrganizations();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
+        <div className="w-full max-w-2xl">
+          <Card>
+            <CardContent className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-2xl">
@@ -17,7 +53,7 @@ export default function CreateOrganizationPage() {
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
-            <CreateorganizationForm />
+            <CreateorganizationForm currentOrganizationCount={organizations.length} />
           </CardContent>
         </Card>
       </div>
