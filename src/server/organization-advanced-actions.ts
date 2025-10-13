@@ -120,8 +120,8 @@ export async function initiateOrganizationDeletion(
       }
 
       // Revalidate organization pages and dashboard layout
-      revalidatePath('/dashboard/settings/organisation');
-      revalidatePath(`/dashboard/settings/organisation/${organizationId}`);
+      revalidatePath('/dashboard/settings/organization');
+      revalidatePath(`/dashboard/settings/organization/${organizationId}`);
       revalidatePath('/dashboard'); // Revalidate dashboard to update sidebar
 
       return createServerActionSuccess({
@@ -146,7 +146,7 @@ export async function initiateOrganizationDeletion(
       }
 
       // Revalidate organization pages and dashboard layout
-      revalidatePath('/dashboard/settings/organisation');
+      revalidatePath('/dashboard/settings/organization');
       revalidatePath('/dashboard'); // Revalidate dashboard to update sidebar
       revalidatePath('/dashboard/settings'); // Revalidate settings layout
 
@@ -189,8 +189,8 @@ export async function restoreOrganization(
     }
 
     // Revalidate organization pages
-    revalidatePath('/dashboard/settings/organisation');
-    revalidatePath(`/dashboard/settings/organisation/${organizationId}`);
+    revalidatePath('/dashboard/settings/organization');
+    revalidatePath(`/dashboard/settings/organization/${organizationId}`);
 
     return createServerActionSuccess(undefined);
   } catch (error) {
@@ -241,7 +241,7 @@ export async function forcePermanentDeletion(
     }
 
     // Revalidate organization pages
-    revalidatePath('/dashboard/settings/organisation');
+    revalidatePath('/dashboard/settings/organization');
 
     return createServerActionSuccess(undefined);
   } catch (error) {
@@ -322,9 +322,9 @@ export async function initiateOwnershipTransfer(
     }
 
     // Revalidate organization pages
-    revalidatePath('/dashboard/settings/organisation');
+    revalidatePath('/dashboard/settings/organization');
     revalidatePath(
-      `/dashboard/settings/organisation/${request.organizationId}`
+      `/dashboard/settings/organization/${request.organizationId}`
     );
 
     return createServerActionSuccess({
@@ -362,7 +362,7 @@ export async function acceptOwnershipTransfer(
     }
 
     // Revalidate organization pages
-    revalidatePath('/dashboard/settings/organisation');
+    revalidatePath('/dashboard/settings/organization');
 
     return createServerActionSuccess(undefined);
   } catch (error) {
@@ -397,7 +397,7 @@ export async function cancelOwnershipTransfer(
     }
 
     // Revalidate organization pages
-    revalidatePath('/dashboard/settings/organisation');
+    revalidatePath('/dashboard/settings/organization');
 
     return createServerActionSuccess(undefined);
   } catch (error) {
@@ -432,7 +432,7 @@ export async function acceptOwnershipTransferByToken(
     }
 
     // Revalidate organization pages
-    revalidatePath('/dashboard/settings/organisation');
+    revalidatePath('/dashboard/settings/organization');
 
     return createServerActionSuccess(undefined);
   } catch (error) {
@@ -500,8 +500,8 @@ export async function bulkUpdateMemberRoles(
     );
 
     // Revalidate organization pages
-    revalidatePath('/dashboard/settings/organisation');
-    revalidatePath(`/dashboard/settings/organisation/${organizationId}`);
+    revalidatePath('/dashboard/settings/organization');
+    revalidatePath(`/dashboard/settings/organization/${organizationId}`);
 
     return createServerActionSuccess(result);
   } catch (error) {
@@ -546,8 +546,8 @@ export async function bulkRemoveMembers(
     );
 
     // Revalidate organization pages
-    revalidatePath('/dashboard/settings/organisation');
-    revalidatePath(`/dashboard/settings/organisation/${organizationId}`);
+    revalidatePath('/dashboard/settings/organization');
+    revalidatePath(`/dashboard/settings/organization/${organizationId}`);
 
     return createServerActionSuccess(result);
   } catch (error) {
@@ -590,8 +590,8 @@ export async function bulkInviteMembers(
     );
 
     // Revalidate organization pages
-    revalidatePath('/dashboard/settings/organisation');
-    revalidatePath(`/dashboard/settings/organisation/${organizationId}`);
+    revalidatePath('/dashboard/settings/organization');
+    revalidatePath(`/dashboard/settings/organization/${organizationId}`);
 
     return createServerActionSuccess(result);
   } catch (error) {

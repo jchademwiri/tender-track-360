@@ -116,7 +116,7 @@ export async function updateMemberRole(
       .where(eq(member.id, memberId));
 
     // Revalidate the organization page
-    revalidatePath(`/dashboard/settings/organisation`);
+    revalidatePath(`/dashboard/settings/organization`);
 
     return createServerActionSuccess(undefined);
   } catch (error) {
@@ -203,7 +203,7 @@ export async function removeMemberFromOrganization(
     await db.delete(member).where(eq(member.id, memberId));
 
     // Revalidate the organization page
-    revalidatePath(`/dashboard/settings/organisation`);
+    revalidatePath(`/dashboard/settings/organization`);
 
     return createServerActionSuccess(undefined);
   } catch (error) {
@@ -293,9 +293,9 @@ export async function bulkRemoveMembersFromOrganization(
     for (const memberId of validMemberIds) {
       await db.delete(member).where(eq(member.id, memberId));
     }
+// Revalidate the organization page
+revalidatePath(`/dashboard/settings/organization`);
 
-    // Revalidate the organization page
-    revalidatePath(`/dashboard/settings/organisation`);
 
     return createServerActionSuccess(undefined);
   } catch (error) {
@@ -398,7 +398,7 @@ export async function updateOrganizationDetails(
       .where(eq(organization.id, organizationId));
 
     // Revalidate the organization page
-    revalidatePath(`/dashboard/settings/organisation`);
+    revalidatePath(`/dashboard/settings/organization`);
 
     return createServerActionSuccess(undefined);
   } catch (error) {
@@ -485,7 +485,7 @@ export async function updateOrganizationSettings(
       .where(eq(organization.id, organizationId));
 
     // Revalidate the organization page
-    revalidatePath(`/dashboard/settings/organisation`);
+    revalidatePath(`/dashboard/settings/organization`);
 
     return createServerActionSuccess(undefined);
   } catch (error) {

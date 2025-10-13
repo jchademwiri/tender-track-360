@@ -188,7 +188,7 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
           ) : canManage ? (
             <Button size={'lg'} className="w-full cursor-pointer">
               <Link
-                href={`/dashboard/organisation/${organization.slug}`}
+                href={`/dashboard/organization/${organization.slug}`}
                 className="flex justify-between items-center"
               >
                 Manage Organization
@@ -198,7 +198,7 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
           ) : (
             // <Link
             //   // @ts-expect-error - Dynamic route typing issue
-            //   href={`/dashboard/organisation/${organization.slug || organization.id}/view`}
+            //   href={`/dashboard/organization/${organization.slug || organization.id}/view`}
             // >
             //   <Button type="button" variant="outline" className="w-full">
             //     <Eye className="h-4 w-4 mr-2" />
