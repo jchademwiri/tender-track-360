@@ -12,7 +12,20 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Eye, Edit } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Edit,
+  MoreHorizontal,
+  Trash2,
+} from 'lucide-react';
 
 interface Tender {
   id: string;
@@ -37,6 +50,8 @@ interface TendersTableProps {
   onPageChange: (page: number) => void;
   onViewTender?: (tenderId: string) => void;
   onEditTender?: (tenderId: string) => void;
+  onDeleteTender?: (tenderId: string) => void;
+  onRowClick?: (tenderId: string) => void;
   className?: string;
 }
 
@@ -86,6 +101,8 @@ export function TendersTable({
   onPageChange,
   onViewTender,
   onEditTender,
+  onDeleteTender,
+  onRowClick,
   className = '',
 }: TendersTableProps) {
   const startItem = (currentPage - 1) * 20 + 1;
@@ -97,7 +114,9 @@ export function TendersTable({
         <CardTitle className="flex items-center justify-between">
           <span>Tenders</span>
           <span className="text-sm font-normal text-muted-foreground">
-            {totalCount > 0 ? `${startItem}-${endItem} of ${totalCount}` : 'No tenders'}
+            {totalCount > 0
+              ? `${startItem}-${endItem} of ${totalCount}`
+              : 'No tenders'}
           </span>
         </CardTitle>
       </CardHeader>
@@ -108,97 +127,138 @@ export function TendersTable({
           </div>
         ) : (
           <>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tender Number</TableHead>
-                    <TableHead>Client</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Value</TableHead>
-                    <TableHead>Submission Date</TableHead>
-                    <TableHead>Days Left</TableHead>
-                    <TableHead className="w-[100px]">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {tenders.map((tender) => {
-                    const daysLeft = getDaysUntilDeadline(tender.submissionDate);
-                    return (
-                      <TableRow key={tender.id}>
-                        <TableCell className="font-medium">
-                          {tender.tenderNumber}
-                        </TableCell>
-                        <TableCell>{tender.client?.name || 'Unknown Client'}</TableCell>
-                        <TableCell className="max-w-[200px] truncate">
-                          {tender.description || '-'}
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getStatusColor(tender.status)}>
-                            {tender.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{formatCurrency(tender.value)}</TableCell>
-                        <TableCell>{formatDate(tender.submissionDate)}</TableCell>
-                        <TableCell>
-                          {tender.status === 'submitted' ? (
-                            (() => {
-                              const submissionDate = tender.updatedAt;
-                              const deadline = tender.submissionDate;
-                              if (!deadline) return 'Submitted';
-                              const daysBefore = Math.ceil((deadline.getTime() - submissionDate.getTime()) / (1000 * 60 * 60 * 24));
-                              if (daysBefore >= 0) {
-                                return `Submitted ${daysBefore} days before deadline`;
-                              } else {
-                                return `Submitted ${Math.abs(daysBefore)} days after deadline`;
-                              }
-                            })()
-                          ) : daysLeft === null ? (
-                            '-'
-                          ) : daysLeft < 0 ? (
-                            <span className="text-red-600 font-medium">
-                              {Math.abs(daysLeft)} days overdue
-                            </span>
-                          ) : daysLeft === 0 ? (
-                            <span className="text-orange-600 font-medium">
-                              Due today
-                            </span>
-                          ) : (
-                            <span className={daysLeft <= 3 ? 'text-orange-600 font-medium' : ''}>
-                              {daysLeft} days
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            {onViewTender && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onViewTender(tender.id)}
-                                className="cursor-pointer"
+            <div className="rounded-md border overflow-hidden">
+              <div className="overflow-x-auto">
+                <Table className="w-full min-w-[800px]">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="min-w-[120px]">
+                        Tender Number
+                      </TableHead>
+                      <TableHead className="min-w-[150px]">Client</TableHead>
+                      <TableHead className="min-w-[200px] hidden sm:table-cell">
+                        Description
+                      </TableHead>
+                      <TableHead className="min-w-[100px]">Status</TableHead>
+                      {/* <TableHead className="min-w-[100px] hidden md:table-cell">
+                        Value
+                      </TableHead> */}
+                      <TableHead className="min-w-[120px] hidden lg:table-cell">
+                        Submission Date
+                      </TableHead>
+                      <TableHead className="min-w-[100px] hidden sm:table-cell">
+                        Days Left
+                      </TableHead>
+                      <TableHead className="w-[100px]">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {tenders.map((tender) => {
+                      const daysLeft = getDaysUntilDeadline(
+                        tender.submissionDate
+                      );
+                      return (
+                        <TableRow
+                          key={tender.id}
+                          className={
+                            onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''
+                          }
+                          onClick={() => onRowClick?.(tender.id)}
+                        >
+                          <TableCell className="font-medium">
+                            {tender.tenderNumber}
+                          </TableCell>
+                          <TableCell>
+                            {tender.client?.name || 'Unknown Client'}
+                          </TableCell>
+                          <TableCell className="max-w-[200px] truncate hidden sm:table-cell">
+                            {tender.description || '-'}
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getStatusColor(tender.status)}>
+                              {tender.status}
+                            </Badge>
+                          </TableCell>
+                          {/* <TableCell className="hidden md:table-cell">
+                            {formatCurrency(tender.value)}
+                          </TableCell> */}
+                          <TableCell className="hidden lg:table-cell">
+                            {formatDate(tender.submissionDate)}
+                          </TableCell>
+                          <TableCell className="hidden sm:table-cell">
+                            {tender.status === 'submitted' ? (
+                              (() => {
+                                const submissionDate = tender.updatedAt;
+                                return `Submitted ${formatDate(submissionDate)}`;
+                              })()
+                            ) : daysLeft === null ? (
+                              '-'
+                            ) : daysLeft < 0 ? (
+                              <span className="text-red-600 font-medium">
+                                {Math.abs(daysLeft)} days overdue
+                              </span>
+                            ) : daysLeft === 0 ? (
+                              <span className="text-orange-600 font-medium">
+                                Due today
+                              </span>
+                            ) : (
+                              <span
+                                className={
+                                  daysLeft <= 3
+                                    ? 'text-orange-600 font-medium'
+                                    : ''
+                                }
                               >
-                                <Eye className="h-4 w-4" />
-                              </Button>
+                                {daysLeft} days
+                              </span>
                             )}
-                            {onEditTender && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onEditTender(tender.id)}
-                                className="cursor-pointer"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+                          </TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="cursor-pointer"
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                {onViewTender && (
+                                  <DropdownMenuItem
+                                    onClick={() => onViewTender(tender.id)}
+                                  >
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    View
+                                  </DropdownMenuItem>
+                                )}
+                                {onEditTender && (
+                                  <DropdownMenuItem
+                                    onClick={() => onEditTender(tender.id)}
+                                  >
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                )}
+                                {onDeleteTender && (
+                                  <DropdownMenuItem
+                                    onClick={() => onDeleteTender(tender.id)}
+                                    className="text-red-600 focus:text-red-600"
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
 
             {/* Pagination */}

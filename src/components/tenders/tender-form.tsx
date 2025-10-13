@@ -234,11 +234,6 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
                               <SelectItem key={client.id} value={client.id}>
                                 <div className="flex flex-col">
                                   <span>{client.name}</span>
-                                  {client.contactName && (
-                                    <span className="text-xs text-gray-500">
-                                      Contact: {client.contactName}
-                                    </span>
-                                  )}
                                 </div>
                               </SelectItem>
                             ))
