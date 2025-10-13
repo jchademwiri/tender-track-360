@@ -7,7 +7,7 @@ import {
 } from '@/server/tenders';
 import { getClients } from '@/server/clients';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Clock, TrendingUp } from 'lucide-react';
+import { FileText, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
 import { RecentActivity } from '@/components/tenders/recent-activity';
 import { UpcomingDeadlines } from '@/components/tenders/upcoming-deadlines';
 import { TendersOverviewClient } from './client-wrapper';
@@ -35,8 +35,8 @@ export default async function TendersOverviewPage() {
   // Fetch all data in parallel
   const [statsResult, activityResult, deadlinesResult, clientsResult, tendersResult] = await Promise.all([
     getTenderStats(session.activeOrganizationId),
-    getRecentActivity(session.activeOrganizationId),
-    getUpcomingDeadlines(session.activeOrganizationId),
+    getRecentActivity(session.activeOrganizationId, 3),
+    getUpcomingDeadlines(session.activeOrganizationId, 3),
     getClients(session.activeOrganizationId),
     getTendersOverview(session.activeOrganizationId, {}, 1, 20)
   ]);
@@ -84,7 +84,7 @@ export default async function TendersOverviewPage() {
       </div>
 
       {/* Key Statistics Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Tenders</CardTitle>
@@ -117,6 +117,28 @@ export default async function TendersOverviewPage() {
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{Math.round(stats.winRate * 100)}%</div>
             <p className="text-xs text-muted-foreground">Success rate</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Value</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${stats.totalValue.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">Combined tender value</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Overdue</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-red-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">{stats.overdueCount}</div>
+            <p className="text-xs text-muted-foreground">Past due date</p>
           </CardContent>
         </Card>
       </div>

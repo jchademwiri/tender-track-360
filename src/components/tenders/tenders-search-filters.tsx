@@ -230,7 +230,7 @@ export function TendersSearchFilters({
           <Button
             variant="outline"
             onClick={clearFilters}
-            className="whitespace-nowrap"
+            className="whitespace-nowrap cursor-pointer"
           >
             Clear Filters
           </Button>
@@ -252,7 +252,7 @@ export function TendersSearchFilters({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-auto p-0 ml-1 hover:bg-transparent"
+                className="h-auto p-0 ml-1 hover:bg-transparent cursor-pointer"
                 onClick={() => {
                   if (filter.key === 'search') {
                     handleFilterChange({ search: '' });
