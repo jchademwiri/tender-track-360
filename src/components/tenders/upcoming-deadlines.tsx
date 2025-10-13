@@ -23,10 +23,14 @@ interface UpcomingDeadlinesProps {
 }
 
 function getUrgencyColor(daysUntil: number | null): string {
-  if (daysUntil === null) return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
-  if (daysUntil <= 1) return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-  if (daysUntil <= 3) return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
-  if (daysUntil <= 7) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+  if (daysUntil === null)
+    return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+  if (daysUntil <= 1)
+    return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+  if (daysUntil <= 3)
+    return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
+  if (daysUntil <= 7)
+    return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
   return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
 }
 
@@ -48,7 +52,9 @@ export function UpcomingDeadlines({
   deadlines,
   className = '',
 }: UpcomingDeadlinesProps) {
-  const urgentDeadlines = deadlines.filter(d => d.daysUntilDeadline !== null && d.daysUntilDeadline <= 3);
+  const urgentDeadlines = deadlines.filter(
+    (d) => d.daysUntilDeadline !== null && d.daysUntilDeadline <= 3
+  );
   const hasUrgent = urgentDeadlines.length > 0;
 
   if (deadlines.length === 0) {
@@ -94,7 +100,9 @@ export function UpcomingDeadlines({
                   <span className="font-medium text-sm truncate">
                     {deadline.tenderNumber}
                   </span>
-                  <Badge className={getUrgencyColor(deadline.daysUntilDeadline)}>
+                  <Badge
+                    className={getUrgencyColor(deadline.daysUntilDeadline)}
+                  >
                     {getUrgencyIcon(deadline.daysUntilDeadline)}
                     <span className="ml-1">
                       {formatDaysUntil(deadline.daysUntilDeadline)}
@@ -123,14 +131,6 @@ export function UpcomingDeadlines({
             </div>
           ))}
         </div>
-
-        {deadlines.length >= 10 && (
-          <div className="text-center pt-4">
-            <button className="text-sm text-primary hover:underline">
-              View all deadlines
-            </button>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

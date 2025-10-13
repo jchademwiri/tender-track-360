@@ -1,5 +1,8 @@
 import { getCurrentUser } from '@/server';
 import { POForm } from '@/components/purchase-orders/po-form';
+import { Button } from '@/components/ui';
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,12 +26,17 @@ export default async function NewPurchaseOrderPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Create Purchase Order</h1>
-        <p className="text-muted-foreground">
-          Create a new purchase order for a project. All purchase orders must be linked to a specific project.
-        </p>
-      </div>
+      <header>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Create Purchase Order
+          </h1>
+          <p className="text-muted-foreground">
+            Create a new purchase order for a project. All purchase orders must
+            be linked to a specific project.
+          </p>
+        </div>
+      </header>
 
       <POForm organizationId={session.activeOrganizationId} />
     </div>

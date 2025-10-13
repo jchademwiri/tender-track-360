@@ -1,6 +1,9 @@
 import { getCurrentUser } from '@/server';
 import { getProjects } from '@/server/projects';
 import { ProjectList } from '@/components/projects/project-list';
+import { Button } from '@/components/ui';
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,12 +33,28 @@ export default async function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-        <p className="text-muted-foreground">
-          Manage and track all your construction projects.
-        </p>
-      </div>
+      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
+          <p className="text-muted-foreground">
+            Manage and track all your construction projects.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button asChild size={'lg'}>
+            <Link href="/dashboard/projects/create">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Project
+            </Link>
+          </Button>
+          <Button asChild size={'lg'}>
+            <Link href="/dashboard/projects/purchase-orders/create">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Purchase Order
+            </Link>
+          </Button>
+        </div>
+      </header>
 
       <ProjectList
         organizationId={session.activeOrganizationId}

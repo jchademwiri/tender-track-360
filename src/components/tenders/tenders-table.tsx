@@ -60,7 +60,9 @@ function getStatusColor(status: string): string {
 function formatCurrency(value: string | null): string {
   if (!value) return '-';
   const numValue = parseFloat(value);
-  return isNaN(numValue) ? '-' : `$${numValue.toLocaleString()}`;
+  if (isNaN(numValue)) return '-';
+  // Use consistent formatting to avoid hydration mismatches
+  return `$${numValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 }
 
 function formatDate(date: Date | null): string {
@@ -140,7 +142,19 @@ export function TendersTable({
                         <TableCell>{formatCurrency(tender.value)}</TableCell>
                         <TableCell>{formatDate(tender.submissionDate)}</TableCell>
                         <TableCell>
-                          {daysLeft === null ? (
+                          {tender.status === 'submitted' ? (
+                            (() => {
+                              const submissionDate = tender.updatedAt;
+                              const deadline = tender.submissionDate;
+                              if (!deadline) return 'Submitted';
+                              const daysBefore = Math.ceil((deadline.getTime() - submissionDate.getTime()) / (1000 * 60 * 60 * 24));
+                              if (daysBefore >= 0) {
+                                return `Submitted ${daysBefore} days before deadline`;
+                              } else {
+                                return `Submitted ${Math.abs(daysBefore)} days after deadline`;
+                              }
+                            })()
+                          ) : daysLeft === null ? (
                             '-'
                           ) : daysLeft < 0 ? (
                             <span className="text-red-600 font-medium">
@@ -163,6 +177,7 @@ export function TendersTable({
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => onViewTender(tender.id)}
+                                className="cursor-pointer"
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
@@ -172,6 +187,7 @@ export function TendersTable({
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => onEditTender(tender.id)}
+                                className="cursor-pointer"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -197,6 +213,7 @@ export function TendersTable({
                     size="sm"
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage <= 1}
+                    className="cursor-pointer"
                   >
                     <ChevronLeft className="h-4 w-4 mr-1" />
                     Previous
@@ -206,6 +223,7 @@ export function TendersTable({
                     size="sm"
                     onClick={() => onPageChange(currentPage + 1)}
                     disabled={currentPage >= totalPages}
+                    className="cursor-pointer"
                   >
                     Next
                     <ChevronRight className="h-4 w-4 ml-1" />

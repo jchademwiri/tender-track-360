@@ -8,7 +8,10 @@ import {
   XCircle,
   Clock,
   DollarSign,
+  Plus,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,12 +56,20 @@ export default async function TendersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Tenders</h1>
-        <p className="text-muted-foreground">
-          Manage and track your tender applications and opportunities.
-        </p>
-      </div>
+      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Tenders</h1>
+          <p className="text-muted-foreground">
+            Manage and track your tender applications and opportunities.
+          </p>
+        </div>
+        <Button asChild size={'lg'}>
+          <Link href="/dashboard/tenders/create">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Tender
+          </Link>
+        </Button>
+      </header>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-5">
