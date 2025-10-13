@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { TendersSearchFilters, type TenderFilters } from '@/components/tenders/tenders-search-filters';
+import {
+  TendersSearchFilters,
+  type TenderFilters,
+} from '@/components/tenders/tenders-search-filters';
 import { TendersTable } from '@/components/tenders/tenders-table';
 import { getTendersOverview } from '@/server/tenders';
 
@@ -50,42 +53,58 @@ export function TendersOverviewClient({
     sortOrder: 'desc',
   });
 
-  const handleFiltersChange = useCallback(async (newFilters: TenderFilters) => {
-    setFilters(newFilters);
-    setLoading(true);
+  const handleFiltersChange = useCallback(
+    async (newFilters: TenderFilters) => {
+      setFilters(newFilters);
+      setLoading(true);
 
-    try {
-      const result = await getTendersOverview(organizationId, newFilters, 1, 20);
-      if (result.success) {
-        setTenders(result.tenders);
-        setTotalCount(result.totalCount);
-        setCurrentPage(result.currentPage);
-        setTotalPages(result.totalPages);
+      try {
+        const result = await getTendersOverview(
+          organizationId,
+          newFilters,
+          1,
+          20
+        );
+        if (result.success) {
+          setTenders(result.tenders);
+          setTotalCount(result.totalCount);
+          setCurrentPage(result.currentPage);
+          setTotalPages(result.totalPages);
+        }
+      } catch (error) {
+        console.error('Error fetching filtered tenders:', error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error fetching filtered tenders:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [organizationId]);
+    },
+    [organizationId]
+  );
 
-  const handlePageChange = useCallback(async (page: number) => {
-    setLoading(true);
+  const handlePageChange = useCallback(
+    async (page: number) => {
+      setLoading(true);
 
-    try {
-      const result = await getTendersOverview(organizationId, filters, page, 20);
-      if (result.success) {
-        setTenders(result.tenders);
-        setTotalCount(result.totalCount);
-        setCurrentPage(result.currentPage);
-        setTotalPages(result.totalPages);
+      try {
+        const result = await getTendersOverview(
+          organizationId,
+          filters,
+          page,
+          20
+        );
+        if (result.success) {
+          setTenders(result.tenders);
+          setTotalCount(result.totalCount);
+          setCurrentPage(result.currentPage);
+          setTotalPages(result.totalPages);
+        }
+      } catch (error) {
+        console.error('Error fetching tenders page:', error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error fetching tenders page:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [organizationId, filters]);
+    },
+    [organizationId, filters]
+  );
 
   const handleViewTender = useCallback((tenderId: string) => {
     // Navigate to tender detail page
@@ -98,7 +117,7 @@ export function TendersOverviewClient({
   }, []);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 ">
       <TendersSearchFilters
         onFiltersChange={handleFiltersChange}
         clients={clients}

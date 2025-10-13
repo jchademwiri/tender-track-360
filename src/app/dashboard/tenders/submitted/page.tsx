@@ -1,5 +1,5 @@
 import { getCurrentUser } from '@/server';
-import { searchTenders } from '@/server/tenders';
+import { getTendersWithCustomSorting } from '@/server/tenders';
 import { TenderList } from '@/components/tenders/tender-list';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock, FileText, Plus, Send } from 'lucide-react';
@@ -26,19 +26,17 @@ export default async function SubmittedTendersPage() {
     );
   }
 
-  // Fetch submitted and pending tenders (exclude drafts)
-  const [submittedResult, pendingResult] = await Promise.all([
-    searchTenders(session.activeOrganizationId, { status: 'submitted' }, 1, 50),
-    searchTenders(session.activeOrganizationId, { status: 'pending' }, 1, 50),
-  ]);
+  // Fetch submitted tenders with custom sorting (excludes drafts by default)
+  // Get all non-draft tenders and filter client-side for submitted/pending view
+  const tendersResult = await getTendersWithCustomSorting(
+    session.activeOrganizationId,
+    1,
+    100
+  );
 
-  const submittedTenders = submittedResult.success
-    ? submittedResult.tenders.filter((t) => t.status !== 'draft')
+  const allSubmittedTenders = tendersResult.success
+    ? tendersResult.tenders
     : [];
-  const pendingTenders = pendingResult.success
-    ? pendingResult.tenders.filter((t) => t.status !== 'draft')
-    : [];
-  const allSubmittedTenders = [...submittedTenders, ...pendingTenders];
 
   return (
     <div className="space-y-6">
@@ -70,7 +68,7 @@ export default async function SubmittedTendersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
-              {submittedTenders.length}
+              {allSubmittedTenders.filter(t => t.status === 'submitted').length}
             </div>
             <p className="text-xs text-muted-foreground">Recently submitted</p>
           </CardContent>
@@ -83,7 +81,7 @@ export default async function SubmittedTendersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
-              {pendingTenders.length}
+              {allSubmittedTenders.filter(t => t.status === 'pending').length}
             </div>
             <p className="text-xs text-muted-foreground">Awaiting results</p>
           </CardContent>
@@ -111,6 +109,8 @@ export default async function SubmittedTendersPage() {
           organizationId={session.activeOrganizationId}
           initialTenders={allSubmittedTenders}
           initialTotalCount={allSubmittedTenders.length}
+          defaultStatusFilter="submitted-pending"
+          pageType="submitted"
         />
       ) : (
         <Card>

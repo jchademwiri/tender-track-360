@@ -886,6 +886,96 @@ export async function getUpcomingDeadlines(organizationId: string, limit: number
   }
 }
 
+// Get tenders with custom status sorting for submitted tenders page
+export async function getTendersWithCustomSorting(
+  organizationId: string,
+  page: number = 1,
+  limit: number = 10,
+  search?: string
+) {
+  try {
+    const offset = (page - 1) * limit;
+
+    let whereCondition = and(
+      eq(tender.organizationId, organizationId),
+      isNull(tender.deletedAt),
+      ne(tender.status, 'draft') // Exclude drafts
+    );
+
+    // Add search condition if provided
+    if (search && search.trim()) {
+      const searchTerm = `%${search.trim()}%`;
+      whereCondition = and(
+        whereCondition,
+        or(
+          ilike(tender.tenderNumber, searchTerm),
+          ilike(tender.description, searchTerm)
+        )
+      );
+    }
+
+    // Custom sorting: submitted → pending → won → lost, then by submission date desc within each group
+    const statusOrder = ['submitted', 'pending', 'won', 'lost'];
+    const tenders = await db
+      .select({
+        id: tender.id,
+        tenderNumber: tender.tenderNumber,
+        description: tender.description,
+        submissionDate: tender.submissionDate,
+        value: tender.value,
+        status: tender.status,
+        createdAt: tender.createdAt,
+        updatedAt: tender.updatedAt,
+        client: {
+          id: client.id,
+          name: client.name,
+          contactName: client.contactName,
+          contactEmail: client.contactEmail,
+          contactPhone: client.contactPhone,
+        },
+      })
+      .from(tender)
+      .leftJoin(client, eq(tender.clientId, client.id))
+      .where(whereCondition)
+      .orderBy(
+        // First sort by custom status order
+        ...statusOrder.map(status => desc(eq(tender.status, status))),
+        // Then by submission date (most recent first)
+        desc(tender.submissionDate),
+        // Finally by created date as fallback
+        desc(tender.createdAt)
+      )
+      .limit(limit)
+      .offset(offset);
+
+    // Get total count for pagination
+    const totalCountResult = await db
+      .select({ count: tender.id })
+      .from(tender)
+      .where(whereCondition);
+
+    const totalCount = totalCountResult.length;
+
+    return {
+      success: true,
+      tenders,
+      totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+    };
+  } catch (error) {
+    console.error('Error fetching tenders with custom sorting:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch tenders',
+      tenders: [],
+      totalCount: 0,
+      currentPage: page,
+      totalPages: 0,
+    };
+  }
+}
+
 // Get filtered tenders for overview table
 export async function getTendersOverview(
   organizationId: string,
