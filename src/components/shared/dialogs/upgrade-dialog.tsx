@@ -1,7 +1,19 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Crown, ArrowLeft, Zap, Check, Star, Users, TrendingUp, Shield, Clock, Building2, Mail } from 'lucide-react';
+import {
+  Crown,
+  ArrowLeft,
+  Zap,
+  Check,
+  Star,
+  Users,
+  TrendingUp,
+  Shield,
+  Clock,
+  Building2,
+  Mail,
+} from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -72,19 +84,33 @@ export function UpgradeDialog({
 
   const pricingTiers: PricingTier[] = [
     {
+      name: 'Free',
+      price: '$0',
+      period: '/month',
+      description: 'Perfect for getting started',
+      features: [
+        '1 organization',
+        'Basic tender management',
+        '5 tenders per month',
+        '100MB storage',
+        'Community support',
+        'Basic reporting',
+      ],
+    },
+    {
       name: 'Pro',
       price: '$29',
       period: '/month',
       description: 'Perfect for growing teams',
       features: [
-        'Unlimited organizations',
+        '5 organizations',
         'Advanced tender management',
         'Priority support',
         'Advanced analytics',
         'Custom workflows',
-        'API access'
+        'API access',
       ],
-      popular: true
+      popular: true,
     },
     {
       name: 'Enterprise',
@@ -97,10 +123,10 @@ export function UpgradeDialog({
         'SSO & advanced security',
         'Custom integrations',
         'SLA guarantee',
-        'Phone support'
+        'Phone support',
       ],
-      enterprise: true
-    }
+      enterprise: true,
+    },
   ];
 
   const testimonials: Testimonial[] = [
@@ -108,16 +134,18 @@ export function UpgradeDialog({
       name: 'Sarah Johnson',
       role: 'Procurement Director',
       company: 'TechCorp',
-      content: 'The upgrade to Pro has transformed our tender management process. We\'ve seen a 40% increase in efficiency.',
-      rating: 5
+      content:
+        "The upgrade to Pro has transformed our tender management process. We've seen a 40% increase in efficiency.",
+      rating: 5,
     },
     {
       name: 'Michael Chen',
       role: 'Operations Manager',
       company: 'Global Industries',
-      content: 'The advanced analytics and unlimited organizations feature is exactly what our growing team needed.',
-      rating: 5
-    }
+      content:
+        'The advanced analytics and unlimited organizations feature is exactly what our growing team needed.',
+      rating: 5,
+    },
   ];
 
   const getContextualMessage = () => {
@@ -127,19 +155,20 @@ export function UpgradeDialog({
       if (usagePercentage >= 100) {
         return {
           title: 'Organization Limit Reached',
-          description: `You've reached the maximum of ${maxCount} organizations on your current plan. Upgrade to create unlimited organizations and unlock powerful features.`
+          description: `You've reached the maximum of ${maxCount} organizations on your current plan. Upgrade to create unlimited organizations and unlock powerful features.`,
         };
       } else if (usagePercentage >= 80) {
         return {
           title: 'Approaching Organization Limit',
-          description: `You're using ${currentCount} of ${maxCount} organizations. Consider upgrading to Pro for unlimited organizations and advanced features.`
+          description: `You're using ${currentCount} of ${maxCount} organizations. Consider upgrading to Pro for unlimited organizations and advanced features.`,
         };
       }
     }
 
     return {
       title: 'Unlock More Potential',
-      description: 'Upgrade to access advanced features and remove limitations on your account.'
+      description:
+        'Upgrade to access advanced features and remove limitations on your account.',
     };
   };
 
@@ -153,11 +182,11 @@ export function UpgradeDialog({
     try {
       // TODO: Implement actual upgrade flow with payment provider
       // For now, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Redirect to payment flow or show success message
+      // Redirect to the full upgrade page with the selected plan
       onOpenChange(false);
-      router.push('/billing/upgrade?plan=pro');
+      window.location.href = '/billing/upgrade?plan=pro';
     } catch (error) {
       console.error('Upgrade failed:', error);
       // Show error toast or alert
@@ -170,10 +199,11 @@ export function UpgradeDialog({
     setIsContactingSales(true);
     try {
       // TODO: Implement contact sales flow
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Open email client or redirect to contact form
-      window.location.href = 'mailto:sales@tendertrack360.com?subject=Enterprise%20Plan%20Inquiry';
+      window.location.href =
+        'mailto:sales@tendertrack360.com?subject=Enterprise%20Plan%20Inquiry';
       onOpenChange(false);
     } catch (error) {
       console.error('Contact sales failed:', error);
@@ -189,23 +219,34 @@ export function UpgradeDialog({
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="text-center space-y-4">
           {/* Animated Icon */}
-          <div className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30 transition-all duration-500 ${animateItems ? 'scale-100 rotate-0' : 'scale-0 rotate-180'}`}>
+          <div
+            className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30 transition-all duration-500 ${animateItems ? 'scale-100 rotate-0' : 'scale-0 rotate-180'}`}
+          >
             <Crown className="h-10 w-10 text-amber-600 dark:text-amber-400" />
           </div>
 
           <div className="space-y-2">
-            <DialogTitle className={`text-2xl font-bold transition-all duration-500 delay-100 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+            <DialogTitle
+              className={`text-2xl font-bold transition-all duration-500 delay-100 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+            >
               {contextualMessage.title}
             </DialogTitle>
-            <DialogDescription className={`text-center text-base transition-all duration-500 delay-200 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+            <DialogDescription
+              className={`text-center text-base transition-all duration-500 delay-200 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+            >
               {contextualMessage.description}
             </DialogDescription>
           </div>
         </DialogHeader>
 
         {/* Enhanced Usage Badge with Animation */}
-        <div className={`flex items-center justify-center gap-3 transition-all duration-500 delay-300 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-          <Badge variant="secondary" className="font-mono text-sm px-3 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30">
+        <div
+          className={`flex items-center justify-center gap-3 transition-all duration-500 delay-300 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+        >
+          <Badge
+            variant="secondary"
+            className="font-mono text-sm px-3 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30"
+          >
             {currentCount}/{maxCount}
           </Badge>
           <span className="text-sm text-muted-foreground">
@@ -214,14 +255,18 @@ export function UpgradeDialog({
           <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 ml-4 max-w-32">
             <div
               className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-1000 ease-out"
-              style={{ width: `${Math.min((currentCount / maxCount) * 100, 100)}%` }}
+              style={{
+                width: `${Math.min((currentCount / maxCount) * 100, 100)}%`,
+              }}
             />
           </div>
         </div>
 
-        <div className={`space-y-6 pt-6 transition-all duration-500 delay-400 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+        <div
+          className={`space-y-6 pt-6 transition-all duration-500 delay-400 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+        >
           {/* Pricing Tiers */}
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             {pricingTiers.map((tier, index) => (
               <div
                 key={tier.name}
@@ -237,19 +282,26 @@ export function UpgradeDialog({
                 <div className="text-center space-y-4">
                   <div>
                     <h3 className="text-xl font-bold">{tier.name}</h3>
-                    <p className="text-sm text-muted-foreground">{tier.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {tier.description}
+                    </p>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex items-baseline justify-center gap-1">
                       <span className="text-3xl font-bold">{tier.price}</span>
-                      <span className="text-muted-foreground">{tier.period}</span>
+                      <span className="text-muted-foreground">
+                        {tier.period}
+                      </span>
                     </div>
                   </div>
 
                   <div className="space-y-3">
                     {tier.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center gap-2 text-sm">
+                      <div
+                        key={featureIndex}
+                        className="flex items-center gap-2 text-sm"
+                      >
                         <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                         <span>{feature}</span>
                       </div>
@@ -261,7 +313,9 @@ export function UpgradeDialog({
           </div>
 
           {/* Social Proof Section */}
-          <div className={`space-y-4 transition-all duration-500 delay-700 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+          <div
+            className={`space-y-4 transition-all duration-500 delay-700 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}
+          >
             <div className="text-center">
               <Button
                 variant="ghost"
@@ -277,16 +331,25 @@ export function UpgradeDialog({
             {showTestimonials && (
               <div className="grid gap-4 md:grid-cols-2 animate-in slide-in-from-bottom-4 duration-500">
                 {testimonials.map((testimonial, index) => (
-                  <div key={index} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 space-y-2">
+                  <div
+                    key={index}
+                    className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 space-y-2"
+                  >
                     <div className="flex items-center gap-1">
                       {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <Star
+                          key={i}
+                          className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                        />
                       ))}
                     </div>
                     <p className="text-sm italic">"{testimonial.content}"</p>
                     <div className="text-xs text-muted-foreground">
                       <span className="font-medium">{testimonial.name}</span>
-                      <span> • {testimonial.role} at {testimonial.company}</span>
+                      <span>
+                        {' '}
+                        • {testimonial.role} at {testimonial.company}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -297,58 +360,93 @@ export function UpgradeDialog({
           <Separator />
 
           {/* Enhanced Action Buttons */}
-          <div className={`space-y-3 transition-all duration-500 delay-800 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-            <Button
-              onClick={handleUpgradeToPro}
-              disabled={isUpgrading}
-              className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-base font-medium cursor-pointer"
-            >
-              {isUpgrading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Processing Upgrade...
-                </>
-              ) : (
-                <>
-                  <Crown className="h-5 w-5 mr-2" />
-                  Upgrade to Pro - {pricingTiers[0].price}{pricingTiers[0].period}
-                </>
-              )}
-            </Button>
-
-            <div className="grid gap-2 sm:grid-cols-2">
+          <div
+            className={`space-y-3 transition-all duration-500 delay-800 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}
+          >
+            <div className="grid gap-3 sm:grid-cols-2">
               <Button
-                variant="outline"
-                onClick={handleContactSales}
-                disabled={isContactingSales}
-                className="cursor-pointer"
+                onClick={handleUpgradeToPro}
+                disabled={isUpgrading}
+                className="h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-base font-medium cursor-pointer"
               >
-                {isContactingSales ? (
+                {isUpgrading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
-                    Connecting...
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    Processing...
                   </>
                 ) : (
                   <>
-                    <Building2 className="h-4 w-4 mr-2" />
-                    Contact Sales
+                    <Crown className="h-5 w-5 mr-2" />
+                    Upgrade to Pro
                   </>
                 )}
               </Button>
 
               <Button
                 variant="outline"
-                onClick={handleGoToDashboard}
-                className="cursor-pointer"
+                onClick={() => {
+                  onOpenChange(false);
+                  window.location.href = '/billing/upgrade?plan=free';
+                }}
+                className="h-12 cursor-pointer"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
+                <ArrowLeft className="h-5 w-5 mr-2" />
+                Downgrade to Free
               </Button>
+            </div>
+
+            <div className="space-y-2">
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Button
+                  variant="outline"
+                  onClick={handleContactSales}
+                  disabled={isContactingSales}
+                  className="cursor-pointer"
+                >
+                  {isContactingSales ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+                      Connecting...
+                    </>
+                  ) : (
+                    <>
+                      <Building2 className="h-4 w-4 mr-2" />
+                      Contact Sales
+                    </>
+                  )}
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={handleGoToDashboard}
+                  className="cursor-pointer"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Dashboard
+                </Button>
+              </div>
+
+              <div className="text-center">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    onOpenChange(false);
+                    window.location.href = '/billing/upgrade';
+                  }}
+                  className="text-sm text-muted-foreground hover:text-foreground cursor-pointer"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  View All Plans & Features
+                </Button>
+              </div>
             </div>
           </div>
 
           {/* Trust Indicators */}
-          <div className={`flex items-center justify-center gap-6 text-xs text-muted-foreground transition-all duration-500 delay-900 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+          <div
+            className={`flex items-center justify-center gap-6 text-xs text-muted-foreground transition-all duration-500 delay-900 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}
+          >
             <div className="flex items-center gap-1">
               <Shield className="h-3 w-3" />
               <span>Secure Payment</span>
