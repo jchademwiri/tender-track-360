@@ -2,7 +2,9 @@ import { getCurrentUser } from '@/server';
 import { searchTenders } from '@/server/tenders';
 import { TenderList } from '@/components/tenders/tender-list';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, FileText, Send } from 'lucide-react';
+import { Clock, FileText, Plus, Send } from 'lucide-react';
+import { Button } from '@/components/ui';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,21 +33,33 @@ export default async function SubmittedTendersPage() {
   ]);
 
   const submittedTenders = submittedResult.success
-    ? submittedResult.tenders.filter(t => t.status !== 'draft')
+    ? submittedResult.tenders.filter((t) => t.status !== 'draft')
     : [];
   const pendingTenders = pendingResult.success
-    ? pendingResult.tenders.filter(t => t.status !== 'draft')
+    ? pendingResult.tenders.filter((t) => t.status !== 'draft')
     : [];
   const allSubmittedTenders = [...submittedTenders, ...pendingTenders];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Submitted Tenders</h1>
-        <p className="text-muted-foreground">
-          Track tenders awaiting results and follow up on submissions.
-        </p>
-      </div>
+      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Submitted Tenders
+          </h1>
+          <p className="text-muted-foreground">
+            Track tenders awaiting results and follow up on submissions.
+          </p>
+        </div>
+        <div>
+          <Button asChild size={'lg'}>
+            <Link href="/dashboard/tenders/create">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Tender
+            </Link>
+          </Button>
+        </div>
+      </header>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">

@@ -3,14 +3,16 @@ import {
   getTenderStats,
   getRecentActivity,
   getUpcomingDeadlines,
-  getTendersOverview
+  getTendersOverview,
 } from '@/server/tenders';
 import { getClients } from '@/server/clients';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
+import { FileText, Clock, TrendingUp, AlertTriangle, Plus } from 'lucide-react';
 import { RecentActivity } from '@/components/tenders/recent-activity';
 import { UpcomingDeadlines } from '@/components/tenders/upcoming-deadlines';
 import { TendersOverviewClient } from './client-wrapper';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,55 +35,78 @@ export default async function TendersOverviewPage() {
   }
 
   // Fetch all data in parallel
-  const [statsResult, activityResult, deadlinesResult, clientsResult, tendersResult] = await Promise.all([
+  const [
+    statsResult,
+    activityResult,
+    deadlinesResult,
+    clientsResult,
+    tendersResult,
+  ] = await Promise.all([
     getTenderStats(session.activeOrganizationId),
     getRecentActivity(session.activeOrganizationId, 3),
     getUpcomingDeadlines(session.activeOrganizationId, 3),
     getClients(session.activeOrganizationId),
-    getTendersOverview(session.activeOrganizationId, {}, 1, 20)
+    getTendersOverview(session.activeOrganizationId, {}, 1, 20),
   ]);
 
-  const stats = statsResult.success ? statsResult.stats : {
-    totalTenders: 0,
-    statusCounts: { draft: 0, submitted: 0, won: 0, lost: 0, pending: 0 },
-    totalValue: 0,
-    winRate: 0,
-    averageValue: 0,
-    upcomingDeadlines: 0,
-    overdueCount: 0,
-  };
+  const stats = statsResult.success
+    ? statsResult.stats
+    : {
+        totalTenders: 0,
+        statusCounts: { draft: 0, submitted: 0, won: 0, lost: 0, pending: 0 },
+        totalValue: 0,
+        winRate: 0,
+        averageValue: 0,
+        upcomingDeadlines: 0,
+        overdueCount: 0,
+      };
 
-  const activity = activityResult.success ? activityResult.activity : {
-    recentTenders: [],
-    recentChanges: [],
-  };
+  const activity = activityResult.success
+    ? activityResult.activity
+    : {
+        recentTenders: [],
+        recentChanges: [],
+      };
 
   const deadlines = deadlinesResult.success ? deadlinesResult.deadlines : [];
 
-  const clients = clientsResult.clients.map(c => ({
+  const clients = clientsResult.clients.map((c) => ({
     id: c.id,
     name: c.name,
   }));
 
-  const tendersData = tendersResult.success ? tendersResult : {
-    tenders: [],
-    totalCount: 0,
-    currentPage: 1,
-    totalPages: 0,
-  };
+  const tendersData = tendersResult.success
+    ? tendersResult
+    : {
+        tenders: [],
+        totalCount: 0,
+        currentPage: 1,
+        totalPages: 0,
+      };
 
-  const activeCount = stats.statusCounts.draft + stats.statusCounts.submitted + stats.statusCounts.pending;
+  const activeCount =
+    stats.statusCounts.draft +
+    stats.statusCounts.submitted +
+    stats.statusCounts.pending;
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Tender Management Overview
-        </h1>
-        <p className="text-muted-foreground">
-          Manage your tender applications and track submission progress.
-        </p>
-      </div>
+      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Tender Management Overview
+          </h1>
+          <p className="text-muted-foreground">
+            Manage your tender applications and track submission progress.
+          </p>
+        </div>
+        <Button asChild size={'lg'}>
+          <Link href="/dashboard/tenders/create">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Tender
+          </Link>
+        </Button>
+      </header>
 
       {/* Key Statistics Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
@@ -100,12 +125,18 @@ export default async function TendersOverviewPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Tenders</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Active Tenders
+            </CardTitle>
             <Clock className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{activeCount}</div>
-            <p className="text-xs text-muted-foreground">Currently in progress</p>
+            <div className="text-2xl font-bold text-blue-600">
+              {activeCount}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Currently in progress
+            </p>
           </CardContent>
         </Card>
 
@@ -115,7 +146,9 @@ export default async function TendersOverviewPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{Math.round(stats.winRate * 100)}%</div>
+            <div className="text-2xl font-bold text-green-600">
+              {Math.round(stats.winRate * 100)}%
+            </div>
             <p className="text-xs text-muted-foreground">Success rate</p>
           </CardContent>
         </Card>
@@ -126,8 +159,12 @@ export default async function TendersOverviewPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${stats.totalValue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Combined tender value</p>
+            <div className="text-2xl font-bold">
+              ${stats.totalValue.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Combined tender value
+            </p>
           </CardContent>
         </Card>
 
@@ -137,7 +174,9 @@ export default async function TendersOverviewPage() {
             <AlertTriangle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.overdueCount}</div>
+            <div className="text-2xl font-bold text-red-600">
+              {stats.overdueCount}
+            </div>
             <p className="text-xs text-muted-foreground">Past due date</p>
           </CardContent>
         </Card>
