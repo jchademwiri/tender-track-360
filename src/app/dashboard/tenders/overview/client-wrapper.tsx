@@ -116,6 +116,16 @@ export function TendersOverviewClient({
     window.location.href = `/dashboard/tenders/${tenderId}/edit`;
   }, []);
 
+  const handleDeleteTender = useCallback((tenderId: string) => {
+    // TODO: Implement delete functionality
+    console.log('Delete tender:', tenderId);
+  }, []);
+
+  const handleRowClick = useCallback((tenderId: string) => {
+    // Navigate to tender detail page on row click
+    window.location.href = `/dashboard/tenders/${tenderId}`;
+  }, []);
+
   return (
     <div className="space-y-4 ">
       <TendersSearchFilters
@@ -131,6 +141,8 @@ export function TendersOverviewClient({
         onPageChange={handlePageChange}
         onViewTender={handleViewTender}
         onEditTender={handleEditTender}
+        onDeleteTender={handleDeleteTender}
+        onRowClick={handleRowClick}
       />
 
       {loading && (
