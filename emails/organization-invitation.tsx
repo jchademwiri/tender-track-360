@@ -29,7 +29,7 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
     <Html lang="en" dir="ltr">
       <Head />
       <Preview>
-        You&apos;ve been invited to join {teamName} - Accept your invitation
+        You&#x27;ve been invited to join {teamName} - Accept your invitation
       </Preview>
       <Tailwind>
         <Body className="bg-gray-100 font-sans py-[40px]">
@@ -37,7 +37,7 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
             {/* Header */}
             <Section className="text-center mb-[32px]">
               <Heading className="text-[28px] font-bold text-gray-900 m-0 mb-[8px]">
-                You&apos;re Invited! 🎉
+                You&#x27;re Invited! 🎉
               </Heading>
               <Text className="text-[18px] text-gray-600 m-0">
                 Join <strong>{teamName}</strong> and start collaborating
@@ -51,7 +51,7 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
               </Text>
               <Text className="text-[16px] text-gray-700 leading-[24px] m-0 mb-[16px]">
                 <strong>{invitedByUsername}</strong> has invited you to join{' '}
-                <strong>{teamName}</strong>. You&apos;ll be able to collaborate
+                <strong>{teamName}</strong>. You&#x27;ll be able to collaborate
                 with the team and access all the tools and resources you need to
                 get started right away.
               </Text>
@@ -77,7 +77,7 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
 
               <Text className="text-[16px] text-gray-700 leading-[24px] m-0 mb-[24px]">
                 Click the button below to accept your invitation and create your
-                account. If you already have an account, you&apos;ll be added to
+                account. If you already have an account, you&#x27;ll be added to
                 the organization automatically.
               </Text>
             </Section>
@@ -95,7 +95,7 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
             {/* Alternative Link */}
             <Section className="mb-[32px]">
               <Text className="text-[14px] text-gray-600 leading-[20px] m-0 mb-[8px]">
-                If the button doesn&apos;t work, you can copy and paste this
+                If the button doesn&#x27;t work, you can copy and paste this
                 link into your browser:
               </Text>
               <Link
@@ -138,7 +138,7 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
                 {invitedByEmail}
               </Text>
               <Text className="text-[14px] text-gray-600 leading-[20px] m-0">
-                • If you didn&apos;t expect this invitation, you can safely
+                • If you didn&#x27;t expect this invitation, you can safely
                 ignore this email
               </Text>
             </Section>

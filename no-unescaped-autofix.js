@@ -1,56 +1,47 @@
+// ESLint rule to detect and fix unescaped entities in JSX
 export default {
   meta: {
-    type: 'problem',
-    fixable: 'code',
-    messages: {
-      unescaped:
-        "Unescaped character '{{char}}' found. Use '{{escape}}' instead.",
-    },
+    fixable: "code"
   },
-  create(context) {
-    const replacements = {
-      "'": '&apos;',
-      '"': '&quot;',
-      '>': '&gt;',
-      '<': '&lt;',
-      '{': '&#123;',
-      '}': '&#125;',
-    };
+  create: function(context) {
+    // Helper function to escape special regex characters
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
 
     return {
-      JSXText(node) {
-        const sourceCode = context.getSourceCode();
-        const text = sourceCode.getText(node);
+      JSXText: function(node) {
+        const text = node.value;
 
-        // Check if text contains any unescaped characters (not already escaped)
-        for (const [char, escape] of Object.entries(replacements)) {
-          // Only match characters that are not part of an existing HTML entity
-          const regex = new RegExp(
-            `${escapeRegExp(char)}(?![a-z0-9#]+;)`,
-            'gi'
-          );
+        // Check for common unescaped entities
+        const unescapedEntities = [
+          { regex: /&(?![a-zA-Z#0-9]+;)/g, replacement: '&' },
+          { regex: /</g, replacement: '<' },
+          { regex: />/g, replacement: '>' },
+          { regex: /"/g, replacement: '"' },
+          { regex: /'/g, replacement: '&#x27;' }
+        ];
 
-          if (regex.test(text)) {
+        for (const entity of unescapedEntities) {
+          if (entity.regex.test(text)) {
             context.report({
-              node,
-              messageId: 'unescaped',
-              data: { char, escape },
-              fix(fixer) {
-                // Replace only unescaped characters (not part of existing entities)
-                const fixedText = text.replace(regex, escape);
+              node: node,
+              message: 'Unescaped entity found. Consider using HTML entities.',
+              fix: function(fixer) {
+                const fixedText = text
+                  .replace(/&(?![a-zA-Z#0-9]+;)/g, '&')
+                  .replace(/</g, '<')
+                  .replace(/>/g, '>')
+                  .replace(/"/g, '"')
+                  .replace(/'/g, '&#x27;');
+
                 return fixer.replaceText(node, fixedText);
-              },
+              }
             });
-            // Only report the first unescaped character found to avoid multiple reports for the same node
-            break;
+            break; // Only report once per text node
           }
         }
-      },
+      }
     };
-  },
+  }
 };
-
-// Helper function to escape special regex characters
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}

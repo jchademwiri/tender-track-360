@@ -8,11 +8,9 @@ import {
   Check,
   Star,
   Users,
-  TrendingUp,
   Shield,
   Clock,
   Building2,
-  Mail,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
@@ -60,8 +58,6 @@ export function UpgradeDialog({
   onOpenChange,
   currentCount,
   maxCount,
-  userName,
-  organizationName,
   usageContext = 'organizations',
 }: UpgradeDialogProps) {
   const router = useRouter();
@@ -343,7 +339,9 @@ export function UpgradeDialog({
                         />
                       ))}
                     </div>
-                    <p className="text-sm italic">&quot;{testimonial.content}&quot;</p>
+                    <p className="text-sm italic">
+                      "{testimonial.content}"
+                    </p>
                     <div className="text-xs text-muted-foreground">
                       <span className="font-medium">{testimonial.name}</span>
                       <span>

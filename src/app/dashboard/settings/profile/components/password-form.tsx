@@ -202,8 +202,8 @@ export function PasswordForm({ onSubmit }: PasswordFormProps) {
                   Password
                 </label>
                 <p className="mt-1 text-sm">
-                  Your password was last updated recently. Click &quot;Change
-                  Password&quot; to update it.
+                  Your password was last updated recently. Click "Change
+                  Password" to update it.
                 </p>
               </div>
             </div>

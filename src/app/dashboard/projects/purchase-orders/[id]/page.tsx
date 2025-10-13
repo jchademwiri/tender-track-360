@@ -37,7 +37,7 @@ export default async function PurchaseOrderPage({ params }: PurchaseOrderPagePro
             Purchase Order Not Found
           </h2>
           <p className="text-gray-600">
-            The purchase order you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it.
+            The purchase order you&#x27;re looking for doesn&#x27;t exist or you don&#x27;t have access to it.
           </p>
         </div>
       </div>

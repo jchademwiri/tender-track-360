@@ -58,7 +58,7 @@ export function TestimonialsSection({
             >
               <div className="mb-4">
                 <p className="text-card-foreground italic">
-                  &quot;{testimonial.content}&quot;
+                  "{testimonial.content}"
                 </p>
               </div>
               <div className="flex items-center">

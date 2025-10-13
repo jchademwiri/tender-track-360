@@ -142,7 +142,7 @@ export function GeneralTab({
             Organization Logo
           </CardTitle>
           <CardDescription>
-            Update your organization&apos;s logo and visual identity
+            Update your organization&#x27;s logo and visual identity
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -204,7 +204,7 @@ export function GeneralTab({
                         />
                       </FormControl>
                       <FormDescription>
-                        This is your organization&apos;s display name.
+                        This is your organization&#x27;s display name.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -226,7 +226,7 @@ export function GeneralTab({
                         />
                       </FormControl>
                       <FormDescription>
-                        Your organization&apos;s website URL.
+                        Your organization&#x27;s website URL.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -317,7 +317,7 @@ export function GeneralTab({
                       />
                     </FormControl>
                     <FormDescription>
-                      Your organization&apos;s primary business address.
+                      Your organization&#x27;s primary business address.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

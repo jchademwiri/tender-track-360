@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, FileText, TrendingUp, CheckCircle } from 'lucide-react';
+import { Clock, FileText, TrendingUp } from 'lucide-react';
 
 interface RecentTender {
   id: string;
@@ -41,7 +41,9 @@ function getStatusColor(status: string): string {
 
 function formatTimeAgo(date: Date): string {
   const now = new Date();
-  const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+  const diffInHours = Math.floor(
+    (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+  );
 
   if (diffInHours < 1) {
     return 'Just now';
@@ -61,13 +63,15 @@ export function RecentActivity({
   className = '',
 }: RecentActivityProps) {
   const combined: ActivityItem[] = [
-    ...recentTenders.map(t => ({ ...t, type: 'new' as const })),
-    ...recentChanges.map(t => ({ ...t, type: 'change' as const }))
-  ].sort((a, b) => {
-    const dateA = a.type === 'new' ? a.createdAt : a.updatedAt;
-    const dateB = b.type === 'new' ? b.createdAt : b.updatedAt;
-    return dateB.getTime() - dateA.getTime();
-  }).slice(0, 3);
+    ...recentTenders.map((t) => ({ ...t, type: 'new' as const })),
+    ...recentChanges.map((t) => ({ ...t, type: 'change' as const })),
+  ]
+    .sort((a, b) => {
+      const dateA = a.type === 'new' ? a.createdAt : a.updatedAt;
+      const dateB = b.type === 'new' ? b.createdAt : b.updatedAt;
+      return dateB.getTime() - dateA.getTime();
+    })
+    .slice(0, 3);
 
   if (combined.length === 0) {
     return (
@@ -98,7 +102,12 @@ export function RecentActivity({
       <CardContent className="space-y-4">
         <div className="space-y-3">
           {combined.map((item) => {
-            const icon = item.type === 'new' ? <FileText className="h-3 w-3" /> : <TrendingUp className="h-3 w-3" />;
+            const icon =
+              item.type === 'new' ? (
+                <FileText className="h-3 w-3" />
+              ) : (
+                <TrendingUp className="h-3 w-3" />
+              );
             const time = item.type === 'new' ? item.createdAt : item.updatedAt;
             return (
               <div

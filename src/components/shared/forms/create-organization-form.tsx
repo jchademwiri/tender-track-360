@@ -246,7 +246,7 @@ export function CreateOrganizationForm({
             Organization Limit Reached
           </h3>
           <p className="text-sm text-amber-700">
-            You&apos;ve reached the maximum number of organizations (2/2) for your current plan.
+            You&#x27;ve reached the maximum number of organizations (2/2) for your current plan.
           </p>
           <p className="text-xs text-muted-foreground">
             Upgrade to Pro to create unlimited organizations and unlock more features.
@@ -415,7 +415,7 @@ export function CreateOrganizationForm({
                 )}
               </div>
               <FormDescription className="text-xs text-muted-foreground">
-                This will be used in your organization&apos;s URL. Only
+                This will be used in your organization&#x27;s URL. Only
                 lowercase letters, numbers, and hyphens allowed.
               </FormDescription>
               <FormMessage className="text-xs" />
@@ -443,7 +443,7 @@ export function CreateOrganizationForm({
                 />
               </FormControl>
               <FormDescription className="text-xs text-muted-foreground">
-                Provide a URL to your organization&apos;s logo image
+                Provide a URL to your organization&#x27;s logo image
               </FormDescription>
               <FormMessage className="text-xs" />
             </FormItem>

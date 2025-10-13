@@ -86,7 +86,7 @@ const VerifyEmail = (props: VerifyEmailProps) => {
                 • This verification link will expire in 24 hours
               </Text>
               <Text className="text-[14px] text-gray-600 leading-[20px] m-0 mb-[8px]">
-                • If you didn&apos;t create an account, you can safely ignore
+                • If you didn&#x27;t create an account, you can safely ignore
                 this email
               </Text>
               <Text className="text-[14px] text-gray-600 leading-[20px] m-0">

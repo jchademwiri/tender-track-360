@@ -5,19 +5,15 @@ import {
   Crown,
   ArrowLeft,
   CreditCard,
-  Calendar,
   TrendingUp,
   Users,
-  Building2,
   Download,
   AlertCircle,
-  Check,
   Plus,
   Edit,
   Trash2,
   Receipt,
   Clock,
-  DollarSign,
   Activity,
   Settings,
   Zap,
@@ -33,7 +29,6 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Types for billing data
 interface Subscription {
@@ -190,10 +185,6 @@ export default function BillingPage() {
     console.log('Download invoice:', invoiceId);
   };
 
-  const handleCancelSubscription = () => {
-    // TODO: Implement subscription cancellation
-    console.log('Cancel subscription');
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -632,7 +623,7 @@ export default function BillingPage() {
                       </span>
                     </div>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      You&apos;re on the Pro plan with access to all premium features.
+                      You&#x27;re on the Pro plan with access to all premium features.
                     </p>
                   </div>
 
