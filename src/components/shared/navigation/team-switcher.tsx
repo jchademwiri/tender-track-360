@@ -29,7 +29,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { CreateorganizationForm } from '@/components/forms';
+import { CreateOrganizationForm } from '@/components/shared/forms';
 import { UpgradeDialog } from '@/components/shared/dialogs';
 import type { OrganizationWithStats } from '@/server/organizations';
 
@@ -154,7 +154,7 @@ export function TeamSwitcher({
                     {organizations.length}/2 organizations used)
                   </DialogDescription>
                 </DialogHeader>
-                <CreateorganizationForm
+                <CreateOrganizationForm
                   currentOrganizationCount={organizations.length}
                 />
               </DialogContent>

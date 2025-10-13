@@ -34,7 +34,7 @@ export default async function SettingsOverviewPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Settings Overview</h1>
         <p className="text-muted-foreground">
-          Manage your account, organisation, and system preferences.
+          Manage your account, organization, and system preferences.
         </p>
       </div>
 
@@ -110,7 +110,7 @@ export default async function SettingsOverviewPage() {
               Organisation Settings
             </CardTitle>
             <CardDescription>
-              Configure organisation information and team settings
+              Configure organization information and team settings
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -127,7 +127,7 @@ export default async function SettingsOverviewPage() {
             <Button asChild className="w-full">
               <Link
                 href="/dashboard/settings"
-                as="/dashboard/settings/organisation"
+                as="/dashboard/settings/organization"
               >
                 Manage Organisation
               </Link>

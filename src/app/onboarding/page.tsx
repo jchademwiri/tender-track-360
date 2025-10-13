@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CreateorganizationForm } from '@/components/shared/forms/create-organization-form';
+import { CreateOrganizationForm } from '@/components/shared/forms/create-organization-form';
 import { authClient } from '@/lib/auth-client';
 import { useEffect, useState } from 'react';
 
@@ -53,7 +53,7 @@ export default function OnboardingPage() {
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
-            <CreateorganizationForm currentOrganizationCount={organizations.length} />
+            <CreateOrganizationForm currentOrganizationCount={organizations.length} />
           </CardContent>
         </Card>
       </div>

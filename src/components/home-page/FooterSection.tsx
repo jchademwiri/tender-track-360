@@ -25,7 +25,7 @@ export function FooterSection() {
                 <Twitter className="w-4 h-4" />
               </a>
               <a
-                href="https://linkedin.com/organisation/tendertrack360"
+                href="https://linkedin.com/organization/tendertrack360"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 bg-secondary rounded flex items-center justify-center hover:bg-secondary/80 transition-colors text-secondary-foreground"

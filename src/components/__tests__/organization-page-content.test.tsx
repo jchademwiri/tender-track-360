@@ -73,7 +73,7 @@ jest.mock('../recent-activity-section', () => ({
 }));
 
 jest.mock('@/components/forms', () => ({
-  CreateorganizationForm: () => (
+  CreateOrganizationForm: () => (
     <form data-testid="create-org-form">
       <input data-testid="org-name-input" placeholder="Organization name" />
       <button type="submit" data-testid="submit-button">

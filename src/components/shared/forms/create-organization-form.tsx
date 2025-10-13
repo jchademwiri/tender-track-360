@@ -23,7 +23,7 @@ import { Loader, Check, X, AlertCircle, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
-const createorganizationFormSchema = z.object({
+const createOrganizationFormSchema = z.object({
   name: z
     .string()
     .min(2, 'Organization name must be at least 2 characters')
@@ -54,13 +54,13 @@ type SlugValidationState =
   | 'taken'
   | 'error';
 
-interface CreateorganizationFormProps {
+interface CreateOrganizationFormProps {
   currentOrganizationCount?: number;
 }
 
-export function CreateorganizationForm({
+export function CreateOrganizationForm({
   currentOrganizationCount = 0,
-}: CreateorganizationFormProps) {
+}: CreateOrganizationFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [slugManuallyChanged, setSlugManuallyChanged] = useState(false);
@@ -72,8 +72,8 @@ export function CreateorganizationForm({
   const nameRef = useRef('');
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof createorganizationFormSchema>>({
-    resolver: zodResolver(createorganizationFormSchema),
+  const form = useForm<z.infer<typeof createOrganizationFormSchema>>({
+    resolver: zodResolver(createOrganizationFormSchema),
     mode: 'onChange', // Show validation errors on change
     defaultValues: {
       name: '',
@@ -136,7 +136,7 @@ export function CreateorganizationForm({
   }, [slugCheckTimeout]);
 
   async function onSubmit(
-    values: z.infer<typeof createorganizationFormSchema>
+    values: z.infer<typeof createOrganizationFormSchema>
   ) {
     // Final slug availability check before submission
     if (slugValidation === 'taken') {
@@ -394,7 +394,7 @@ export function CreateorganizationForm({
                       URL Preview:
                     </span>
                     <Badge variant="secondary" className="text-xs font-mono">
-                      /dashboard/settings/organisation/{field.value}
+                      /dashboard/settings/organization/{field.value}
                     </Badge>
                   </div>
                 )}

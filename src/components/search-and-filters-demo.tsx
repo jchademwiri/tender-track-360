@@ -54,7 +54,7 @@ const mockMembers: MemberWithUser[] = [
     user: {
       id: 'user3',
       name: 'Bob Johnson',
-      email: 'bob@organisation.com',
+      email: 'bob@organization.com',
       image: null,
       createdAt: new Date('2024-01-03'),
       updatedAt: new Date('2024-01-03'),

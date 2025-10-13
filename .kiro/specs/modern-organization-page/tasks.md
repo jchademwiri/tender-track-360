@@ -40,7 +40,7 @@
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
 - [x] 6. Enhance the create organization dialog
-  - Update CreateorganizationForm with modern styling and better validation
+  - Update CreateOrganizationForm with modern styling and better validation
   - Add real-time form validation with error feedback
   - Implement loading states and success feedback animations
   - Add organization slug generation and preview functionality

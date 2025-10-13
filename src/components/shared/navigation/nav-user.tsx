@@ -139,7 +139,7 @@ export function NavUser({ user }: { user: User }) {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/organisation" className="cursor-pointer">
+                <Link href="/dashboard/organization" className="cursor-pointer">
                   <Building2 />
                   Organizations
                 </Link>

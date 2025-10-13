@@ -7,7 +7,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { CreateorganizationForm } from '../create-organization-form';
+import { CreateOrganizationForm } from '../create-organization-form';
 
 // Mock the external dependencies with simple implementations
 jest.mock('next/navigation', () => ({
@@ -40,7 +40,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
 
   describe('Form Rendering', () => {
     it('renders all required form fields', () => {
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       // Check for form fields
       expect(screen.getByLabelText(/organization name/i)).toBeInTheDocument();
@@ -54,7 +54,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
     });
 
     it('shows proper placeholders', () => {
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       expect(
         screen.getByPlaceholderText(/enter your organization name/i)
@@ -68,7 +68,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
     });
 
     it('shows form descriptions', () => {
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       expect(
         screen.getByText(/this will be the display name for your organization/i)
@@ -84,7 +84,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
     });
 
     it('disables submit button initially', () => {
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       const submitButton = screen.getByRole('button', {
         name: /create organization/i,
@@ -96,7 +96,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
   describe('Slug Generation', () => {
     it('auto-generates slug from organization name', async () => {
       const user = userEvent.setup();
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       const nameInput = screen.getByLabelText(/organization name/i);
       const slugInput = screen.getByLabelText(/organization slug/i);
@@ -109,7 +109,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
 
     it('handles special characters in name correctly', async () => {
       const user = userEvent.setup();
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       const nameInput = screen.getByLabelText(/organization name/i);
       const slugInput = screen.getByLabelText(/organization slug/i);
@@ -117,12 +117,12 @@ describe('CreateorganizationForm - Basic Functionality', () => {
       await user.type(nameInput, 'Test & Organisation @ 2024!');
 
       // Special characters should be converted to hyphens
-      expect(slugInput).toHaveValue('test-organisation-2024');
+      expect(slugInput).toHaveValue('test-organization-2024');
     });
 
     it('shows URL preview when slug is entered', async () => {
       const user = userEvent.setup();
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       const nameInput = screen.getByLabelText(/organization name/i);
       await user.type(nameInput, 'Test Org');
@@ -133,7 +133,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
 
     it('allows manual slug editing', async () => {
       const user = userEvent.setup();
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       const nameInput = screen.getByLabelText(/organization name/i);
       const editButton = screen.getByRole('button', { name: /edit/i });
@@ -154,7 +154,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
   describe('Form Validation', () => {
     it('shows validation error for short organization name', async () => {
       const user = userEvent.setup();
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       const nameInput = screen.getByLabelText(/organization name/i);
 
@@ -170,7 +170,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
 
     it('shows validation error for invalid characters in name', async () => {
       const user = userEvent.setup();
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       const nameInput = screen.getByLabelText(/organization name/i);
 
@@ -188,7 +188,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
 
     it('shows validation error for invalid logo URL', async () => {
       const user = userEvent.setup();
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       const logoInput = screen.getByLabelText(/logo url/i);
 
@@ -206,7 +206,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
 
     it('accepts valid logo URL', async () => {
       const user = userEvent.setup();
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       const logoInput = screen.getByLabelText(/logo url/i);
 
@@ -223,7 +223,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
   describe('User Interactions', () => {
     it('supports keyboard navigation', async () => {
       const user = userEvent.setup();
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       // Tab through form elements
       await user.tab();
@@ -246,7 +246,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
         () => new Promise((resolve) => setTimeout(resolve, 1000))
       );
 
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       const nameInput = screen.getByLabelText(/organization name/i);
       await user.type(nameInput, 'Test Organization');
@@ -264,7 +264,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
 
   describe('Accessibility', () => {
     it('has proper ARIA labels', () => {
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       const nameInput = screen.getByLabelText(/organization name/i);
       const slugInput = screen.getByLabelText(/organization slug/i);
@@ -276,7 +276,7 @@ describe('CreateorganizationForm - Basic Functionality', () => {
     });
 
     it('provides helpful descriptions for form fields', () => {
-      render(<CreateorganizationForm />);
+      render(<CreateOrganizationForm />);
 
       // Check that form descriptions are present
       expect(

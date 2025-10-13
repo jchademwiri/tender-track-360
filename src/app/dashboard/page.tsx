@@ -61,7 +61,7 @@ export default async function DashboardPage() {
         </Button>
         <Button variant="outline" size="lg" asChild>
           <Link
-            href="/dashboard/organisation/create"
+            href="/dashboard/organization/create"
             className="flex items-center"
           >
             <Building2 className="mr-2 h-4 w-4" />
