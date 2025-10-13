@@ -30,7 +30,7 @@ const createOrganizationFormSchema = z.object({
 });
 
 export async function createOrganization(
-  form: z.infer<typeof createorganizationFormSchema>
+  form: z.infer<typeof createOrganizationFormSchema>
 ) {
   // Validate input
   const parsed = createOrganizationFormSchema.safeParse(form);

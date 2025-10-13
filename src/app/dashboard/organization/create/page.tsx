@@ -1,12 +1,15 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
 import { CreateOrganizationForm } from '@/components/shared/forms/create-organization-form';
 import { authClient } from '@/lib/auth-client';
 import { useEffect, useState } from 'react';
 
 export default function CreateOrganizationPage() {
-  const [organizations, setOrganizations] = useState<any[]>([]);
+  const [organizations, setOrganizations] = useState<{ id: string; name: string; slug: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

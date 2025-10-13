@@ -284,7 +284,7 @@ export default function UpgradePage() {
 
             <div className="space-y-4">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Unlock Your Team's Full Potential
+                Unlock Your Team&apos;s Full Potential
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
                 Join thousands of organizations already using our platform to
@@ -427,7 +427,7 @@ export default function UpgradePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 dark:text-gray-300 mb-4 italic">
-                      "{testimonial.content}"
+                      &quot;{testimonial.content}&quot;
                     </p>
                     <div className="text-sm">
                       <span className="font-semibold text-gray-900 dark:text-white">
@@ -511,7 +511,7 @@ export default function UpgradePage() {
                   Do you offer refunds?
                 </h4>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
-                  Yes, we offer a 30-day money-back guarantee if you're not
+                  Yes, we offer a 30-day money-back guarantee if you&apos;re not
                   satisfied with your upgrade.
                 </p>
               </div>

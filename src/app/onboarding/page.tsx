@@ -6,7 +6,7 @@ import { authClient } from '@/lib/auth-client';
 import { useEffect, useState } from 'react';
 
 export default function OnboardingPage() {
-  const [organizations, setOrganizations] = useState<any[]>([]);
+  const [organizations, setOrganizations] = useState<{ id: string; name: string; slug: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function OnboardingPage() {
               Welcome to Tender Track 360! 🎉
             </CardTitle>
             <p className="text-muted-foreground">
-              Let's set up your organization and get you started
+              Let&apos;s set up your organization and get you started
             </p>
           </CardHeader>
           <CardContent className="space-y-6">

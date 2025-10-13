@@ -632,7 +632,7 @@ export default function BillingPage() {
                       </span>
                     </div>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      You're on the Pro plan with access to all premium features.
+                      You&apos;re on the Pro plan with access to all premium features.
                     </p>
                   </div>
 

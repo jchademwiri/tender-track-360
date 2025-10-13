@@ -343,7 +343,7 @@ export function UpgradeDialog({
                         />
                       ))}
                     </div>
-                    <p className="text-sm italic">"{testimonial.content}"</p>
+                    <p className="text-sm italic">&quot;{testimonial.content}&quot;</p>
                     <div className="text-xs text-muted-foreground">
                       <span className="font-medium">{testimonial.name}</span>
                       <span>

@@ -246,7 +246,7 @@ export function CreateOrganizationForm({
             Organization Limit Reached
           </h3>
           <p className="text-sm text-amber-700">
-            You've reached the maximum number of organizations (2/2) for your current plan.
+            You&apos;ve reached the maximum number of organizations (2/2) for your current plan.
           </p>
           <p className="text-xs text-muted-foreground">
             Upgrade to Pro to create unlimited organizations and unlock more features.

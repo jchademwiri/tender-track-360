@@ -7,6 +7,9 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 
+// Force dynamic rendering for dashboard layout since it uses server functions with headers
+export const dynamic = 'force-dynamic';
+
 export default async function MainDashboardLayout({
   children,
 }: {
