@@ -132,7 +132,7 @@ export function TendersTable({
                       <TableHead className="min-w-[100px] hidden md:table-cell">
                         Days Left
                       </TableHead>
-                      {/* <TableHead className="w-[100px]">Actions</TableHead> */}
+                      <TableHead className="w-[100px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -201,7 +201,7 @@ export function TendersTable({
                               </span>
                             )}
                           </TableCell>
-                          {/* <TableCell>
+                          <TableCell>
                             <div className="flex items-center gap-1">
                               {onViewTender && (
                                 <Button
@@ -224,7 +224,7 @@ export function TendersTable({
                                 </Button>
                               )}
                             </div>
-                          </TableCell> */}
+                          </TableCell>
                         </TableRow>
                       );
                     })}
