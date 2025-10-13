@@ -217,7 +217,7 @@ export function DangerZone({
               orgToast.deleted(organizationName, confirmation.deletionType);
               setShowDeletionModal(false);
               // Redirect to organizations list after successful deletion
-              window.location.href = '/dashboard/settings/organisation';
+              window.location.href = '/dashboard/settings/organization';
             } else {
               errorToast(
                 result.error?.message || 'Failed to delete organization'

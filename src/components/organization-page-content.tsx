@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import type { RecentActivity } from '@/types/activity';
 import type { OrganizationWithStats } from '@/server/organizations';
-import { CreateorganizationForm } from './forms';
+import { CreateOrganizationForm } from './forms';
 import { UpgradeDialog } from './shared/dialogs';
 import { OrganizationSearch } from './shared/search';
 
@@ -155,7 +155,7 @@ export function OrganizationPageContent({
                   Please fill in the details to create a new organization.
                 </DialogDescription>
               </DialogHeader>
-              <CreateorganizationForm
+              <CreateOrganizationForm
                 currentOrganizationCount={organizations.length}
               />
             </DialogContent>
@@ -243,7 +243,7 @@ export function OrganizationPageContent({
                       Please fill in the details to create a new organization.
                     </DialogDescription>
                   </DialogHeader>
-                  <CreateorganizationForm
+                  <CreateOrganizationForm
                     currentOrganizationCount={organizations.length}
                   />
                 </DialogContent>
@@ -304,7 +304,7 @@ export function OrganizationPageContent({
                           organization.
                         </DialogDescription>
                       </DialogHeader>
-                      <CreateorganizationForm
+                      <CreateOrganizationForm
                         currentOrganizationCount={organizations.length}
                       />
                     </DialogContent>

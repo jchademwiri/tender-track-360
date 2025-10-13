@@ -23,7 +23,7 @@ import { Loader, Check, X, AlertCircle, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
-const createorganizationFormSchema = z.object({
+const createOrganizationFormSchema = z.object({
   name: z
     .string()
     .min(2, 'Organization name must be at least 2 characters')
@@ -54,13 +54,13 @@ type SlugValidationState =
   | 'taken'
   | 'error';
 
-interface CreateorganizationFormProps {
+interface CreateOrganizationFormProps {
   currentOrganizationCount?: number;
 }
 
-export function CreateorganizationForm({
+export function CreateOrganizationForm({
   currentOrganizationCount = 0,
-}: CreateorganizationFormProps) {
+}: CreateOrganizationFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [slugManuallyChanged, setSlugManuallyChanged] = useState(false);
@@ -72,8 +72,8 @@ export function CreateorganizationForm({
   const nameRef = useRef('');
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof createorganizationFormSchema>>({
-    resolver: zodResolver(createorganizationFormSchema),
+  const form = useForm<z.infer<typeof createOrganizationFormSchema>>({
+    resolver: zodResolver(createOrganizationFormSchema),
     mode: 'onChange', // Show validation errors on change
     defaultValues: {
       name: '',
@@ -136,7 +136,7 @@ export function CreateorganizationForm({
   }, [slugCheckTimeout]);
 
   async function onSubmit(
-    values: z.infer<typeof createorganizationFormSchema>
+    values: z.infer<typeof createOrganizationFormSchema>
   ) {
     // Final slug availability check before submission
     if (slugValidation === 'taken') {
@@ -182,17 +182,7 @@ export function CreateorganizationForm({
           error as { message: string }
         ).message.toLowerCase();
 
-        if (
-          errorMessage.includes('limit') ||
-          errorMessage.includes('maximum')
-        ) {
-          toast.error(
-            `You have reached the maximum number of organizations (${currentOrganizationCount}/2). Please contact support if you need to create more organizations.`,
-            {
-              duration: 6000, // Show longer for important message
-            }
-          );
-        } else if (errorMessage.includes('slug')) {
+        if (errorMessage.includes('slug')) {
           toast.error(
             'This organization slug is already taken. Please choose a different one.'
           );
@@ -240,6 +230,31 @@ export function CreateorganizationForm({
         return null;
     }
   };
+
+  // Show limit reached message before form if user has reached max organizations
+  if (currentOrganizationCount >= 2) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 space-y-4 animate-in fade-in-0 zoom-in-95 duration-200">
+        <div className="relative">
+          <div className="size-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full flex items-center justify-center">
+            <AlertCircle className="size-8 text-amber-600" />
+          </div>
+        </div>
+
+        <div className="text-center space-y-2 animate-in slide-in-from-bottom-2 duration-200">
+          <h3 className="text-lg font-bold text-amber-900">
+            Organization Limit Reached
+          </h3>
+          <p className="text-sm text-amber-700">
+            You&apos;ve reached the maximum number of organizations (2/2) for your current plan.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Upgrade to Pro to create unlimited organizations and unlock more features.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (isSuccess) {
     return (
@@ -379,7 +394,7 @@ export function CreateorganizationForm({
                       URL Preview:
                     </span>
                     <Badge variant="secondary" className="text-xs font-mono">
-                      /dashboard/settings/organisation/{field.value}
+                      /dashboard/settings/organization/{field.value}
                     </Badge>
                   </div>
                 )}
@@ -440,7 +455,8 @@ export function CreateorganizationForm({
             !form.formState.isValid ||
             isLoading ||
             slugValidation === 'taken' ||
-            slugValidation === 'checking'
+            slugValidation === 'checking' ||
+            currentOrganizationCount >= 2
           }
           type="submit"
           className="w-full transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/25 active:scale-[0.98] disabled:hover:scale-100 disabled:hover:shadow-none"

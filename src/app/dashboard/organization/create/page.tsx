@@ -1,11 +1,14 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
 import { CreateOrganizationForm } from '@/components/shared/forms/create-organization-form';
 import { authClient } from '@/lib/auth-client';
 import { useEffect, useState } from 'react';
 
-export default function OnboardingPage() {
+export default function CreateOrganizationPage() {
   const [organizations, setOrganizations] = useState<{ id: string; name: string; slug: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -46,10 +49,10 @@ export default function OnboardingPage() {
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-3xl">
-              Welcome to Tender Track 360! 🎉
+              Create a new Organization
             </CardTitle>
             <p className="text-muted-foreground">
-              Let&apos;s set up your organization and get you started
+              Set up your organization to get started
             </p>
           </CardHeader>
           <CardContent className="space-y-6">

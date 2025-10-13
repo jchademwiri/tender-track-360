@@ -176,7 +176,7 @@ const OrganizationInvitation = (props: OrganizationInvitationProps) => {
 OrganizationInvitation.PreviewProps = {
   email: 'hello@jacobc.co.za',
   invitedByUsername: 'John Smith',
-  invitedByEmail: 'john.smith@organisation.com',
+  invitedByEmail: 'john.smith@organization.com',
   teamName: 'Acme Corporation',
   inviteLink: 'https://yourapp.com/invite/accept?token=abc123xyz789',
 };

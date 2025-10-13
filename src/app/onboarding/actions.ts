@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import { nanoid } from 'nanoid';
 
-const createorganizationFormSchema = z.object({
+const createOrganizationFormSchema = z.object({
   name: z
     .string()
     .min(2, 'Organization name must be at least 2 characters')
@@ -30,10 +30,10 @@ const createorganizationFormSchema = z.object({
 });
 
 export async function createOrganization(
-  form: z.infer<typeof createorganizationFormSchema>
+  form: z.infer<typeof createOrganizationFormSchema>
 ) {
   // Validate input
-  const parsed = createorganizationFormSchema.safeParse(form);
+  const parsed = createOrganizationFormSchema.safeParse(form);
   if (!parsed.success) {
     return { error: parsed.error.errors[0].message };
   }

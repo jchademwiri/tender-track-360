@@ -64,7 +64,7 @@ export interface TestimonialsSectionProps {
   testimonials: Array<{
     id: string;
     name: string;
-    organisation: string;
+    organization: string;
     role: string;
     content: string;
     avatar?: string;
