@@ -26,3 +26,22 @@ export * from './select';
 export * from './separator';
 export * from './sidebar';
 export * from './logout';
+export {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from './chart';
+export * from './metric-card';
