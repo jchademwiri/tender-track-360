@@ -160,8 +160,8 @@ Create a comprehensive organization management interface with tabbed navigation,
 
 ### Files to Create/Modify
 
-- `src/app/dashboard/settings/organisation/[organizationId]/page.tsx` - Main management page
-- `src/app/dashboard/settings/organisation/[organizationId]/components/` - Tab components
+- `src/app/(dashboard)/dashboard/settings/organisation/[organizationId]/page.tsx` - Main management page
+- `src/app/(dashboard)/dashboard/settings/organisation/[organizationId]/components/` - Tab components
 - `src/server/organizations-actions.ts` - New server actions for organization management
 
 ### Components to Create

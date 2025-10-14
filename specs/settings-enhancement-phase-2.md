@@ -130,7 +130,7 @@ Transform the organization settings page to display all user organizations with 
 
 ### Files to Modify
 
-- `src/app/dashboard/settings/organisation/page.tsx` - Main organization settings page
+- `src/app/(dashboard)/dashboard/settings/organisation/page.tsx` - Main organization settings page
 - Create new components as needed
 
 ### Components to Create

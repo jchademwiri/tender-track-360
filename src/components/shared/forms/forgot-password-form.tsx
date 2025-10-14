@@ -52,7 +52,7 @@ export function ForgotPasswordForm({
       toast.error(error.message);
     } else {
       toast.success('Password reset link sent successfully');
-      router.push('/organization');
+      router.push('/dashboard');
     }
 
     setIsLoading(false);

@@ -59,7 +59,7 @@ export function OrganizationCard({
             <Avatar className="size-12 transition-transform duration-300 group-hover:scale-110">
               <AvatarImage src={organization.logo || undefined} />
               <AvatarFallback className="bg-primary/10 text-primary font-semibold transition-colors duration-300 group-hover:bg-primary/20">
-                <Link href={`/organization/${organization.slug}`}>
+                <Link href={`/dashboard/organization/${organization.slug}`}>
                   {getInitials(organization.name)}
                 </Link>
               </AvatarFallback>
@@ -109,7 +109,7 @@ export function OrganizationCard({
               className="flex-1 transition-all duration-200 hover:scale-105"
               size="sm"
             >
-              <Link href={`/organization/${organization.slug}/dashboard`}>
+              <Link href={`/dashboard`}>
                 <ExternalLink className="size-4 mr-2 transition-transform duration-200 group-hover:translate-x-0.5" />
                 Go to Dashboard
               </Link>

@@ -246,8 +246,8 @@ export const config = {
 Organization provider is integrated at the dashboard layout level:
 
 ```tsx
-// src/app/(dashboard)/layout.tsx
-export default async function DashboardLayout({ children }) {
+// src/app/(dashboard)/dashboard/layout.tsx
+export default async function MainDashboardLayout({ children }) {
   const organizations = await getorganizations();
 
   return (
