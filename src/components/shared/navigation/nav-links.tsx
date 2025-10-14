@@ -16,14 +16,11 @@ export function NavLinks() {
 
   return (
     <div className="flex items-center gap-2">
-      <Link href="/organization" className="text-sm hover:underline">
+      <Link href="/dashboard/organization" className="text-sm hover:underline">
         Organization
       </Link>
       {orgSlug && (
-        <Link
-          href={`/organization/${orgSlug}/dashboard`}
-          className="text-sm hover:underline"
-        >
+        <Link href="/dashboard" className="text-sm hover:underline">
           Dashboard
         </Link>
       )}

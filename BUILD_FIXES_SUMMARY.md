@@ -24,10 +24,10 @@ after: async ({ user, organizationId }: { user: { id: string }; organizationId: 
 
 **Files Fixed**:
 
-- `src/app/dashboard/clients/[id]/edit/page.tsx`
-- `src/app/dashboard/clients/[id]/page.tsx`
-- `src/app/dashboard/tenders/[id]/page.tsx`
-- `src/app/dashboard/tenders/[id]/edit/page.tsx`
+- `src/app/(dashboard)/dashboard/clients/[id]/edit/page.tsx`
+- `src/app/(dashboard)/dashboard/clients/[id]/page.tsx`
+- `src/app/(dashboard)/dashboard/tenders/[id]/page.tsx`
+- `src/app/(dashboard)/dashboard/tenders/[id]/edit/page.tsx`
 
 **Fix**: Updated all params interfaces to use Promise type:
 
