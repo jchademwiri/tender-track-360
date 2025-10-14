@@ -167,7 +167,7 @@ Implement safe organization deletion with proper safeguards and add advanced man
 
 ### Files to Create/Modify
 
-- `src/app/dashboard/settings/organisation/[organizationId]/danger/page.tsx` - Danger zone page
+- `src/app/(dashboard)/dashboard/settings/organisation/[organizationId]/danger/page.tsx` - Danger zone page
 - `src/server/organization-advanced-actions.ts` - Advanced server actions
 - `src/components/organization/deletion-modal.tsx` - Deletion confirmation modal
 - `src/components/organization/transfer-ownership-modal.tsx` - Ownership transfer modal

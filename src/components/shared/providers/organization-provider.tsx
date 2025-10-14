@@ -46,12 +46,12 @@ export function OrganizationProvider({
           showToast: false, // Don't show toast for automatic URL sync
         }).catch(() => {
           // Redirect to the correct organization URL on error
-          router.push(`/organization/${activeOrganization.slug}`);
+          window.location.href = `/organization/${activeOrganization.slug}`;
         });
       } else {
         // URL has invalid organization slug, redirect to active organization
         console.warn(`Invalid organization slug in URL: ${urlSlug}`);
-        router.push(`/organization/${activeOrganization.slug}`);
+        window.location.href = `/organization/${activeOrganization.slug}`;
       }
     }
   }, [pathname, activeOrganization, organizations, router]);
