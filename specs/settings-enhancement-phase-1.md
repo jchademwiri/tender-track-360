@@ -117,8 +117,8 @@ Transform the complex main settings page into a clean, focused interface with wo
 
 ### Files to Modify
 
-- `src/app/dashboard/settings/page.tsx` - Main settings page
-- `src/app/dashboard/settings/overview/page.tsx` - Fix button types
+- `src/app/(dashboard)/dashboard/settings/page.tsx` - Main settings page
+- `src/app/(dashboard)/dashboard/settings/overview/page.tsx` - Fix button types
 - Update any shared components as needed
 
 ### Components to Create

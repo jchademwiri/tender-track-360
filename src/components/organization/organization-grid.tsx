@@ -1,17 +1,8 @@
-import { OrganizationCard } from './organization-card';
-import type { Role } from '@/db/schema';
+import { OrganizationCard } from '../organization-card';
+import type { OrganizationWithStats } from '@/server/organizations';
 
 interface OrganizationGridProps {
-  organizations: Array<{
-    id: string;
-    name: string;
-    slug?: string | null;
-    logo?: string | null;
-    createdAt: Date;
-    memberCount: number;
-    userRole: Role;
-    lastActivity?: Date;
-  }>;
+  organizations: OrganizationWithStats[];
 }
 
 export function OrganizationGrid({ organizations }: OrganizationGridProps) {

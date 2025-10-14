@@ -78,7 +78,7 @@ export function OrganizationSelector({
                 }
                 className="w-full justify-start"
               >
-                <Link href={`/organization/${org.slug}/dashboard`}>
+                <Link href="/dashboard">
                   <span className="font-medium">{org.name}</span>
                 </Link>
               </Button>
