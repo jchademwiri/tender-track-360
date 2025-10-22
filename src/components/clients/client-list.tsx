@@ -23,6 +23,7 @@ import {
 
 import { getClients, deleteClient } from '@/server';
 import type { Client } from '@/db/schema';
+import Link from 'next/link';
 
 interface ClientListProps {
   organizationId: string;
@@ -125,13 +126,12 @@ export function ClientList({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Clients</CardTitle>
-          <Button
-            onClick={() => router.push('/dashboard/clients/new')}
-            className="cursor-pointer"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Client
-          </Button>
+          <Link href="/dashboard/clients/create">
+            <Button asChild>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Client
+            </Button>
+          </Link>
         </div>
 
         {/* Search */}
@@ -167,13 +167,12 @@ export function ClientList({
                 : 'Get started by adding your first client.'}
             </p>
             {!searchQuery && (
-              <Button
-                onClick={() => router.push('/dashboard/clients/new')}
-                className="cursor-pointer"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Client
-              </Button>
+              <Link href="/dashboard/clients/create">
+                <Button asChild>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Client
+                </Button>
+              </Link>
             )}
           </div>
         ) : (

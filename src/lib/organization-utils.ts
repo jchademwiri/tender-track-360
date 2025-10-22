@@ -24,52 +24,74 @@ export async function switchOrganization({
   showToast = true,
 }: OrganizationSwitchOptions): Promise<{ success: boolean; error?: string }> {
   try {
-    // Step 1: Switch the active organization
-    const result = await authClient.organization.setActive({
-      organizationId,
+    // Step 1: Switch the active organization using direct API call
+    console.log(`Attempting to switch to organization: ${organizationId}`);
+
+    const baseUrl = typeof window !== 'undefined'
+      ? window.location.origin
+      : 'http://localhost:3000';
+
+    const response = await fetch(`${baseUrl}/api/auth/organization/set-active`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        organizationId,
+      }),
+      credentials: 'include',
     });
 
-    if (result.error) {
-      const errorMessage = 'Failed to switch organization';
+    console.log('Organization switch response status:', response.status);
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Organization switch successful:', result);
+
+      // Step 2: Force session refresh to ensure server components get updated data
+      try {
+        await authClient.getSession({
+          fetchOptions: {
+            cache: 'no-store',
+          },
+        });
+      } catch (sessionError) {
+        console.warn('Session refresh failed, continuing with router refresh:', sessionError);
+      }
+
+      // Step 3: Navigate to new URL if provided
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      }
+
+      // Step 4: Refresh the page to update all server components
+      router.refresh();
+
+      // Step 5: Show success message
+      if (showToast) {
+        toast.success(`Switched to ${organizationName}`);
+      }
+
+      return { success: true };
+    } else {
+      const errorText = await response.text();
+      console.error('Organization switch failed:', response.status, errorText);
+      const errorMessage = `Failed to switch organization (${response.status}): ${errorText}`;
       if (showToast) {
         toast.error(errorMessage);
       }
       return { success: false, error: errorMessage };
     }
-
-    // Step 2: Force session refresh to ensure server components get updated data
-    // This is crucial for server components that depend on session.activeOrganizationId
-    try {
-      await authClient.getSession({
-        fetchOptions: {
-          cache: 'no-store',
-        },
-      });
-    } catch (sessionError) {
-      console.warn(
-        'Session refresh failed, continuing with router refresh:',
-        sessionError
-      );
-    }
-
-    // Step 3: Navigate to new URL if provided
-    if (redirectUrl) {
-      router.push(redirectUrl);
-    }
-
-    // Step 4: Refresh the page to update all server components
-    router.refresh();
-
-    // Step 5: Show success message
-    if (showToast) {
-      toast.success(`Switched to ${organizationName}`);
-    }
-
-    return { success: true };
   } catch (error) {
     console.error('Organization switch error:', error);
-    const errorMessage =
-      error instanceof Error ? error.message : 'Failed to switch organization';
+
+    let errorMessage = 'Failed to switch organization';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === 'object' && error !== null) {
+      // Handle fetch errors or other API errors
+      errorMessage = `Network error: ${String(error)}`;
+    }
 
     if (showToast) {
       toast.error(errorMessage);
@@ -94,12 +116,63 @@ export async function switchOrganizationWithReload({
 }> {
   try {
     // Step 1: Switch the active organization
-    const result = await authClient.organization.setActive({
-      organizationId,
-    });
+    console.log(`Attempting to switch to organization: ${organizationId}`);
 
-    if (result.error) {
-      const errorMessage = 'Failed to switch organization';
+    // Try multiple approaches for organization switching
+    let result;
+
+    // Method 1: Try the standard organization setActive method
+    try {
+      result = await authClient.organization.setActive({
+        organizationId,
+      });
+      console.log('Method 1 (setActive) result:', result);
+    } catch (method1Error) {
+      console.warn('Method 1 failed:', method1Error);
+
+      // Method 2: Try using direct API call to the auth endpoint
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/api/auth/organization/set-active`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ organizationId }),
+            credentials: 'include',
+          }
+        );
+
+        if (response.ok) {
+          result = { success: true };
+          console.log('Method 2 (direct API call) succeeded');
+        } else {
+          throw new Error(`API call failed with status: ${response.status}`);
+        }
+      } catch (method2Error) {
+        console.warn('Method 2 failed:', method2Error);
+
+        // Method 3: Try using session update approach
+        try {
+          // Update the session with the new organization
+          await authClient.getSession({
+            fetchOptions: {
+              cache: 'no-store',
+            },
+          });
+          result = { success: true };
+          console.log('Method 3 (session refresh) succeeded');
+        } catch (method3Error) {
+          console.error('All methods failed:', method3Error);
+          throw method3Error;
+        }
+      }
+    }
+
+    if (result?.error) {
+      const errorMessage = `Failed to switch organization: ${result.error.message || result.error}`;
+      console.error('Organization switch error:', result.error);
       if (showToast) {
         toast.error(errorMessage);
       }
