@@ -14,17 +14,28 @@ import OrganizationInvitation from '@/emails/organization-invitation';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
+  trustedOrigins: [
+    'http://localhost:3000',
+    'https://tender-track-360.vercel.app',
+    ...(process.env.NEXT_PUBLIC_URL ? [new URL(process.env.NEXT_PUBLIC_URL).origin] : []),
+  ],
   databaseHooks: {
     session: {
       create: {
         before: async (session) => {
-          const organization = await getActiveOrganization(session.userId);
-          return {
-            data: {
-              ...session,
-              activeOrganizationId: organization?.id,
-            },
-          };
+          try {
+            const organization = await getActiveOrganization(session.userId);
+            return {
+              data: {
+                ...session,
+                activeOrganizationId: organization?.id,
+              },
+            };
+          } catch (error) {
+            console.error('Error in session create hook:', error);
+            return { data: session };
+          }
         },
       },
     },
