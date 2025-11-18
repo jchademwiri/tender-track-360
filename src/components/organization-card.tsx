@@ -47,8 +47,8 @@ export function OrganizationCard({
   return (
     <Card
       className={cn(
-        'group relative overflow-hidden transition-all duration-300 ease-out hover:shadow-xl hover:shadow-primary/10 hover:scale-[1.03] hover:-translate-y-1 cursor-pointer',
-        'before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100',
+        'group relative overflow-hidden transition-all duration-300 ease-out',
+        'before:absolute before:inset-0 before:bg-linear-to-br before:from-primary/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100',
         isActive && 'ring-2 ring-primary ring-offset-2 shadow-lg',
         className
       )}
@@ -56,7 +56,7 @@ export function OrganizationCard({
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <Avatar className="size-12 transition-transform duration-300 group-hover:scale-110">
+            <Avatar className="size-12 transition-transform duration-300">
               <AvatarImage src={organization.logo || undefined} />
               <AvatarFallback className="bg-primary/10 text-primary font-semibold transition-colors duration-300 group-hover:bg-primary/20">
                 <Link href={`/dashboard/organization/${organization.slug}`}>
@@ -66,7 +66,9 @@ export function OrganizationCard({
             </Avatar>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-lg leading-tight truncate">
-                {organization.name}
+                <Link href={`/dashboard/organization/${organization.slug}`}>
+                  {organization.name}
+                </Link>
               </h3>
               <div className="flex items-center gap-2 mt-1">
                 <Badge
