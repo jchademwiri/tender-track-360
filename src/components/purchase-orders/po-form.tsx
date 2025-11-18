@@ -40,7 +40,7 @@ const poFormSchema = z.object({
   status: z.enum(['draft', 'sent', 'delivered']),
   poDate: z.date().optional(),
   expectedDeliveryDate: z.date().optional(),
-  notes: z.string().optional(),
+  deliveryAddress: z.string().optional(),
 });
 
 type POFormValues = z.infer<typeof poFormSchema>;
@@ -57,7 +57,7 @@ interface POFormProps {
     status: 'draft' | 'sent' | 'delivered';
     poDate?: Date;
     expectedDeliveryDate?: Date;
-    notes?: string;
+    deliveryAddress?: string;
   };
   onSuccess?: () => void;
 }
@@ -84,7 +84,7 @@ export function POForm({
       status: initialData?.status || 'draft',
       poDate: initialData?.poDate,
       expectedDeliveryDate: initialData?.expectedDeliveryDate,
-      notes: initialData?.notes || '',
+      deliveryAddress: initialData?.deliveryAddress || '',
     },
   });
 
@@ -431,15 +431,16 @@ export function POForm({
                     </p>
                   </div>
                 )}
+
                 <FormField
                   control={form.control}
-                  name="notes"
+                  name="deliveryAddress"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Notes</FormLabel>
+                      <FormLabel>Delivery Address</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Additional notes (optional)"
+                          placeholder="Delivery address (optional)"
                           rows={4}
                           {...field}
                         />

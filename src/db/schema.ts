@@ -279,7 +279,7 @@ export const purchaseOrder = pgTable('purchase_order', {
   poDate: timestamp('po_date'), // Purchase order date
   expectedDeliveryDate: timestamp('expected_delivery_date'),
   deliveredAt: timestamp('delivered_at'),
-  notes: text('notes'),
+  deliveryAddress: text('delivery_address'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   deletedAt: timestamp('deleted_at'), // Soft deletion
