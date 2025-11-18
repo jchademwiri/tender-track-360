@@ -8,7 +8,9 @@ interface EditPurchaseOrderPageProps {
 
 export const dynamic = 'force-dynamic';
 
-export default async function EditPurchaseOrderPage({ params }: EditPurchaseOrderPageProps) {
+export default async function EditPurchaseOrderPage({
+  params,
+}: EditPurchaseOrderPageProps) {
   const { id } = await params;
   const { session } = await getCurrentUser();
 
@@ -37,7 +39,8 @@ export default async function EditPurchaseOrderPage({ params }: EditPurchaseOrde
             Purchase Order Not Found
           </h2>
           <p className="text-gray-600">
-            The purchase order you&#x27;re trying to edit doesn&#x27;t exist or you don&#x27;t have access to it.
+            The purchase order you&#x27;re trying to edit doesn&#x27;t exist or
+            you don&#x27;t have access to it.
           </p>
         </div>
       </div>
@@ -49,7 +52,9 @@ export default async function EditPurchaseOrderPage({ params }: EditPurchaseOrde
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Edit Purchase Order</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Edit Purchase Order
+        </h1>
         <p className="text-muted-foreground">
           Update purchase order {po.poNumber} details.
         </p>
@@ -67,7 +72,7 @@ export default async function EditPurchaseOrderPage({ params }: EditPurchaseOrde
           status: po.status as 'draft' | 'sent' | 'delivered',
           poDate: po.poDate || undefined,
           expectedDeliveryDate: po.expectedDeliveryDate || undefined,
-          notes: po.notes || undefined,
+          deliveryAddress: po.deliveryAddress || undefined,
         }}
       />
     </div>

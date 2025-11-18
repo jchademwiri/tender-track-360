@@ -2,7 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
-  typedRoutes: true, // Now stable!
+  // typedRoutes is now enabled by default in Next.js 16
   images: {
     remotePatterns: [
       {
@@ -10,6 +10,20 @@ const nextConfig: NextConfig = {
         hostname: 'www.jacobc.co.za',
         port: '',
       },
+    ],
+  },
+  // Enable the new App Router Instrumentation V2
+  experimental: {
+    // Enhanced Server and Client Actions
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+    // Optimized Module Resolution
+    optimizePackageImports: [
+      '@radix-ui/react-avatar',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      'lucide-react',
     ],
   },
 };

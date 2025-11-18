@@ -25,7 +25,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { createPurchaseOrder, updatePurchaseOrder } from '@/server/purchase-orders';
+import {
+  createPurchaseOrder,
+  updatePurchaseOrder,
+} from '@/server/purchase-orders';
 import { getProjects } from '@/server/projects';
 
 const poFormSchema = z.object({
@@ -37,7 +40,7 @@ const poFormSchema = z.object({
   status: z.enum(['draft', 'sent', 'delivered']),
   poDate: z.date().optional(),
   expectedDeliveryDate: z.date().optional(),
-  notes: z.string().optional(),
+  deliveryAddress: z.string().optional(),
 });
 
 type POFormValues = z.infer<typeof poFormSchema>;
@@ -54,12 +57,16 @@ interface POFormProps {
     status: 'draft' | 'sent' | 'delivered';
     poDate?: Date;
     expectedDeliveryDate?: Date;
-    notes?: string;
+    deliveryAddress?: string;
   };
   onSuccess?: () => void;
 }
 
-export function POForm({ organizationId, initialData, onSuccess }: POFormProps) {
+export function POForm({
+  organizationId,
+  initialData,
+  onSuccess,
+}: POFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,7 +84,7 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
       status: initialData?.status || 'draft',
       poDate: initialData?.poDate,
       expectedDeliveryDate: initialData?.expectedDeliveryDate,
-      notes: initialData?.notes || '',
+      deliveryAddress: initialData?.deliveryAddress || '',
     },
   });
 
@@ -102,7 +109,11 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
       try {
         if (initialData?.id) {
           // Update existing PO
-          const result = await updatePurchaseOrder(organizationId, initialData.id, data);
+          const result = await updatePurchaseOrder(
+            organizationId,
+            initialData.id,
+            data
+          );
           if (result.success) {
             if (onSuccess) {
               onSuccess();
@@ -187,59 +198,6 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
 
                 <FormField
                   control={form.control}
-                  name="projectId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Project *</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={loadingProjects}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a project" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {loadingProjects ? (
-                            <SelectItem value="loading" disabled>
-                              Loading projects...
-                            </SelectItem>
-                          ) : projects.length === 0 ? (
-                            <SelectItem value="none" disabled>
-                              No projects available
-                            </SelectItem>
-                          ) : (
-                            projects.map((project) => (
-                              <SelectItem key={project.id} value={project.id}>
-                                {project.projectNumber.toUpperCase()}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="supplierName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Supplier Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter supplier name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="description"
                   render={({ field }) => (
                     <FormItem>
@@ -282,7 +240,10 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Status *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select status" />
@@ -310,9 +271,15 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
                         <Input
                           type="date"
                           {...field}
-                          value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                          value={
+                            field.value
+                              ? field.value.toISOString().split('T')[0]
+                              : ''
+                          }
                           onChange={(e) => {
-                            const date = e.target.value ? new Date(e.target.value) : undefined;
+                            const date = e.target.value
+                              ? new Date(e.target.value)
+                              : undefined;
                             field.onChange(date);
                           }}
                         />
@@ -332,29 +299,17 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
                         <Input
                           type="date"
                           {...field}
-                          value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                          value={
+                            field.value
+                              ? field.value.toISOString().split('T')[0]
+                              : ''
+                          }
                           onChange={(e) => {
-                            const date = e.target.value ? new Date(e.target.value) : undefined;
+                            const date = e.target.value
+                              ? new Date(e.target.value)
+                              : undefined;
                             field.onChange(date);
                           }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notes</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Additional notes (optional)"
-                          rows={4}
-                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -366,6 +321,60 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
 
             {/* Related Information */}
             <Card className="shadow-sm">
+              <CardContent className="space-y-6p-6">
+                <FormField
+                  control={form.control}
+                  name="projectId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={loadingProjects}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a project" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {loadingProjects ? (
+                            <SelectItem value="loading" disabled>
+                              Loading projects...
+                            </SelectItem>
+                          ) : projects.length === 0 ? (
+                            <SelectItem value="none" disabled>
+                              No projects available
+                            </SelectItem>
+                          ) : (
+                            projects.map((project) => (
+                              <SelectItem key={project.id} value={project.id}>
+                                {project.projectNumber.toUpperCase()}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="supplierName"
+                  render={({ field }) => (
+                    <FormItem className="py-2">
+                      <FormLabel>Supplier Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter supplier name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
               <CardHeader>
                 <CardTitle className="flex items-center text-lg">
                   <Building className="h-5 w-5 mr-2 text-green-600" />
@@ -382,7 +391,9 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
                       Selected Project Details
                     </h4>
                     {(() => {
-                      const selectedProject = projects.find(p => p.id === form.watch('projectId'));
+                      const selectedProject = projects.find(
+                        (p) => p.id === form.watch('projectId')
+                      );
                       if (!selectedProject) return null;
 
                       return (
@@ -395,15 +406,18 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
                           </div>
                           {selectedProject.description && (
                             <div>
-                              <span className="font-medium">Description:</span> {selectedProject.description}
+                              <span className="font-medium">Description:</span>{' '}
+                              {selectedProject.description}
                             </div>
                           )}
                           <div>
-                            <span className="font-medium">Status:</span> {selectedProject.status}
+                            <span className="font-medium">Status:</span>{' '}
+                            {selectedProject.status}
                           </div>
                           {selectedProject.client && (
                             <div>
-                              <span className="font-medium">Client:</span> {selectedProject.client.name}
+                              <span className="font-medium">Client:</span>{' '}
+                              {selectedProject.client.name}
                             </div>
                           )}
                         </div>
@@ -417,6 +431,24 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
                     </p>
                   </div>
                 )}
+
+                <FormField
+                  control={form.control}
+                  name="deliveryAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Delivery Address</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Delivery address (optional)"
+                          rows={4}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             </Card>
           </div>
@@ -432,7 +464,11 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending} className="min-w-[120px] cursor-pointer">
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="min-w-[120px] cursor-pointer"
+            >
               {isPending ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -441,7 +477,9 @@ export function POForm({ organizationId, initialData, onSuccess }: POFormProps) 
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  {initialData?.id ? 'Update Purchase Order' : 'Create Purchase Order'}
+                  {initialData?.id
+                    ? 'Update Purchase Order'
+                    : 'Create Purchase Order'}
                 </>
               )}
             </Button>

@@ -52,7 +52,7 @@ interface PurchaseOrderWithProject {
   poDate: Date | null;
   expectedDeliveryDate: Date | null;
   deliveredAt: Date | null;
-  notes: string | null;
+  deliveryAddress: string | null;
   createdAt: Date;
   updatedAt: Date;
   project: {

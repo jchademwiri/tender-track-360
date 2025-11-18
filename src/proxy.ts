@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Debug: Log all cookies
   const allCookies = request.cookies.getAll();
-  console.log('=== MIDDLEWARE DEBUG ===');
+  console.log('=== PROXY DEBUG ===');
   console.log('Path:', pathname);
   console.log(
     'All cookies:',
