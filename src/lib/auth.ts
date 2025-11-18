@@ -101,7 +101,8 @@ export const auth = betterAuth({
   plugins: [
     organization({
       async sendInvitationEmail(data) {
-        const inviteLink = `${process.env.NEXT_PUBLIC_URL}/api/accept-invitation/${data.id}`;
+        const base = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+        const inviteLink = `${base}/invite/accept/${data.id}`;
         await resend.emails.send({
           from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
           to: data.email,
