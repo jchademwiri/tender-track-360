@@ -20,7 +20,9 @@ export default async function InviteAcceptPage({ params }: Props) {
     return (
       <div className="p-8">
         <h1 className="text-2xl font-bold">Invitation not found</h1>
-        <p className="mt-2 text-muted-foreground">This invitation may have expired or been cancelled.</p>
+        <p className="mt-2 text-muted-foreground">
+          This invitation may have expired or been cancelled.
+        </p>
       </div>
     );
   }
@@ -32,10 +34,15 @@ export default async function InviteAcceptPage({ params }: Props) {
         <div className="mb-6">
           <h1 className="text-2xl font-bold">You're invited</h1>
           <p className="text-muted-foreground mt-2">
-            You were invited to join the organization <strong>{invite.organizationId}</strong> as <strong>{invite.role}</strong>.
+            You were invited to join the organization{' '}
+            <strong>{invite.organizationId}</strong> as{' '}
+            <strong>{invite.role}</strong>.
           </p>
         </div>
-        <AcceptInvitationClient invitationId={invitationId} inviteEmail={invite.email} />
+        <AcceptInvitationClient
+          invitationId={invitationId}
+          inviteEmail={invite.email}
+        />
       </div>
     </div>
   );

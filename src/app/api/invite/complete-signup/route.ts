@@ -7,7 +7,10 @@ export async function POST(request: NextRequest) {
     const { invitationId, name, email, password } = body;
 
     if (!invitationId || !email || !password || !name) {
-      return NextResponse.json({ success: false, message: 'Missing fields' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: 'Missing fields' },
+        { status: 400 }
+      );
     }
 
     // Create the user and request headers/cookies from the auth API
@@ -23,14 +26,20 @@ export async function POST(request: NextRequest) {
 
     // Attempt to accept the invitation using the headers returned from signup (so the request is authenticated)
     try {
-      await auth.api.acceptInvitation({ body: { invitationId }, headers: signUpHeaders });
+      await auth.api.acceptInvitation({
+        body: { invitationId },
+        headers: signUpHeaders,
+      });
     } catch (acceptErr) {
       console.error('Accept invitation failed after signup:', acceptErr);
       // proceed — user was created; we can still return success and let user re-try accept in UI
     }
 
     // Build a JSON response and forward any Set-Cookie headers so the browser receives the session cookie
-    const res = NextResponse.json({ success: true, redirectUrl: `/dashboard?invitationId=${invitationId}` });
+    const res = NextResponse.json({
+      success: true,
+      redirectUrl: `/dashboard?invitationId=${invitationId}`,
+    });
 
     if (signUpHeaders) {
       // Copy Set-Cookie headers from signUpHeaders into our response
@@ -48,6 +57,9 @@ export async function POST(request: NextRequest) {
     return res;
   } catch (error) {
     console.error('Error in complete-signup route:', error);
-    return NextResponse.json({ success: false, message: 'Internal error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: 'Internal error' },
+      { status: 500 }
+    );
   }
 }

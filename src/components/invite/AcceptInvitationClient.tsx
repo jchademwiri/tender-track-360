@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -52,7 +52,10 @@ export default function AcceptInvitationClient({
       </div>
       {showSignUp && (
         <div className="mt-4 rounded-md border p-4">
-          <p className="mb-2 text-sm">Create an account for <strong>{inviteEmail}</strong> and accept the invitation.</p>
+          <p className="mb-2 text-sm">
+            Create an account for <strong>{inviteEmail}</strong> and accept the
+            invitation.
+          </p>
           <div className="grid gap-2">
             <input
               value={name}
@@ -76,7 +79,12 @@ export default function AcceptInvitationClient({
                     const resp = await fetch('/api/invite/complete-signup', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ invitationId, name, email: inviteEmail, password }),
+                      body: JSON.stringify({
+                        invitationId,
+                        name,
+                        email: inviteEmail,
+                        password,
+                      }),
                     });
                     const data = await resp.json();
                     if (data?.success) {
@@ -108,7 +116,8 @@ export default function AcceptInvitationClient({
         </div>
       )}
       <p className="text-sm text-muted-foreground">
-        If you don’t have an account yet, create one and you will be returned to this page to complete accepting the invitation.
+        If you don’t have an account yet, create one and you will be returned to
+        this page to complete accepting the invitation.
       </p>
     </div>
   );
