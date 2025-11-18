@@ -33,7 +33,10 @@ export async function getPurchaseOrders(
 
     // Add project filter if provided
     if (projectId) {
-      whereCondition = and(whereCondition, eq(purchaseOrder.projectId, projectId));
+      whereCondition = and(
+        whereCondition,
+        eq(purchaseOrder.projectId, projectId)
+      );
     }
 
     // Add search condition if provided
@@ -64,7 +67,7 @@ export async function getPurchaseOrders(
         poDate: purchaseOrder.poDate,
         expectedDeliveryDate: purchaseOrder.expectedDeliveryDate,
         deliveredAt: purchaseOrder.deliveredAt,
-        notes: purchaseOrder.notes,
+        deliveryAddress: purchaseOrder.deliveryAddress,
         createdAt: purchaseOrder.createdAt,
         updatedAt: purchaseOrder.updatedAt,
         project: {
@@ -98,7 +101,6 @@ export async function getPurchaseOrders(
     throw new Error('Failed to fetch purchase orders');
   }
 }
-
 
 // Create a new purchase order
 export async function createPurchaseOrder(
@@ -139,7 +141,10 @@ export async function createPurchaseOrder(
       .limit(1);
 
     if (existingPO.length > 0) {
-      return { success: false, error: 'PO Number already exists in this organization' };
+      return {
+        success: false,
+        error: 'PO Number already exists in this organization',
+      };
     }
 
     const newPurchaseOrder = await db
@@ -168,7 +173,10 @@ export async function createPurchaseOrder(
 }
 
 // Get purchase order by ID with project information
-export async function getPurchaseOrderById(organizationId: string, poId: string) {
+export async function getPurchaseOrderById(
+  organizationId: string,
+  poId: string
+) {
   try {
     const poData = await db
       .select({
@@ -181,7 +189,7 @@ export async function getPurchaseOrderById(organizationId: string, poId: string)
         poDate: purchaseOrder.poDate,
         expectedDeliveryDate: purchaseOrder.expectedDeliveryDate,
         deliveredAt: purchaseOrder.deliveredAt,
-        notes: purchaseOrder.notes,
+        deliveryAddress: purchaseOrder.deliveryAddress,
         createdAt: purchaseOrder.createdAt,
         updatedAt: purchaseOrder.updatedAt,
         project: {
@@ -257,7 +265,10 @@ export async function updatePurchaseOrder(
         .limit(1);
 
       if (duplicatePO.length > 0) {
-        return { success: false, error: 'PO Number already exists in this organization' };
+        return {
+          success: false,
+          error: 'PO Number already exists in this organization',
+        };
       }
     }
 
@@ -337,24 +348,31 @@ export async function updatePurchaseOrderStatus(
 
     // Check if PO is already delivered - cannot change status once delivered
     if (existingPO[0].status === 'delivered') {
-      return { success: false, error: 'Cannot change status of a delivered purchase order' };
+      return {
+        success: false,
+        error: 'Cannot change status of a delivered purchase order',
+      };
     }
 
     // Check user permissions - only owner and admin can change status
     const { auth } = await import('@/lib/auth');
     const { headers } = await import('next/headers');
 
-    const { success: hasPermission, error: permissionError } = await auth.api.hasPermission({
-      headers: await headers(),
-      body: {
-        permissions: {
-          project: ['update'], // Admin/owner level permission
+    const { success: hasPermission, error: permissionError } =
+      await auth.api.hasPermission({
+        headers: await headers(),
+        body: {
+          permissions: {
+            project: ['update'], // Admin/owner level permission
+          },
         },
-      },
-    });
+      });
 
     if (permissionError || !hasPermission) {
-      return { success: false, error: 'Insufficient permissions to change purchase order status' };
+      return {
+        success: false,
+        error: 'Insufficient permissions to change purchase order status',
+      };
     }
 
     const updatedPO = await db
@@ -362,7 +380,8 @@ export async function updatePurchaseOrderStatus(
       .set({
         status: validatedData.status,
         // Auto-set deliveredAt when status is delivered
-        deliveredAt: validatedData.status === 'delivered' ? new Date() : undefined,
+        deliveredAt:
+          validatedData.status === 'delivered' ? new Date() : undefined,
         updatedAt: new Date(),
       })
       .where(eq(purchaseOrder.id, poId))
@@ -388,7 +407,10 @@ export async function updatePurchaseOrderStatus(
 }
 
 // Soft delete purchase order
-export async function deletePurchaseOrder(organizationId: string, poId: string) {
+export async function deletePurchaseOrder(
+  organizationId: string,
+  poId: string
+) {
   try {
     // Check if purchase order exists and belongs to organization
     const existingPO = await db

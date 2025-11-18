@@ -22,7 +22,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { deletePurchaseOrder, updatePurchaseOrderStatus } from '@/server/purchase-orders';
+import {
+  deletePurchaseOrder,
+  updatePurchaseOrderStatus,
+} from '@/server/purchase-orders';
 
 interface PurchaseOrderWithProject {
   id: string;
@@ -34,7 +37,7 @@ interface PurchaseOrderWithProject {
   poDate: Date | null;
   expectedDeliveryDate: Date | null;
   deliveredAt: Date | null;
-  notes: string | null;
+  deliveryAddress: string | null;
   createdAt: Date;
   updatedAt: Date;
   project: {
@@ -248,24 +251,24 @@ export function PODetails({ po, organizationId }: PODetailsProps) {
                 </p>
               </div>
 
-              {po.notes && (
+              {po.deliveryAddress && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">
-                    Notes
+                    Delivery Address
                   </label>
                   <p className="text-foreground whitespace-pre-wrap">
-                    {po.notes}
+                    {po.deliveryAddress}
                   </p>
                 </div>
               )}
 
-              {!po.notes && (
+              {!po.deliveryAddress && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">
-                    Notes
+                    Delivery Address
                   </label>
                   <p className="text-muted-foreground italic">
-                    No notes added
+                    No delivery address added
                   </p>
                 </div>
               )}
@@ -287,7 +290,8 @@ export function PODetails({ po, organizationId }: PODetailsProps) {
                     Project Number
                   </label>
                   <p className="text-lg font-medium text-blue-600">
-                    {po.project?.projectNumber.toUpperCase() || 'Unknown Project'}
+                    {po.project?.projectNumber.toUpperCase() ||
+                      'Unknown Project'}
                   </p>
                 </div>
 
@@ -296,9 +300,7 @@ export function PODetails({ po, organizationId }: PODetailsProps) {
                     <label className="text-sm font-medium text-muted-foreground">
                       Project Description
                     </label>
-                    <p className="text-foreground">
-                      {po.project.description}
-                    </p>
+                    <p className="text-foreground">{po.project.description}</p>
                   </div>
                 )}
               </div>
@@ -400,7 +402,9 @@ export function PODetails({ po, organizationId }: PODetailsProps) {
                   <label className="text-sm font-medium text-muted-foreground">
                     Expected Delivery
                   </label>
-                  <p className="text-sm">{formatDate(po.expectedDeliveryDate)}</p>
+                  <p className="text-sm">
+                    {formatDate(po.expectedDeliveryDate)}
+                  </p>
                 </div>
               )}
               {po.deliveredAt && (
