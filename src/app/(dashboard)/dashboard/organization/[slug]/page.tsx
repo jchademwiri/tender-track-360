@@ -41,8 +41,7 @@ async function OrganizationManagementContent({ slug }: { slug: string }) {
 
     // If user is just a member, redirect to read-only view
     if (userMembership.role === 'member') {
-      // @ts-expect-error - Dynamic route typing issue
-      redirect(`/dashboard/organization/${slug}/view`);
+      redirect(`/dashboard/organization/${slug}`);
     }
 
     return (
