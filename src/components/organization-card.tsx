@@ -48,7 +48,8 @@ export function OrganizationCard({
     <Card
       className={cn(
         'group relative overflow-hidden transition-all duration-300 ease-out',
-        'before:absolute before:inset-0 before:bg-linear-to-br before:from-primary/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100',
+        // allow clicks through the decorative pseudo element
+        'before:absolute before:inset-0 before:bg-linear-to-br before:from-primary/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100 before:pointer-events-none',
         isActive && 'ring-2 ring-primary ring-offset-2 shadow-lg',
         className
       )}
@@ -112,28 +113,21 @@ export function OrganizationCard({
               size="sm"
             >
               <Link href={`/dashboard`}>
-                <ExternalLink className="size-4 mr-2 transition-transform duration-200 group-hover:translate-x-0.5" />
+                <ExternalLink className="size-4 mr-2 py-4 transition-transform duration-200 group-hover:translate-x-0.5" />
                 Go to Dashboard
               </Link>
             </Button>
             {(actualUserRole === 'owner' || actualUserRole === 'admin') && (
               <Button
+                asChild
                 variant="outline"
                 size="sm"
-                asChild
-                className="transition-all duration-200 hover:scale-105 hover:rotate-12"
+                aria-label="Organization settings"
+                className="transition-all duration-200 hover:scale-105 hover:rotate-12 p-1 hover:bg-muted rounded"
               >
-                {/* TODO: Implement settings page route */}
-                <button
-                  onClick={() => {
-                    console.log('Settings clicked for:', organization.slug);
-                    // TODO: Navigate to settings page when route is created
-                  }}
-                  aria-label="Settings"
-                  className="p-1 hover:bg-muted rounded"
-                >
+                <Link href={`/dashboard/organization/${organization.slug}`}>
                   <Settings className="size-4 transition-transform duration-200" />
-                </button>
+                </Link>
               </Button>
             )}
           </div>
