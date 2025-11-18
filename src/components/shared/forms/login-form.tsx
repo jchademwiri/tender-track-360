@@ -50,8 +50,14 @@ export function LoginForm({
     const { success, message } = await signIn(values.email, values.password);
     if (success) {
       toast.success(message as string);
-      // Use window.location.replace for full page refresh with auth state
-      window.location.replace('/dashboard');
+      // If a `next` param is present in the URL, return there after login; otherwise go to dashboard
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const next = params.get('next');
+        window.location.replace(next || '/dashboard');
+      } catch (e) {
+        window.location.replace('/dashboard');
+      }
     } else {
       toast.error(message as string);
     }

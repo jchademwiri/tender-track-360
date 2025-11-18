@@ -23,6 +23,10 @@ export async function GET(
     );
   } catch (error) {
     console.error(error);
-    return NextResponse.redirect(new URL(`/organization`, request.url));
+    // If accept fails (likely because the user is not authenticated),
+    // redirect to the public invite accept page so the recipient can sign in or sign up.
+    return NextResponse.redirect(
+      new URL(`/invite/accept/${invitationId}`, request.url)
+    );
   }
 }

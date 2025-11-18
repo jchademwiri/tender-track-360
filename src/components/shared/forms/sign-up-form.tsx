@@ -54,10 +54,15 @@ export function SignUpForm({
       values.password
     );
     if (success) {
-      toast.success(`
-        ${message as string}, Please check your email to verify your account.
-      `);
-      router.push('/dashboard');
+      toast.success(`${message as string}`);
+      // If this signup was started from an invitation, redirect back using the `next` query param in the URL
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const next = params.get('next');
+        router.push(next || '/dashboard');
+      } catch (e) {
+        router.push('/dashboard');
+      }
     } else {
       toast.error(message as string);
     }

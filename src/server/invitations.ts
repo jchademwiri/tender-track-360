@@ -169,7 +169,11 @@ export async function inviteMember(
     // Send invitation email
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
-      const inviteLink = `${process.env.NEXT_PUBLIC_URL}/api/accept-invitation/${newInvitation[0].id}`;
+      const base =
+        process.env.NEXT_PUBLIC_APP_URL ||
+        process.env.NEXT_PUBLIC_URL ||
+        'http://localhost:3000';
+      const inviteLink = `${base}/invite/accept/${newInvitation[0].id}`;
 
       await resend.emails.send({
         from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
@@ -386,7 +390,11 @@ export async function resendInvitation(
     // Send invitation email
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
-      const inviteLink = `${process.env.NEXT_PUBLIC_URL}/api/accept-invitation/${invitationId}`;
+      const base =
+        process.env.NEXT_PUBLIC_APP_URL ||
+        process.env.NEXT_PUBLIC_URL ||
+        'http://localhost:3000';
+      const inviteLink = `${base}/invite/accept/${invitationId}`;
 
       await resend.emails.send({
         from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
