@@ -3,65 +3,37 @@
 import { OrganizationMembersSection } from '@/components/organization-members-section';
 import { Member } from '@/db/schema';
 import { PendingInvitation } from '@/server/organizations';
+import { faker } from '@faker-js/faker';
 
 // Example usage of the BulkActionsToolbar component
 export function BulkActionsExample() {
-  // Mock data for demonstration
-  const mockMembers: Member[] = [
-    {
-      id: 'member1',
-      userId: 'user1',
-      organizationId: 'org1',
-      role: 'member',
-      createdAt: new Date(),
-      user: {
-        id: 'user1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        image: null,
-        emailVerified: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
+  // Generate mock data using Faker.js
+  const mockMembers: Member[] = Array.from({ length: 5 }, () => ({
+    id: faker.string.uuid(),
+    userId: faker.string.uuid(),
+    organizationId: faker.string.uuid(),
+    role: faker.helpers.arrayElement(['member', 'admin', 'owner']),
+    createdAt: faker.date.recent(),
+    user: {
+      id: faker.string.uuid(),
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      image: faker.image.avatar(),
+      emailVerified: faker.datatype.boolean(),
+      createdAt: faker.date.recent(),
+      updatedAt: faker.date.recent(),
     },
-    {
-      id: 'member2',
-      userId: 'user2',
-      organizationId: 'org1',
-      role: 'admin',
-      createdAt: new Date(),
-      user: {
-        id: 'user2',
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        image: null,
-        emailVerified: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    },
-  ];
+  }));
 
-  const mockInvitations: PendingInvitation[] = [
-    {
-      id: 'inv1',
-      email: 'pending1@example.com',
-      role: 'member',
-      status: 'pending',
-      invitedAt: new Date(),
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      inviterName: 'Admin User',
-    },
-    {
-      id: 'inv2',
-      email: 'pending2@example.com',
-      role: 'member',
-      status: 'pending',
-      invitedAt: new Date(),
-      expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-      inviterName: 'Admin User',
-    },
-  ];
+  const mockInvitations: PendingInvitation[] = Array.from({ length: 3 }, () => ({
+    id: faker.string.uuid(),
+    email: faker.internet.email(),
+    role: faker.helpers.arrayElement(['member', 'admin']),
+    status: 'pending',
+    invitedAt: faker.date.recent(),
+    expiresAt: faker.date.future(),
+    inviterName: faker.person.fullName(),
+  }));
 
   const handleInviteClick = () => {
     console.log('Invite member clicked');
