@@ -4,13 +4,13 @@ import { eq } from 'drizzle-orm';
 import AcceptInvitationClient from '@/components/invite/AcceptInvitationClient';
 
 type Props = {
-  params: {
+  params: Promise<{
     invitationId: string;
-  };
+  }>;
 };
 
 export default async function InviteAcceptPage({ params }: Props) {
-  const { invitationId } = params;
+  const { invitationId } = await params;
 
   const invite = await db.query.invitation.findFirst({
     where: eq(invitation.id, invitationId),

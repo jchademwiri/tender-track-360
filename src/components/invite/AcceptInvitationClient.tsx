@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function AcceptInvitationClient({
   invitationId,
@@ -88,12 +89,15 @@ export default function AcceptInvitationClient({
                     });
                     const data = await resp.json();
                     if (data?.success) {
+                      toast.success('Account created and invitation accepted!');
                       window.location.href = data.redirectUrl || '/dashboard';
                     } else {
                       setError(data?.message || 'Failed to create account');
+                      toast.error(data?.message || 'Failed to create account');
                     }
                   } catch (e) {
                     setError('Network error');
+                    toast.error('Network error occurred');
                   } finally {
                     setIsSubmitting(false);
                   }
