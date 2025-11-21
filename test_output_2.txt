@@ -1,0 +1,34 @@
+FAIL src/server/__tests__/crud-integration.test.ts (15.554 s)
+  Client CRUD Integration Tests
+    Create Client
+      ΓêÜ should create a new client successfully (1018 ms)
+      ├ù should fail validation with invalid email (22 ms)
+    Read Client
+      ΓêÜ should get client by ID (501 ms)
+      ΓêÜ should list clients with pagination (3299 ms)
+    Update Client
+      ΓêÜ should update client details (1499 ms)
+    Delete Client
+      ΓêÜ should soft delete client (2518 ms)
+
+  ΓùÅ Client CRUD Integration Tests ΓÇ║ Create Client ΓÇ║ should fail validation with invalid email
+
+    TypeError: Cannot read properties of undefined (reading 'value')
+
+      88 |     return { success: true, client: newClient[0] };
+      89 |   } catch (error) {
+    > 90 |     console.error('Error creating client:', error);
+         |             ^
+      91 |     if (error instanceof z.ZodError) {
+      92 |       return {
+      93 |         success: false,
+
+      at console.error (node_modules/.pnpm/@jest+console@29.7.0/node_modules/@jest/console/build/CustomConsole.js:112:48)
+      at error (src/server/clients.ts:90:13)
+      at Object.<anonymous> (src/server/__tests__/crud-integration.test.ts:68:40)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 5 passed, 6 total
+Snapshots:   0 total
+Time:        15.65 s
+Ran all test suites matching /src\\server\\__tests__\\crud-integration.test.ts/i.
