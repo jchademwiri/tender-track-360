@@ -55,10 +55,10 @@ export async function POST(request: NextRequest) {
     }
 
     return res;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in complete-signup route:', error);
     return NextResponse.json(
-      { success: false, message: 'Internal error' },
+      { success: false, message: error?.body?.message || 'Internal error' },
       { status: 500 }
     );
   }

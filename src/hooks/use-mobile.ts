@@ -38,7 +38,7 @@ export function useBreakpoint(breakpoint: Breakpoint): boolean {
 }
 
 export function useMobile(): boolean {
-  return !useBreakpoint('md');
+  return useMediaQuery(`(max-width: ${BREAKPOINTS.md - 1}px)`);
 }
 
 export function useTablet(): boolean {
