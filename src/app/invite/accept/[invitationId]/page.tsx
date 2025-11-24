@@ -1,16 +1,18 @@
 import { db } from '@/db';
-import { invitation } from '@/db/schema';
+import { invitation, user } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import AcceptInvitationClient from '@/components/invite/AcceptInvitationClient';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 
 type Props = {
-  params: {
+  params: Promise<{
     invitationId: string;
-  };
+  }>;
 };
 
 export default async function InviteAcceptPage({ params }: Props) {
-  const { invitationId } = params;
+  const { invitationId } = await params;
 
   const invite = await db.query.invitation.findFirst({
     where: eq(invitation.id, invitationId),
@@ -27,6 +29,16 @@ export default async function InviteAcceptPage({ params }: Props) {
     );
   }
 
+  // Check if a user already exists with this email
+  const existingUser = await db.query.user.findFirst({
+    where: eq(user.email, invite.email),
+  });
+
+  // Check if current user is logged in
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-2xl">
@@ -42,6 +54,8 @@ export default async function InviteAcceptPage({ params }: Props) {
         <AcceptInvitationClient
           invitationId={invitationId}
           inviteEmail={invite.email}
+          userExists={!!existingUser}
+          currentUserEmail={session?.user?.email}
         />
       </div>
     </div>

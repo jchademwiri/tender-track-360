@@ -1,4 +1,5 @@
 import { betterAuth } from 'better-auth';
+import { env } from '@/env';
 import { organization } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
@@ -14,13 +15,11 @@ import OrganizationInvitation from '@/emails/organization-invitation';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
+  baseURL: env.BETTER_AUTH_URL,
   trustedOrigins: [
     'http://localhost:3000',
     'https://tender-track-360.vercel.app',
-    ...(process.env.NEXT_PUBLIC_URL
-      ? [new URL(process.env.NEXT_PUBLIC_URL).origin]
-      : []),
+    ...(env.NEXT_PUBLIC_URL ? [new URL(env.NEXT_PUBLIC_URL).origin] : []),
   ],
   databaseHooks: {
     session: {
@@ -31,7 +30,7 @@ export const auth = betterAuth({
             return {
               data: {
                 ...session,
-                activeOrganizationId: organization?.id,
+                activeOrganizationId: organization?.id ?? null,
               },
             };
           } catch (error) {
@@ -48,14 +47,14 @@ export const auth = betterAuth({
   }),
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
       await resend.emails.send({
-        from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
+        from: 'Tender Track 360 <onboarding@resend.dev>',
         to: user.email,
         subject: 'Verify your email address',
         react: VerifyEmail({
@@ -74,7 +73,7 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url }) => {
       try {
         const { data, error } = await resend.emails.send({
-          from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
+          from: 'Tender Track 360 <onboarding@resend.dev>',
           to: user.email,
           subject: 'Reset your password',
           react: ResetPasswordEmail({
@@ -103,13 +102,10 @@ export const auth = betterAuth({
   plugins: [
     organization({
       async sendInvitationEmail(data) {
-        const base =
-          process.env.NEXT_PUBLIC_APP_URL ||
-          process.env.NEXT_PUBLIC_URL ||
-          'http://localhost:3000';
+        const base = env.NEXT_PUBLIC_URL || 'http://localhost:3000';
         const inviteLink = `${base}/invite/accept/${data.id}`;
         await resend.emails.send({
-          from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
+          from: 'Tender Track 360 <onboarding@resend.dev>',
           to: data.email,
           subject: `You're invited to join ${data.organization.name}`,
           react: OrganizationInvitation({
