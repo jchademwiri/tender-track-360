@@ -48,6 +48,30 @@ function Button({
   }) {
   const Comp = asChild ? Slot : 'button';
 
+  // Ensure Slot (when using `asChild`) receives a single React element child.
+  // Radix Slot expects a single element; if multiple children were passed,
+  // wrap them in a single `span` so Slot receives exactly one child.
+  if (asChild) {
+    const { children, ...rest } = props as any;
+
+    const singleChild =
+      React.Children.count(children) > 1 ? (
+        <span className="inline-flex items-center gap-2">{children}</span>
+      ) : (
+        children
+      );
+
+    return (
+      <Slot
+        data-slot="button"
+        className={cn(buttonVariants({ variant, size, className }))}
+        {...rest}
+      >
+        {singleChild}
+      </Slot>
+    );
+  }
+
   return (
     <Comp
       data-slot="button"
