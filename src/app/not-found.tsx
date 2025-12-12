@@ -25,7 +25,7 @@ export default function NotFound() {
             <div className="space-y-2">
               <h1 className="text-2xl font-bold">Page Not Found</h1>
               <p className="text-muted-foreground">
-                The page you&apos;re looking for doesn&apos;t exist or has been
+                The page you&#x27;re looking for doesn&#x27;t exist or has been
                 moved to a different location.
               </p>
             </div>
@@ -40,7 +40,7 @@ export default function NotFound() {
               </Button>
               <Button
                 variant="outline"
-                className="flex-1"
+                className="flex-1 cursor-pointer"
                 onClick={() => window.history.back()}
               >
                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
@@ -53,7 +53,7 @@ export default function NotFound() {
               <p className="text-sm text-muted-foreground">
                 Need help? Try checking the URL or{' '}
                 <Link
-                  href="/contact"
+                  href="/"
                   className="text-primary hover:underline font-medium"
                 >
                   contact support

@@ -1,10 +1,21 @@
+import { Header } from '@/components/home-page/Header';
+import { HeroSection } from '@/components/home-page/HeroSection';
+import { FeaturesSection } from '@/components/home-page/FeaturesSection';
+import { BenefitsSection } from '@/components/home-page/BenefitsSection';
+import { TestimonialsSection } from '@/components/home-page/TestimonialsSection';
+import { FooterSection } from '@/components/home-page/FooterSection';
+
 export default function Home() {
   return (
-    <section className="grid place-items-center min-h-screen text-center">
-      <div>
-        <h1 className="text-4xl font-bold">Tender Track 360</h1>
-        <p className="mt-4 text-lg">Welcome to Tender Track 360!</p>
-      </div>
-    </section>
+    <div className="min-h-screen">
+      <Header />
+      <main>
+        <HeroSection />
+        <FeaturesSection />
+        <BenefitsSection />
+        <TestimonialsSection />
+        <FooterSection />
+      </main>
+    </div>
   );
 }

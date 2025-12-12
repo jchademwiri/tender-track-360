@@ -14,6 +14,12 @@ export const env = createEnv({
     UPLOADTHING_TOKEN: z
       .string()
       .min(1, { message: 'UPLOADTHING_TOKEN is required' }),
+    GOOGLE_CLIENT_ID: z.string().min(1, {
+      message: 'GOOGLE_CLIENT_ID is required',
+    }),
+    GOOGLE_CLIENT_SECRET: z.string().min(1, {
+      message: 'GOOGLE_CLIENT_SECRET is required',
+    }),
   },
   client: {
     NEXT_PUBLIC_URL: z.string().min(1, {
@@ -26,6 +32,8 @@ export const env = createEnv({
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
   },
 });

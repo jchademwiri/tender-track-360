@@ -1,4 +1,5 @@
 # Tender Track 360
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/jchademwiri/tender-track-360?utm_source=oss&utm_medium=github&utm_campaign=jchademwiri%2Ftender-track-360&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
 Tender Track 360 is a comprehensive web application designed to streamline and optimize the government tender management process for businesses. This platform digitizes the entire tender lifecycle, from discovery to award, enabling organizations to efficiently track, respond to, and analyze public procurement opportunities.
 
@@ -8,7 +9,11 @@ Built with modern web technologies, Tender Track 360 provides a centralized hub 
 
 ## Key Features
 
+- **Tender Management**: Comprehensive tools to manage and organize tenders
 - **Tender Lifecycle Management**: Track tenders from publication through submission to final award decision
+- **Purchase Order Management**: Track and manage purchase orders associated with tenders
+- **Tender Tracking**: Monitor the status of each tender from initial publication to final award
+- **Tender Analytics**: Gain insights from historical tender data to inform future bids
 - **Document Repository**: Centralized storage for all tender-related files with version control
 - **Deadline Tracking**: Automated notifications for approaching deadlines and submission requirements
 - **Status Dashboard**: Visual overview of all active, pending, and completed tenders
