@@ -43,18 +43,32 @@ export function ForgotPasswordForm({
 
   async function onSubmit(values: z.infer<typeof forgotPasswordFormSchema>) {
     setIsLoading(true);
-    const { error } = await authClient.forgetPassword({
-      email: values.email,
-      redirectTo: '/reset-password',
-    });
+    
+    try {
+      const response = await fetch('/api/auth/forget-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+          redirectTo: '/reset-password',
+        }),
+      });
 
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success('Password reset link sent successfully');
-      router.push('/dashboard');
+      const result = await response.json();
+
+      if (!response.ok || result.error) {
+        toast.error(result.error?.message || 'Failed to send reset email');
+      } else {
+        toast.success('Password reset link sent successfully');
+        router.push('/login');
+      }
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      toast.error('Failed to send reset email');
     }
-
+    
     setIsLoading(false);
   }
 

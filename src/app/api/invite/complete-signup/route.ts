@@ -26,10 +26,15 @@ export async function POST(request: NextRequest) {
 
     // Attempt to accept the invitation using the headers returned from signup (so the request is authenticated)
     try {
-      await auth.api.acceptInvitation({
+      const acceptInvitationOptions: any = {
         body: { invitationId },
-        headers: signUpHeaders,
-      });
+      };
+      
+      if (signUpHeaders) {
+        acceptInvitationOptions.headers = signUpHeaders;
+      }
+      
+      await auth.api.acceptInvitation(acceptInvitationOptions);
     } catch (acceptErr) {
       console.error('Accept invitation failed after signup:', acceptErr);
       // proceed — user was created; we can still return success and let user re-try accept in UI
