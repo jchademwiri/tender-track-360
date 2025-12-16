@@ -6,11 +6,18 @@ import {
 import { getClientStats } from '@/server/clients';
 import { getProjectStats } from '@/server/projects';
 
+export interface ActivityItem {
+  id: string;
+  type: 'tender_created' | 'status_updated';
+  description: string;
+  timestamp: Date;
+}
+
 export interface DashboardData {
   tenderStats: Awaited<ReturnType<typeof getTenderStats>>['stats'];
   clientStats: Awaited<ReturnType<typeof getClientStats>>['stats'];
   projectStats: Awaited<ReturnType<typeof getProjectStats>>['stats'];
-  recentActivity: Awaited<ReturnType<typeof getRecentActivity>>['activity'];
+  recentActivity: ActivityItem[];
   upcomingDeadlines: Awaited<
     ReturnType<typeof getUpcomingDeadlines>
   >['deadlines'];
@@ -34,11 +41,29 @@ export async function getDashboardData(
       getUpcomingDeadlines(organizationId, 10),
     ]);
 
+    const activityData = recentActivityResult.activity;
+    const recentActivity: ActivityItem[] = [
+      ...activityData.recentTenders.map((t) => ({
+        id: `create-${t.id}`,
+        type: 'tender_created' as const,
+        description: `New tender ${t.tenderNumber}`,
+        timestamp: t.createdAt,
+      })),
+      ...activityData.recentChanges.map((t) => ({
+        id: `update-${t.id}`,
+        type: 'status_updated' as const,
+        description: `Tender ${t.tenderNumber} updated to ${t.status}`,
+        timestamp: t.updatedAt || t.createdAt,
+      })),
+    ]
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .slice(0, 10);
+
     return {
       tenderStats: tenderStatsResult.stats,
       clientStats: clientStatsResult.stats,
       projectStats: projectStatsResult.stats,
-      recentActivity: recentActivityResult.activity,
+      recentActivity,
       upcomingDeadlines: upcomingDeadlinesResult.deadlines,
     };
   } catch (error) {
@@ -93,7 +118,7 @@ export function getMonthlyTrendsData(
   // This would typically fetch historical data from the database
   // For now, we'll create sample data based on current stats
   const currentMonth = new Date();
-  const months = [];
+  const months: { month: string; tenders: number; value: number }[] = [];
 
   for (let i = 5; i >= 0; i--) {
     const date = new Date(

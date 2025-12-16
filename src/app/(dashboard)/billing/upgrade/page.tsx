@@ -18,7 +18,6 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { get } from 'http';
 
 // Enhanced TypeScript interfaces
 interface PricingTier {
@@ -105,25 +104,6 @@ export default function UpgradePage() {
       ],
       popular: true,
       ctaText: 'Start Pro Trial',
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise',
-      price: 'Custom',
-      period: 'pricing',
-      description: 'For large organizations',
-      features: [
-        'Everything in Pro',
-        'Dedicated account manager',
-        'SSO & advanced security',
-        'Custom integrations',
-        'SLA guarantee',
-        'Phone support',
-        'Advanced compliance',
-        'Custom training',
-      ],
-      enterprise: true,
-      ctaText: 'Contact Sales',
     },
   ];
 
