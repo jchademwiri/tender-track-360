@@ -2,8 +2,22 @@
  * @jest-environment node
  */
 import { db } from '@/db';
-import { organization, client } from '@/db/schema';
-import { createClient, getClients, getClientById, updateClient, deleteClient } from '@/server/clients';
+import {
+  organization,
+  client,
+  tender,
+  project,
+  purchaseOrder,
+} from '@/db/schema';
+import {
+  createClient,
+  getClients,
+  getClientById,
+  updateClient,
+  deleteClient,
+} from '@/server/clients';
+import { deleteTender } from '@/server/tenders';
+import { deleteProject } from '@/server/projects';
 import { eq } from 'drizzle-orm';
 
 // Mock revalidatePath to avoid Next.js errors in test environment
@@ -101,7 +115,7 @@ describe('Client CRUD Integration Tests', () => {
     it('should list clients with pagination', async () => {
       const result = await getClients(testOrgId);
       expect(result.clients.length).toBeGreaterThan(0);
-      const found = result.clients.find(c => c.id === clientId);
+      const found = result.clients.find((c) => c.id === clientId);
       expect(found).toBeDefined();
     });
   });
@@ -159,8 +173,100 @@ describe('Client CRUD Integration Tests', () => {
 
       // Verify it doesn't show up in getClients
       const listResult = await getClients(testOrgId);
-      const found = listResult.clients.find(c => c.id === clientId);
+      const found = listResult.clients.find((c) => c.id === clientId);
       expect(found).toBeUndefined();
     });
+  });
+
+  describe('Safe Deletion Constraints', () => {
+    let clientId: string;
+    let tenderId: string;
+    let projectId: string;
+    let poId: string;
+
+    beforeAll(async () => {
+      // Create Client
+      const clientRes = await createClient(testOrgId, {
+        name: `${TEST_PREFIX}_Safe_Client`,
+      });
+      clientId = clientRes.client!.id;
+
+      // Create Tender linked to Client
+      tenderId = `tender_${Date.now()}`;
+      await db.insert(tender).values({
+        id: tenderId,
+        organizationId: testOrgId,
+        tenderNumber: `TND_${Date.now()}`,
+        clientId: clientId,
+        description: 'Safe Deletion Test Tender',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      // Create Project linked to Tender
+      projectId = `proj_${Date.now()}`;
+      await db.insert(project).values({
+        id: projectId,
+        organizationId: testOrgId,
+        projectNumber: `PRJ_${Date.now()}`,
+        clientId: clientId,
+        tenderId: tenderId,
+        description: 'Safe Deletion Test Project',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      // Create Active Purchase Order linked to Project
+      poId = `po_${Date.now()}`;
+      await db.insert(purchaseOrder).values({
+        id: poId,
+        organizationId: testOrgId,
+        projectId: projectId,
+        poNumber: `PO_${Date.now()}`,
+        description: 'Safe Deletion Test PO',
+        totalAmount: '1000',
+        status: 'sent', // Active status
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    });
+
+    it('should prevent deleting Project with active Purchase Orders', async () => {
+      const result = await deleteProject(testOrgId, projectId);
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('active purchase orders');
+    });
+
+    it('should prevent deleting Tender with active Projects', async () => {
+      const result = await deleteTender(testOrgId, tenderId);
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('active projects');
+    });
+
+    it('should prevent deleting Client with active Tenders', async () => {
+      const result = await deleteClient(testOrgId, clientId);
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('active tenders');
+    });
+
+    it('should allow deletion after dependencies are removed', async () => {
+      // 1. Delete PO
+      await db
+        .update(purchaseOrder)
+        .set({ deletedAt: new Date() })
+        .where(eq(purchaseOrder.id, poId));
+
+      // 2. Delete Project (Should now succeed)
+      const projResult = await deleteProject(testOrgId, projectId);
+      expect(projResult.success).toBe(true);
+
+      // 3. Delete Tender (Should now succeed)
+      const tenderResult = await deleteTender(testOrgId, tenderId);
+      expect(tenderResult.success).toBe(true);
+
+      // 4. Delete Client (Should now succeed)
+      const clientResult = await deleteClient(testOrgId, clientId);
+      expect(clientResult.success).toBe(true);
+    }, 15000);
   });
 });

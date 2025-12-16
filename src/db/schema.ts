@@ -324,6 +324,17 @@ export const memberRelations = relations(member, ({ one }) => ({
   }),
 }));
 
+export const invitationRelations = relations(invitation, ({ one }) => ({
+  organization: one(organization, {
+    fields: [invitation.organizationId],
+    references: [organization.id],
+  }),
+  inviter: one(user, {
+    fields: [invitation.inviterId],
+    references: [user.id],
+  }),
+}));
+
 export type NotificationPreferences =
   typeof notificationPreferences.$inferSelect;
 
@@ -487,6 +498,7 @@ export const schema = {
   // Relations
   organizationRelations,
   memberRelations,
+  invitationRelations,
   notificationPreferencesRelations,
   ownershipTransferRelations,
   securityAuditLogRelations,

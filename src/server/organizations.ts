@@ -115,6 +115,9 @@ export async function getActiveOrganizations(): Promise<
 
     return organizationsWithStats;
   } catch (error) {
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      throw error;
+    }
     console.error('Error fetching active organizations:', error);
     throw new Error('Failed to fetch active organizations');
   }

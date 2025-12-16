@@ -31,8 +31,10 @@ import {
   User,
   Trash2,
   UserMinus,
+  UserPlus,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { InviteMemberModal } from '@/components/shared/modals/invite-member-modal';
 import type { Role } from '@/db/schema';
 import {
   getOrganizationMembers,
@@ -145,6 +147,7 @@ export function MembersTab({
   const [memberToRemove, setMemberToRemove] =
     useState<OrganizationMember | null>(null);
   const [showBulkRemoveDialog, setShowBulkRemoveDialog] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const canManage = canManageMembers(userRole);
 
@@ -298,7 +301,7 @@ export function MembersTab({
                 Manage team members and their roles in the organization
               </CardDescription>
             </div>
-            {canManage && selectedMembers.length > 0 && (
+            {canManage && selectedMembers.length > 0 ? (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
                   {selectedMembers.length} selected
@@ -321,7 +324,12 @@ export function MembersTab({
                   Remove Selected
                 </Button>
               </div>
-            )}
+            ) : canManage ? (
+              <Button onClick={() => setIsInviteModalOpen(true)} size="sm">
+                <UserPlus className="h-4 w-4 mr-2" />
+                Invite Member
+              </Button>
+            ) : null}
           </div>
         </CardHeader>
         <CardContent>
@@ -507,6 +515,25 @@ export function MembersTab({
         confirmText="Remove Members"
         variant="destructive"
         icon="remove"
+      />
+
+      <InviteMemberModal
+        organizationId={organization.id}
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        onSuccess={() => {
+          // Reload members
+          // Since we don't have a direct reload function exposed from the effect,
+          // we might want to trigger a re-fetch or rely on the server action's revalidatePath.
+          // However, revalidatePath reloads the page data, but this component fetches in useEffect.
+          // We should probably lift the fetch or trigger it again.
+          // For now, we'll force a reload by toggling a key or just relying on the user to refresh,
+          // BUT better is to trigger the effect again.
+          // actually inviteMember server action does revalidatePath so the page should update?
+          // But this component fetches client-side on mount.
+          // Let's add a refresh trigger.
+          window.location.reload();
+        }}
       />
     </div>
   );

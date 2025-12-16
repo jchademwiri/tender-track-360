@@ -3,8 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/shared/providers';
-import { Analytics } from "@vercel/analytics/next"
-
+import { Analytics } from '@vercel/analytics/next';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,6 +29,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <ThemeProvider
           attribute="class"
@@ -37,12 +37,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main>
-            {children}
-          </main>
+          <main>{children}</main>
         </ThemeProvider>
         <Toaster />
-         <Analytics />
+        <Analytics />
       </body>
     </html>
   );

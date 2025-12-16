@@ -16,6 +16,9 @@ export default async function InviteAcceptPage({ params }: Props) {
 
   const invite = await db.query.invitation.findFirst({
     where: eq(invitation.id, invitationId),
+    with: {
+      organization: true,
+    },
   });
 
   if (!invite) {
@@ -47,7 +50,7 @@ export default async function InviteAcceptPage({ params }: Props) {
           <h1 className="text-2xl font-bold">You're invited</h1>
           <p className="text-muted-foreground mt-2">
             You were invited to join the organization{' '}
-            <strong>{invite.organizationId}</strong> as{' '}
+            <strong>{invite.organization.name}</strong> as{' '}
             <strong>{invite.role}</strong>.
           </p>
         </div>

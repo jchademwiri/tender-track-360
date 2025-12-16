@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/db';
-import { client } from '@/db/schema';
+import { client, tender } from '@/db/schema';
 import { eq, and, isNull, ilike, or, desc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -197,8 +197,20 @@ export async function deleteClient(organizationId: string, clientId: string) {
       return { success: false, error: 'Client not found' };
     }
 
-    // TODO: Check if client has active tenders before deletion
-    // This will be implemented when tender functionality is added
+    // Check if client has active tenders before deletion
+    const activeTenders = await db
+      .select({ id: tender.id })
+      .from(tender)
+      .where(and(eq(tender.clientId, clientId), isNull(tender.deletedAt)))
+      .limit(1);
+
+    if (activeTenders.length > 0) {
+      return {
+        success: false,
+        error:
+          'Cannot delete client with active tenders. Please delete the tenders first.',
+      };
+    }
 
     await db
       .update(client)

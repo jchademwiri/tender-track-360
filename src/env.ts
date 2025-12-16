@@ -20,6 +20,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string().min(1, {
       message: 'GOOGLE_CLIENT_SECRET is required',
     }),
+    REPLY_TO_EMAIL: z.string().email().optional(),
   },
   client: {
     NEXT_PUBLIC_URL: z.string().min(1, {
@@ -34,6 +35,7 @@ export const env = createEnv({
     UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    REPLY_TO_EMAIL: process.env.REPLY_TO_EMAIL,
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
   },
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +27,10 @@ import {
   error as errorToast,
   success as successToast,
 } from '@/lib/toast-enhanced';
+import {
+  getOrganizationMembers,
+  type OrganizationMember,
+} from '@/server/organizations';
 
 interface DangerZoneProps {
   organizationId: string;
@@ -46,8 +50,33 @@ export function DangerZone({
   const [showDeletionModal, setShowDeletionModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [eligibleMembers, setEligibleMembers] = useState<OrganizationMember[]>(
+    []
+  );
 
   const isOwner = userRole === 'owner';
+
+  // Fetch eligible members (admins and managers) when transfer modal is opened
+  useEffect(() => {
+    if (showTransferModal && isOwner) {
+      const fetchMembers = async () => {
+        try {
+          const members = await getOrganizationMembers(organizationId);
+          // Filter for eligible members:
+          // 1. Not the current owner (which is the current user since isOwner is true)
+          // 2. Must be admin or manager (as per description text)
+          const eligible = members.filter(
+            (m) => m.role !== 'owner' && ['admin', 'manager'].includes(m.role)
+          );
+          setEligibleMembers(eligible);
+        } catch (error) {
+          console.error('Error fetching members for transfer:', error);
+          errorToast('Failed to load eligible members');
+        }
+      };
+      fetchMembers();
+    }
+  }, [showTransferModal, isOwner, organizationId]);
 
   return (
     <div className="space-y-6">
@@ -160,7 +189,7 @@ export function DangerZone({
 
             {hasActiveContracts && (
               <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/10 rounded-lg border border-amber-200 dark:border-amber-800">
-                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
                 <div className="text-xs text-amber-700 dark:text-amber-300">
                   <p className="font-medium">
                     Warning: Active contracts detected
@@ -236,7 +265,7 @@ export function DangerZone({
         isOpen={showTransferModal}
         onClose={() => setShowTransferModal(false)}
         organizationId={organizationId}
-        eligibleMembers={[]} // This would be fetched from actual data
+        eligibleMembers={eligibleMembers}
         onTransfer={async (request) => {
           try {
             const result = await initiateOwnershipTransfer(request);
