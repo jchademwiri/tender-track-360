@@ -6,20 +6,22 @@ export const authClient = createAuthClient({
   plugins: [organizationClient()],
 });
 
-export const signInWithGoogle = async () => {
+export const signInWithGoogle = async (callbackURL?: string) => {
+  const finalCallbackURL = callbackURL || '/dashboard';
   try {
     await authClient.signIn.social({
       provider: 'google',
-      callbackURL: '/dashboard',
+      callbackURL: finalCallbackURL,
     });
   } catch (error) {
     console.error('Google sign in error:', error);
     // Fallback to direct redirect
-    const baseUrl = typeof window !== 'undefined'
-      ? window.location.origin
-      : process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+    const baseUrl =
+      typeof window !== 'undefined'
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
 
-    window.location.href = `${baseUrl}/api/auth/sign-in/google?callbackURL=/dashboard`;
+    window.location.href = `${baseUrl}/api/auth/sign-in/google?callbackURL=${encodeURIComponent(finalCallbackURL)}`;
   }
 };
 

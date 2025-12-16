@@ -12,7 +12,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "email": "email dev --port 3001",
+    "email": "node --import ./scripts/email-polyfill.js node_modules/react-email/dist/index.js dev --port 3001",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -68,6 +68,7 @@
     "resend": "^6.0.1",
     "sonner": "^2.0.5",
     "tailwind-merge": "^3.3.1",
+    "web-streams-polyfill": "^4.2.0",
     "zod": "^3.25.64"
   },
   "devDependencies": {
