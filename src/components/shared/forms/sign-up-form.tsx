@@ -204,11 +204,11 @@ export function SignUpForm({
       </Card>
       <div className="text-muted-foreground/60 text-center text-xs text-balance">
         By clicking continue, you agree to our{' '}
-        <Link href="/" className="underline hover:text-primary">
+        <Link href="/terms" className="underline hover:text-primary">
           Terms of Service
         </Link>{' '}
         and{' '}
-        <Link href="/" className="underline hover:text-primary">
+        <Link href="/privacy" className="underline hover:text-primary">
           Privacy Policy
         </Link>
         .
