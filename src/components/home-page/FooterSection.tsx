@@ -151,13 +151,13 @@ export function FooterSection() {
             </div>
             <div className="flex space-x-6 text-sm text-muted-foreground">
               <Link
-                href="#privacy"
+                href="/privacy"
                 className="hover:text-foreground transition-colors"
               >
                 Privacy Policy
               </Link>
               <Link
-                href="#terms"
+                href="/terms"
                 className="hover:text-foreground transition-colors"
               >
                 Terms of Service

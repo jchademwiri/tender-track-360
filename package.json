@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "next dev --webpack ",
     "build": "next build --webpack",
-    "start": "next start",
+    "start": "next start --webpack",
     "lint": "eslint .",
     "lint:fix": "eslint --fix",
     "test": "jest",
