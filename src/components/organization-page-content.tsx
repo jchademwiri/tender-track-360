@@ -21,6 +21,8 @@ import { CreateOrganizationForm } from './forms';
 import { UpgradeDialog } from './shared/dialogs';
 import { OrganizationSearch } from './shared/search';
 
+import { useRouter } from 'next/navigation';
+
 interface OrganizationPageContentProps {
   organizations: OrganizationWithStats[];
   recentActivities: RecentActivity[];
@@ -30,6 +32,7 @@ export function OrganizationPageContent({
   organizations,
   recentActivities,
 }: OrganizationPageContentProps) {
+  const router = useRouter();
   const { data: activeOrganization, isPending: isLoading } =
     authClient.useActiveOrganization();
   const [filteredOrganizations, setFilteredOrganizations] =
@@ -315,7 +318,9 @@ export function OrganizationPageContent({
                       variant="outline"
                       className="w-full justify-start cursor-pointer"
                       onClick={() => {
-                        window.location.href = `/organization/${activeOrganization.slug}/dashboard`;
+                        router.push(
+                          `/organization/${activeOrganization.slug}/dashboard`
+                        );
                       }}
                       aria-label={`Go to ${activeOrganization.name} dashboard`}
                     >
