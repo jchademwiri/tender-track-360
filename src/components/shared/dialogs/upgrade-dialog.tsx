@@ -199,7 +199,7 @@ export function UpgradeDialog({
 
       // Open email client or redirect to contact form
       window.location.href =
-        'mailto:sales@tendertrack360.com?subject=Enterprise%20Plan%20Inquiry';
+        'mailto:sales@tendertrack360.co.za?subject=Enterprise%20Plan%20Inquiry';
       onOpenChange(false);
     } catch (error) {
       console.error('Contact sales failed:', error);
@@ -339,9 +339,7 @@ export function UpgradeDialog({
                         />
                       ))}
                     </div>
-                    <p className="text-sm italic">
-                      "{testimonial.content}"
-                    </p>
+                    <p className="text-sm italic">"{testimonial.content}"</p>
                     <div className="text-xs text-muted-foreground">
                       <span className="font-medium">{testimonial.name}</span>
                       <span>

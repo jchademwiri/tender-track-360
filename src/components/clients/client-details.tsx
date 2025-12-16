@@ -202,7 +202,7 @@ export function ClientDetails({ client, organizationId }: ClientDetailsProps) {
                         </label>
                         <p className="text-foreground">
                           <Link
-                            href={`mailto:${client.contactEmail}`}
+                            href="mailto:info@tendertrack360.co.za"
                             className="text-blue-600 hover:text-blue-800 hover:underline"
                           >
                             {client.contactEmail}
@@ -298,7 +298,7 @@ export function ClientDetails({ client, organizationId }: ClientDetailsProps) {
                   variant="outline"
                   className="w-full justify-start cursor-pointer"
                   onClick={() =>
-                    window.open(`mailto:${client.contactEmail}`, '_blank')
+                    window.open('mailto:info@tendertrack360.co.za', '_blank')
                   }
                 >
                   <Mail className="h-4 w-4 mr-2" />

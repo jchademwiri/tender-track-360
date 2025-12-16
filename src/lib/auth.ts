@@ -55,8 +55,10 @@ export const auth = betterAuth({
     sendVerificationEmail: async ({ user, url }) => {
       await resend.emails.send({
         from: 'Tender Track 360 <onboarding@resend.dev>',
-        to: user.email,
+        // MVP: Send all emails to info@tendertrack360.co.za
+        to: 'info@tendertrack360.co.za',
         subject: 'Verify your email address',
+        replyTo: process.env.REPLY_TO_EMAIL || 'info@tendertrack360.co.za',
         react: VerifyEmail({
           username: user.name,
           verificationUrl: url,
@@ -74,8 +76,10 @@ export const auth = betterAuth({
       try {
         const { data, error } = await resend.emails.send({
           from: 'Tender Track 360 <onboarding@resend.dev>',
-          to: user.email,
+          // MVP: Send all emails to info@tendertrack360.co.za
+          to: 'info@tendertrack360.co.za',
           subject: 'Reset your password',
+          replyTo: process.env.REPLY_TO_EMAIL || 'info@tendertrack360.co.za',
           react: ResetPasswordEmail({
             username: user.name,
             resetUrl: url,
@@ -106,8 +110,10 @@ export const auth = betterAuth({
         const inviteLink = `${base}/invite/accept/${data.id}`;
         await resend.emails.send({
           from: 'Tender Track 360 <onboarding@resend.dev>',
-          to: data.email,
+          // MVP: Send all emails to info@tendertrack360.co.za
+          to: 'info@tendertrack360.co.za',
           subject: `You're invited to join ${data.organization.name}`,
+          replyTo: process.env.REPLY_TO_EMAIL || 'info@tendertrack360.co.za',
           react: OrganizationInvitation({
             email: data.email,
             invitedByUsername: data.inviter.user.name,

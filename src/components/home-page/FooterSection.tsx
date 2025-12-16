@@ -88,7 +88,7 @@ export function FooterSection() {
             <ul className="space-y-2 text-muted-foreground">
               <li>
                 <a
-                  href="https://docs.tendertrack360.com"
+                  href="https://docs.tendertrack360.co.za"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-foreground transition-colors"
@@ -126,10 +126,10 @@ export function FooterSection() {
           <div>
             <h4 className="font-semibold mb-4 text-foreground">Contact</h4>
             <div className="space-y-2 text-muted-foreground">
-              <div>📧 support@tendertrack360.com</div>
+              <div>📧 support@tendertrack360.co.za</div>
               <div>📞 +1 (555) 123-4567</div>
               <div>📍 123 Business Ave, Suite 100</div>
-              <div>🌐 www.tendertrack360.com</div>
+              <div>🌐 www.tendertrack360.co.za</div>
             </div>
           </div>
         </div>
