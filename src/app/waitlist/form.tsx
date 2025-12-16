@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useActionState, useRef, useTransition } from "react";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { useActionState, useRef, useTransition } from 'react';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -13,22 +13,31 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { submitWaitlistForm } from "./action";
-import { formSchema } from "./schema";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
+import { submitWaitlistForm } from './action';
+import { formSchema } from './schema';
+import { Sparkles, CheckCircle2 } from 'lucide-react';
 
 type FormValues = z.infer<typeof formSchema>;
 
 export function WaitlistForm() {
   const [state, formAction] = useActionState(submitWaitlistForm, {
-    message: "",
+    message: '',
   });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      email: '',
+      companyName: '',
     },
   });
 
@@ -44,52 +53,90 @@ export function WaitlistForm() {
   const [isPending, startTransition] = useTransition();
 
   return (
-    <div className="max-w-md w-full mx-auto space-y-6">
-      <div className="space-y-2 text-center">
-        <h2 className="text-3xl font-bold">Join the Waitlist</h2>
-        <p className="text-muted-foreground">
-          Be the first to know when we launch.
-        </p>
+    <Card className="max-w-md w-full mx-auto border-white/10 bg-card/50 backdrop-blur-sm shadow-xl">
+      <CardHeader className="text-center space-y-4 pb-2">
+        <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+          <Sparkles className="h-3 w-3" />
+          <span>Coming Soon</span>
+        </div>
+        <div className="space-y-2">
+          <CardTitle className="text-3xl font-bold tracking-tight">
+            Join the Waitlist
+          </CardTitle>
+          <CardDescription className="text-balance text-base">
+            Get early access to the most advanced tender management platform.
+          </CardDescription>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
         {state.message && (
-          <div className="inline-block px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
-            {state.message}
+          <div className="flex items-center gap-2 p-4 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            <CheckCircle2 className="h-5 w-5 shrink-0" />
+            <p className="text-sm font-medium">{state.message}</p>
           </div>
         )}
-      </div>
 
-      <Form {...form}>
-        <form
-          ref={formRef}
-          action={formAction}
-          onSubmit={onSubmit}
-          className="space-y-6"
-        >
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription className="sr-only">
-                  Your email
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Form {...form}>
+          <form
+            ref={formRef}
+            action={formAction}
+            onSubmit={onSubmit}
+            className="space-y-4"
+          >
+            <FormField
+              control={form.control}
+              name="companyName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Company Name{' '}
+                    <span className="text-muted-foreground font-normal text-xs ml-1">
+                      (Optional)
+                    </span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Acme Corp"
+                      {...field}
+                      value={field.value ?? ''}
+                      className="bg-background/50"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Sending..." : "Join the Waitlist"}
-          </Button>
-        </form>
-      </Form>
-    </div>
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="you@company.com"
+                      {...field}
+                      className="bg-background/50"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              type="submit"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-11"
+              disabled={isPending}
+            >
+              {isPending ? 'Joining...' : 'Join the Waitlist'}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }
