@@ -1,6 +1,9 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { formatCurrency } from '@/lib/format';
+import { updateUserPlan, getUserUsageStats } from '@/server/billing';
+import { ConfirmDialog } from '@/components/shared/dialogs/confirm-dialog';
 import {
   Crown,
   ArrowLeft,
@@ -23,7 +26,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 interface PricingTier {
   id: string;
   name: string;
-  price: string;
+  price: string | number;
   period: string;
   description: string;
   features: string[];
@@ -46,13 +49,24 @@ export default function UpgradePage() {
   const planParam = searchParams.get('plan');
 
   const [isUpgrading, setIsUpgrading] = useState(false);
-  const [isContactingSales, setIsContactingSales] = useState(false);
   const [showTestimonials, setShowTestimonials] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isLoadingPlan, setIsLoadingPlan] = useState(true);
 
   // Animation state for staggered animations
   const [animateItems, setAnimateItems] = useState(false);
+
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    planId: string | null;
+    planName: string;
+  }>({
+    isOpen: false,
+    planId: null,
+    planName: '',
+  });
 
   useEffect(() => {
     // Trigger animations after a short delay
@@ -60,9 +74,26 @@ export default function UpgradePage() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Fetch current plan
+  useEffect(() => {
+    const fetchPlan = async () => {
+      try {
+        const result = await getUserUsageStats();
+        if (result.success && result.plan) {
+          setCurrentPlan(result.plan);
+        }
+      } catch (err) {
+        console.error('Failed to fetch plan:', err);
+      } finally {
+        setIsLoadingPlan(false);
+      }
+    };
+    fetchPlan();
+  }, []);
+
   // Validate plan parameter
   useEffect(() => {
-    if (planParam && !['free', 'pro', 'enterprise'].includes(planParam)) {
+    if (planParam && !['free', 'pro'].includes(planParam)) {
       setError('Invalid plan parameter. Please select a valid plan.');
     } else {
       setError(null);
@@ -74,35 +105,50 @@ export default function UpgradePage() {
     {
       id: 'free',
       name: 'Free',
-      price: 'R0',
+      price: 0,
       period: '/month',
       description: 'Perfect for getting started',
       features: [
         '1 organization',
         'Basic tender management',
         '5 tenders per month',
+        '0 Active Projects',
         '100MB storage',
         'Community support',
-        'Basic reporting',
       ],
       ctaText: 'Get Started Free',
     },
     {
+      id: 'starter',
+      name: 'Starter',
+      price: 249,
+      period: '/month',
+      description: 'For freelancers & consultants',
+      features: [
+        '1 organization',
+        'Unlimited tenders',
+        '2 Active Projects',
+        '1GB storage',
+        'Email support',
+        'Tender Export',
+      ],
+      ctaText: 'Start Free Trial',
+      popular: true,
+    },
+    {
       id: 'pro',
       name: 'Pro',
-      price: 'R499',
+      price: 499,
       period: '/month',
-      description: 'Perfect for growing teams',
+      description: 'For growing teams',
       features: [
-        '5 organizations',
-        'Advanced tender management',
+        '2 organizations',
+        'Unlimited tenders',
+        '5 Active Projects',
+        '10GB storage',
         'Priority support',
         'Advanced analytics',
-
-        'Team collaboration tools',
-        'Export capabilities',
       ],
-      popular: true,
       ctaText: 'Start Pro Trial',
     },
   ];
@@ -134,71 +180,56 @@ export default function UpgradePage() {
     },
   ];
 
-  const getSelectedTier = () => {
-    if (!selectedPlan) return pricingTiers[0]; // Default to Pro
-    return (
-      pricingTiers.find((tier) => tier.id === selectedPlan) || pricingTiers[0]
-    );
-  };
-  getSelectedTier(); //TODO: remove?
+  // Removed unused getSelectedTier
 
   const handleGoBack = () => {
     router.back();
   };
 
-  const handleUpgrade = async (planId: string) => {
+  const handleUpgrade = (planId: string) => {
     const tier = pricingTiers.find((t) => t.id === planId);
     if (!tier) return;
 
-    if (tier.enterprise) {
-      await handleContactSales();
-    } else {
-      await handleUpgradeToPro();
-    }
+    setConfirmDialog({
+      isOpen: true,
+      planId,
+      planName: tier.name,
+    });
   };
 
-  const handleUpgradeToPro = async () => {
+  const handleConfirmUpgrade = async () => {
+    if (!confirmDialog.planId) return;
+
+    const planId = confirmDialog.planId;
+    setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
     setIsUpgrading(true);
+
     try {
       // TODO: Implement actual upgrade flow with Paystack
-      // Documentation: https://paystack.com/docs/api/subscription/
-      // Guides: https://paystack.com/docs/guides/accept_payments_on_your_react_app/
-      // For now, simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // For now, simulate API call AND update DB
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // Show success message and redirect to dashboard
-      alert('Upgrade successful! Welcome to the Pro plan.');
-      router.push('/dashboard');
+      const result = await updateUserPlan(planId as 'free' | 'starter' | 'pro');
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      // Refresh the router to update server components and data
+      router.refresh();
+
+      // Redirect back to billing
+      router.push('/billing');
     } catch (error) {
       console.error('Upgrade failed:', error);
       setError('Upgrade failed. Please try again or contact support.');
-    } finally {
       setIsUpgrading(false);
-    }
-  };
-
-  const handleContactSales = async () => {
-    setIsContactingSales(true);
-    try {
-      // TODO: Implement contact sales flow
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Open email client or redirect to contact form
-      window.location.href =
-        'mailto:sales@tendertrack360.co.za?subject=Enterprise%20Plan%20Inquiry&body=Hi%2C%0A%0AI%27m%20interested%20in%20the%20Enterprise%20plan.%20Please%20contact%20me%20to%20discuss%20pricing%20and%20features.%0A%0AThank%20you%21';
-    } catch (error) {
-      console.error('Contact sales failed:', error);
-      setError(
-        'Failed to contact sales. Please email us directly at sales@tendertrack360.co.za'
-      );
-    } finally {
-      setIsContactingSales(false);
     }
   };
 
   if (error && planParam) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
         <div className="max-w-md w-full">
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
@@ -216,7 +247,7 @@ export default function UpgradePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
       <div className="bg-white dark:bg-gray-900 shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -232,7 +263,7 @@ export default function UpgradePage() {
                 Back
               </Button>
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30">
                   <Crown className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
@@ -255,7 +286,7 @@ export default function UpgradePage() {
           <div
             className={`text-center space-y-6 transition-all duration-500 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
           >
-            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30">
+            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30">
               <Crown className="h-12 w-12 text-amber-600 dark:text-amber-400" />
             </div>
 
@@ -280,7 +311,7 @@ export default function UpgradePage() {
                   key={tier.id}
                   className={`relative rounded-2xl border-2 p-8 transition-all duration-500 hover:shadow-xl ${
                     tier.popular
-                      ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 scale-105'
+                      ? 'border-blue-500 bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 scale-105'
                       : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                   } ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}
                   style={{ transitionDelay: `${300 + index * 100}ms` }}
@@ -306,7 +337,9 @@ export default function UpgradePage() {
                       <div className="space-y-2">
                         <div className="flex items-baseline justify-center gap-2">
                           <span className="text-4xl font-bold text-gray-900 dark:text-white">
-                            {tier.price}
+                            {typeof tier.price === 'number'
+                              ? formatCurrency(tier.price)
+                              : tier.price}
                           </span>
                           <span className="text-gray-600 dark:text-gray-300">
                             {tier.period}
@@ -336,32 +369,32 @@ export default function UpgradePage() {
 
                     <Button
                       onClick={() => handleUpgrade(tier.id)}
-                      disabled={isUpgrading || isContactingSales}
+                      disabled={
+                        isUpgrading || isLoadingPlan || currentPlan === tier.id
+                      }
                       className={`w-full h-12 text-base font-medium cursor-pointer ${
-                        tier.popular
-                          ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
-                          : tier.enterprise
-                            ? 'bg-gray-900 hover:bg-gray-800'
+                        currentPlan === tier.id
+                          ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/40 cursor-default'
+                          : tier.popular
+                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
                             : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                       }`}
                     >
-                      {isUpgrading && selectedPlan === tier.id ? (
+                      {isLoadingPlan ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
+                      ) : isUpgrading && selectedPlan === tier.id ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                           Processing...
                         </>
-                      ) : isContactingSales && selectedPlan === tier.id ? (
+                      ) : currentPlan === tier.id ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                          Connecting...
+                          <Check className="h-5 w-5 mr-2" />
+                          Current Plan
                         </>
                       ) : (
                         <>
-                          {tier.enterprise ? (
-                            <Building2 className="h-5 w-5 mr-2" />
-                          ) : (
-                            <CreditCard className="h-5 w-5 mr-2" />
-                          )}
+                          <CreditCard className="h-5 w-5 mr-2" />
                           {tier.ctaText}
                         </>
                       )}
@@ -496,6 +529,14 @@ export default function UpgradePage() {
           </div>
         </div>
       </div>
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
+        onConfirm={handleConfirmUpgrade}
+        title={`Confirm Subscription Change`}
+        description={`Are you sure you want to switch to the ${confirmDialog.planName} plan? Your billing cycle and features will be updated immediately.`}
+        confirmText="Confirm Change"
+      />
     </div>
   );
 }

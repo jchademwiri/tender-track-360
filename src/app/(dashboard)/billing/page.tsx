@@ -1,6 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { formatCurrency } from '@/lib/format';
+import { AddPaymentMethodDialog } from '@/components/shared/dialogs/add-payment-method-dialog';
+import { getUserUsageStats } from '@/server/billing';
 import {
   Crown,
   ArrowLeft,
@@ -94,12 +97,32 @@ export default function BillingPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [animateItems, setAnimateItems] = useState(false);
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
 
   useEffect(() => {
     // Trigger animations after a short delay
     const timer = setTimeout(() => setAnimateItems(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  // Plan definitions map
+  const PLAN_DETAILS = {
+    free: {
+      name: 'Free',
+      price: 0,
+      limits: { orgs: 1, tenders: 5, storage: 100 },
+    },
+    starter: {
+      name: 'Starter',
+      price: 249,
+      limits: { orgs: 1, tenders: 9999, storage: 1000 },
+    },
+    pro: {
+      name: 'Pro',
+      price: 499,
+      limits: { orgs: 2, tenders: 9999, storage: 10000 },
+    },
+  };
 
   useEffect(() => {
     // Simulate loading billing data
@@ -111,10 +134,44 @@ export default function BillingPage() {
         // Guides: https://paystack.com/docs/guides/accept_payments_on_your_react_app/
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
-        // Mock data - replace with actual API responses
-        // Mock data removed for production readiness - waiting for API integration
-        setSubscription(null);
-        setUsage(null);
+        // Fetch real usage stats
+        const usageResult = await getUserUsageStats();
+        // Fallback to 'free' if plan is invalid or missing
+        const currentPlanKey = (usageResult.plan ||
+          'free') as keyof typeof PLAN_DETAILS;
+        const planDetails = PLAN_DETAILS[currentPlanKey] || PLAN_DETAILS.free;
+
+        // Mock subscription data but using REAL plan details
+        setSubscription({
+          id: 'sub_mock_123',
+          plan: planDetails.name,
+          status: 'active',
+          current_period_start: new Date().toISOString(),
+          current_period_end: new Date(
+            Date.now() + 30 * 24 * 60 * 60 * 1000
+          ).toISOString(),
+          cancel_at_period_end: false,
+          price: planDetails.price,
+          currency: 'ZAR',
+          interval: 'month',
+        });
+
+        // Use real usage with Dynamic Limits
+        setUsage({
+          organizations: {
+            current: usageResult.usage.organizations,
+            limit: planDetails.limits.orgs,
+          },
+          tenders: {
+            current: usageResult.usage.tenders,
+            limit: planDetails.limits.tenders,
+          },
+          storage: {
+            current: usageResult.usage.storage,
+            limit: planDetails.limits.storage,
+          },
+        });
+
         setPaymentMethods([]);
         setInvoices([]);
       } catch (err) {
@@ -137,8 +194,16 @@ export default function BillingPage() {
   };
 
   const handleManagePaymentMethod = () => {
-    // TODO: Implement payment method management
-    console.log('Manage payment method');
+    setIsPaymentDialogOpen(true);
+  };
+
+  const handleManageSubscription = () => {
+    // Redirect to upgrade page which serves as our "Manage" portal for now
+    router.push('/billing/upgrade');
+  };
+
+  const handleAddPaymentMethod = (method: PaymentMethod) => {
+    setPaymentMethods((prev) => [...prev, method]);
   };
 
   const handleDownloadInvoice = (invoiceId: string) => {
@@ -169,16 +234,13 @@ export default function BillingPage() {
     });
   };
 
-  const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-ZA', {
-      style: 'currency',
-      currency: currency || 'ZAR',
-    }).format(amount);
+  const formatCurrencyLocal = (amount: number, currency: string) => {
+    return formatCurrency(amount, { currency: currency || 'ZAR' });
   };
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
         <div className="max-w-md w-full">
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
@@ -196,7 +258,7 @@ export default function BillingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
       <div className="bg-white dark:bg-gray-900 shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -212,7 +274,7 @@ export default function BillingPage() {
                 Back
               </Button>
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30">
                   <CreditCard className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
@@ -238,7 +300,7 @@ export default function BillingPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30">
                     <Crown className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
@@ -279,10 +341,9 @@ export default function BillingPage() {
                       Monthly Price
                     </p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {formatCurrency(
-                        subscription.price,
-                        subscription.currency
-                      )}
+                      {formatCurrency(subscription.price, {
+                        currency: subscription.currency,
+                      })}
                     </p>
                   </div>
                   <div className="space-y-2">
@@ -313,7 +374,7 @@ export default function BillingPage() {
           >
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30">
                   <Activity className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
@@ -423,7 +484,7 @@ export default function BillingPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30">
                     <CreditCard className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
@@ -508,7 +569,7 @@ export default function BillingPage() {
             >
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30">
                     <Receipt className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                   </div>
                   <div>
@@ -557,7 +618,9 @@ export default function BillingPage() {
                             {invoice.status}
                           </Badge>
                           <span className="font-medium">
-                            {formatCurrency(invoice.amount, invoice.currency)}
+                            {formatCurrency(invoice.amount, {
+                              currency: invoice.currency,
+                            })}
                           </span>
                           {invoice.download_url && (
                             <Button
@@ -589,7 +652,7 @@ export default function BillingPage() {
             >
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30">
                     <Zap className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div>
@@ -602,29 +665,22 @@ export default function BillingPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div className="p-4 bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
                     <div className="flex items-center gap-2 mb-2">
                       <Star className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       <span className="font-medium text-blue-900 dark:text-blue-100">
-                        Current Plan: Pro
+                        Current Plan:{' '}
+                        {subscription ? subscription.plan : 'Loading...'}
                       </span>
                     </div>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      You&#x27;re on the Pro plan with access to all premium
-                      features.
+                      You&#x27;re on the{' '}
+                      {subscription ? subscription.plan : '...'} plan with
+                      access to all features.
                     </p>
                   </div>
 
                   <div className="space-y-3">
-                    <Button
-                      onClick={handleUpgrade}
-                      className="w-full"
-                      size="lg"
-                    >
-                      <Crown className="h-5 w-5 mr-2" />
-                      Upgrade to Enterprise
-                    </Button>
-
                     <Button
                       variant="outline"
                       className="w-full"
@@ -635,7 +691,12 @@ export default function BillingPage() {
                       Downgrade to Free
                     </Button>
 
-                    <Button variant="outline" className="w-full" size="lg">
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      size="lg"
+                      onClick={handleManageSubscription}
+                    >
                       <Settings className="h-5 w-5 mr-2" />
                       Manage Subscription
                     </Button>
@@ -672,6 +733,11 @@ export default function BillingPage() {
           </div>
         </div>
       </div>
+      <AddPaymentMethodDialog
+        open={isPaymentDialogOpen}
+        onOpenChange={setIsPaymentDialogOpen}
+        onAdd={handleAddPaymentMethod}
+      />
     </div>
   );
 }

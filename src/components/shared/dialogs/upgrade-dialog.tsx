@@ -23,11 +23,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { formatCurrency } from '@/lib/format';
 
 // Enhanced TypeScript interfaces
 interface PricingTier {
   name: string;
-  price: string;
+  price: number | string;
   period: string;
   description: string;
   features: string[];
@@ -81,47 +82,40 @@ export function UpgradeDialog({
   const pricingTiers: PricingTier[] = [
     {
       name: 'Free',
-      price: '$0',
+      price: 0,
       period: '/month',
       description: 'Perfect for getting started',
       features: [
         '1 organization',
         'Basic tender management',
-        '5 tenders per month',
-        '100MB storage',
+        '0 Active Projects',
         'Community support',
-        'Basic reporting',
       ],
     },
     {
-      name: 'Pro',
-      price: '$29',
+      name: 'Starter',
+      price: 249,
       period: '/month',
-      description: 'Perfect for growing teams',
+      description: 'For freelancers & consultants',
       features: [
-        '5 organizations',
-        'Advanced tender management',
-        'Priority support',
-        'Advanced analytics',
-        'Custom workflows',
-        'API access',
+        '1 organization',
+        'Unlimited tenders',
+        '2 Active Projects',
+        'Email support',
       ],
       popular: true,
     },
     {
-      name: 'Enterprise',
-      price: 'Custom',
-      period: 'pricing',
-      description: 'For large organizations',
+      name: 'Pro',
+      price: 499,
+      period: '/month',
+      description: 'For growing teams',
       features: [
-        'Everything in Pro',
-        'Dedicated account manager',
-        'SSO & advanced security',
-        'Custom integrations',
-        'SLA guarantee',
-        'Phone support',
+        '2 organizations',
+        'Unlimited tenders',
+        '5 Active Projects',
+        'Priority support',
       ],
-      enterprise: true,
     },
   ];
 
@@ -285,7 +279,11 @@ export function UpgradeDialog({
 
                   <div className="space-y-1">
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-3xl font-bold">{tier.price}</span>
+                      <span className="text-3xl font-bold">
+                        {typeof tier.price === 'number'
+                          ? formatCurrency(tier.price)
+                          : tier.price}
+                      </span>
                       <span className="text-muted-foreground">
                         {tier.period}
                       </span>
@@ -395,27 +393,8 @@ export function UpgradeDialog({
               <div className="grid gap-2 sm:grid-cols-2">
                 <Button
                   variant="outline"
-                  onClick={handleContactSales}
-                  disabled={isContactingSales}
-                  className="cursor-pointer"
-                >
-                  {isContactingSales ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
-                      Connecting...
-                    </>
-                  ) : (
-                    <>
-                      <Building2 className="h-4 w-4 mr-2" />
-                      Contact Sales
-                    </>
-                  )}
-                </Button>
-
-                <Button
-                  variant="outline"
                   onClick={handleGoToDashboard}
-                  className="cursor-pointer"
+                  className="cursor-pointer col-span-2"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Dashboard

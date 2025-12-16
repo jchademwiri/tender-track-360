@@ -18,6 +18,7 @@ export const user = pgTable('user', {
   updatedAt: timestamp('updated_at')
     .$defaultFn(() => new Date())
     .notNull(),
+  plan: text('plan').default('free').notNull(),
 });
 
 export type User = typeof user.$inferSelect;

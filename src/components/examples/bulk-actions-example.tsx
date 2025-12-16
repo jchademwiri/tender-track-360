@@ -22,18 +22,22 @@ export function BulkActionsExample() {
       emailVerified: faker.datatype.boolean(),
       createdAt: faker.date.recent(),
       updatedAt: faker.date.recent(),
+      plan: 'free',
     },
   }));
 
-  const mockInvitations: PendingInvitation[] = Array.from({ length: 3 }, () => ({
-    id: faker.string.uuid(),
-    email: faker.internet.email(),
-    role: faker.helpers.arrayElement(['member', 'admin']),
-    status: 'pending',
-    invitedAt: faker.date.recent(),
-    expiresAt: faker.date.future(),
-    inviterName: faker.person.fullName(),
-  }));
+  const mockInvitations: PendingInvitation[] = Array.from(
+    { length: 3 },
+    () => ({
+      id: faker.string.uuid(),
+      email: faker.internet.email(),
+      role: faker.helpers.arrayElement(['member', 'admin']),
+      status: 'pending',
+      invitedAt: faker.date.recent(),
+      expiresAt: faker.date.future(),
+      inviterName: faker.person.fullName(),
+    })
+  );
 
   const handleInviteClick = () => {
     console.log('Invite member clicked');

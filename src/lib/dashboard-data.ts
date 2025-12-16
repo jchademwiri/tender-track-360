@@ -72,23 +72,8 @@ export async function getDashboardData(
   }
 }
 
-// Helper functions for formatting dashboard data
-export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('en-ZA', {
-    style: 'currency',
-    currency: 'ZAR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-export function formatPercentage(value: number): string {
-  return `${value.toFixed(1)}%`;
-}
-
-export function formatNumber(value: number): string {
-  return new Intl.NumberFormat('en-US').format(value);
-}
+// Re-export formatters for backward compatibility
+export * from '@/lib/format';
 
 // Chart data formatters
 export function getTenderStatusChartData(
