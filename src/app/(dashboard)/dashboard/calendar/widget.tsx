@@ -103,7 +103,7 @@ export function CalendarClient() {
                     : prev.filter((t) => t !== 'tender_submission')
                 );
               }}
-              className="h-2.5 w-2.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+              className="h-2 w-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
             <label
               htmlFor="chk-tender"
@@ -124,7 +124,7 @@ export function CalendarClient() {
                     : prev.filter((t) => t !== 'po_expected_delivery')
                 );
               }}
-              className="h-2.5 w-2.5 data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500"
+              className="h-2 w-2 data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500"
             />
             <label
               htmlFor="chk-po-exp"
@@ -145,7 +145,7 @@ export function CalendarClient() {
                     : prev.filter((t) => t !== 'po_delivered')
                 );
               }}
-              className="h-2.5 w-2.5 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+              className="h-2 w-2 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
             />
             <label
               htmlFor="chk-po-del"
