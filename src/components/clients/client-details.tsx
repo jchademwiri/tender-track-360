@@ -202,7 +202,7 @@ export function ClientDetails({ client, organizationId }: ClientDetailsProps) {
                         </label>
                         <p className="text-foreground">
                           <Link
-                            href="mailto:info@tendertrack360.co.za"
+                            href={`mailto:${client.contactEmail}`}
                             className="text-blue-600 hover:text-blue-800 hover:underline"
                           >
                             {client.contactEmail}
