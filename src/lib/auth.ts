@@ -5,6 +5,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
 import { db } from '@/db';
 import { schema } from '@/db/schema';
+import { eq, and, count } from 'drizzle-orm';
 import { ac, admin, manager, member, owner } from '@/lib/auth/permissions';
 import { Resend } from 'resend';
 import ResetPasswordEmail from '@/emails/reset-password-email';
@@ -124,10 +125,33 @@ export const auth = betterAuth({
         });
       },
       allowUserToCreateOrganization: async (user) => {
-        // Example: only verified users can create orgs
-        return user.emailVerified;
+        // Enforce subscription limits
+        // Free/Starter: 1 Organization
+        // Pro: 2 Organizations
+
+        // We need to cast user to any to access custom 'plan' field if types aren't inferred yet
+        const userPlan = (user as any).plan || 'free';
+        const limit = userPlan === 'pro' ? 2 : 1;
+
+        const ownedOrgsCount = await db
+          .select({ count: count() })
+          .from(schema.member)
+          .where(
+            and(
+              eq(schema.member.userId, user.id),
+              eq(schema.member.role, 'owner')
+            )
+          );
+
+        const currentCount = ownedOrgsCount[0]?.count || 0;
+
+        if (currentCount >= limit) {
+          return false;
+        }
+
+        return true;
       },
-      organizationLimit: 2,
+      // organizationLimit: 2, // Removed in favor of dynamic check above
 
       // Hook to update session when organization is switched
       hooks: {

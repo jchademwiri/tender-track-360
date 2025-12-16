@@ -105,6 +105,25 @@ export default function BillingPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Plan definitions map
+  const PLAN_DETAILS = {
+    free: {
+      name: 'Free',
+      price: 0,
+      limits: { orgs: 1, tenders: 5, storage: 100 },
+    },
+    starter: {
+      name: 'Starter',
+      price: 249,
+      limits: { orgs: 1, tenders: 9999, storage: 1000 },
+    },
+    pro: {
+      name: 'Pro',
+      price: 499,
+      limits: { orgs: 2, tenders: 9999, storage: 10000 },
+    },
+  };
+
   useEffect(() => {
     // Simulate loading billing data
     const loadBillingData = async () => {
@@ -115,38 +134,41 @@ export default function BillingPage() {
         // Guides: https://paystack.com/docs/guides/accept_payments_on_your_react_app/
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
-        // Mock data - replace with actual API responses
+        // Fetch real usage stats
+        const usageResult = await getUserUsageStats();
+        // Fallback to 'free' if plan is invalid or missing
+        const currentPlanKey = (usageResult.plan ||
+          'free') as keyof typeof PLAN_DETAILS;
+        const planDetails = PLAN_DETAILS[currentPlanKey] || PLAN_DETAILS.free;
+
+        // Mock subscription data but using REAL plan details
         setSubscription({
           id: 'sub_mock_123',
-          plan: 'Pro',
+          plan: planDetails.name,
           status: 'active',
           current_period_start: new Date().toISOString(),
           current_period_end: new Date(
             Date.now() + 30 * 24 * 60 * 60 * 1000
           ).toISOString(),
           cancel_at_period_end: false,
-          price: 499,
+          price: planDetails.price,
           currency: 'ZAR',
           interval: 'month',
         });
 
-        // Fetch real usage stats
-        const usageResult = await getUserUsageStats();
-
-        // Use real usage with Pro plan limits (2 Orgs, Unlimited Tenders, 10GB)
-        // Note: For tenders, we show the count but limit is technically simplified here for display
+        // Use real usage with Dynamic Limits
         setUsage({
           organizations: {
             current: usageResult.usage.organizations,
-            limit: 2, // Pro Limit
+            limit: planDetails.limits.orgs,
           },
           tenders: {
             current: usageResult.usage.tenders,
-            limit: 100, // Visual limit for progress bar, effectively unlimited in logic
+            limit: planDetails.limits.tenders,
           },
           storage: {
             current: usageResult.usage.storage,
-            limit: 10000, // 10GB
+            limit: planDetails.limits.storage,
           },
         });
 
@@ -647,12 +669,14 @@ export default function BillingPage() {
                     <div className="flex items-center gap-2 mb-2">
                       <Star className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       <span className="font-medium text-blue-900 dark:text-blue-100">
-                        Current Plan: Pro
+                        Current Plan:{' '}
+                        {subscription ? subscription.plan : 'Loading...'}
                       </span>
                     </div>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      You&#x27;re on the Pro plan with access to all premium
-                      features.
+                      You&#x27;re on the{' '}
+                      {subscription ? subscription.plan : '...'} plan with
+                      access to all features.
                     </p>
                   </div>
 
