@@ -126,9 +126,19 @@ export function FooterSection() {
           <div>
             <h4 className="font-semibold mb-4 text-foreground">Contact</h4>
             <div className="space-y-2 text-muted-foreground">
-              <div>📧 support@tendertrack360.co.za</div>
-              <div>📞 +1 (555) 123-4567</div>
-              <div>📍 123 Business Ave, Suite 100</div>
+              <Link
+                href="mailto:info@tendertrack360.co.za"
+                className="hover:text-foreground transition-colors"
+              >
+                📧 info@tendertrack360.co.za
+              </Link>
+              <Link
+                href="tel:+27686478157"
+                className="hover:text-foreground transition-colors"
+              >
+                📞 +27 68 647 8157
+              </Link>
+              {/* <div>📍 123 Business Ave, Suite 100</div> */}
               <div>🌐 www.tendertrack360.co.za</div>
             </div>
           </div>
