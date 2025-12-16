@@ -55,7 +55,7 @@ export const auth = betterAuth({
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
       await resend.emails.send({
-        from: 'Tender Track 360 <onboarding@resend.dev>',
+        from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
         // MVP: Send all emails to info@tendertrack360.co.za
         to: user.email,
         subject: 'Verify your email address',
@@ -76,7 +76,7 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url }) => {
       try {
         const { data, error } = await resend.emails.send({
-          from: 'Tender Track 360 <onboarding@resend.dev>',
+          from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
           // MVP: Send all emails to info@tendertrack360.co.za
           to: user.email,
           subject: 'Reset your password',
@@ -110,7 +110,7 @@ export const auth = betterAuth({
         const base = env.NEXT_PUBLIC_URL || 'http://localhost:3000';
         const inviteLink = `${base}/invite/accept/${data.id}`;
         await resend.emails.send({
-          from: 'Tender Track 360 <onboarding@resend.dev>',
+          from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
           // MVP: Send all emails to info@tendertrack360.co.za
           to: data.email,
           subject: `You're invited to join ${data.organization.name}`,
