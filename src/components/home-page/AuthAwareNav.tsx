@@ -15,7 +15,7 @@ export default function AuthAwareNav() {
           <Link href="/login">Sign In</Link>
         </Button>
         <Button size="sm" asChild>
-          <Link href="/sign-up">Get Started</Link>
+          <Link href="/waitlist">Join Waitlist</Link>
         </Button>
       </div>
     );
@@ -38,7 +38,7 @@ export default function AuthAwareNav() {
         <Link href="/login">Sign In</Link>
       </Button>
       <Button size="sm" asChild>
-        <Link href="/sign-up">Get Started</Link>
+        <Link href="/waitlist">Join Waitlist</Link>
       </Button>
     </div>
   );

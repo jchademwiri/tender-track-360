@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export function HeroSection() {
   return (
-    <section className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-secondary/40 via-background to-background">
+    <section className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-linear-to-b from-secondary/40 via-background to-background">
       {/* Decorative background accents */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-secondary/30 blur-3xl opacity-70" />
@@ -13,13 +13,13 @@ export function HeroSection() {
 
       <div className="container mx-auto px-4">
         <div className="flex flex-col items-center text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1 text-sm text-muted-foreground backdrop-blur supports-[backdrop-filter]:bg-background/40">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1 text-sm text-muted-foreground backdrop-blur supports-backdrop-filter:bg-background/40">
             <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
             All-in-one tender management
           </div>
 
           <h1 className="mb-6 max-w-5xl text-5xl font-bold tracking-tight text-foreground md:text-7xl">
-            <span className="bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent">
+            <span className="bg-linear-to-b from-foreground to-foreground/60 bg-clip-text text-transparent">
               Streamline Your Tender Management Process
             </span>
           </h1>
@@ -30,7 +30,7 @@ export function HeroSection() {
 
           <div className="flex w-full flex-col items-center justify-center gap-4 sm:flex-row">
             <Button size="lg" asChild className="px-8">
-              <Link href="/sign-up">Get Started</Link>
+              <Link href="/waitlist">Join Waitlist</Link>
             </Button>
             <Button size="lg" variant="outline" asChild className="px-8">
               <Link href="#features">Learn More</Link>

@@ -14,10 +14,10 @@ export function FeaturesSection({
     },
     {
       id: '2',
-      title: 'Document Repository',
-      description: 'Centralized file management with version control',
-      icon: '📁',
-      benefits: ['Version control', 'Secure storage'],
+      title: 'Project & PO Management',
+      description: 'Manage projects, purchase orders, and contracts seamlessly',
+      icon: '🏗️',
+      benefits: ['Track Purchase Orders', 'Contract Management'],
     },
     {
       id: '3',

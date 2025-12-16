@@ -59,9 +59,9 @@ export function SignUpForm({
       try {
         const params = new URLSearchParams(window.location.search);
         const next = params.get('next');
-        router.push(next || '/dashboard');
+        router.push(next ? `/check-email?next=${next}` : '/check-email');
       } catch (e) {
-        router.push('/dashboard');
+        router.push('/check-email');
       }
     } else {
       toast.error(message as string);
