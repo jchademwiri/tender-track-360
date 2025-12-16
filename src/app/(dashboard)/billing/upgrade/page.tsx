@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { formatCurrency } from '@/lib/format';
 import {
   Crown,
   ArrowLeft,
@@ -23,7 +24,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 interface PricingTier {
   id: string;
   name: string;
-  price: string;
+  price: string | number;
   period: string;
   description: string;
   features: string[];
@@ -74,7 +75,7 @@ export default function UpgradePage() {
     {
       id: 'free',
       name: 'Free',
-      price: 'R0',
+      price: 0,
       period: '/month',
       description: 'Perfect for getting started',
       features: [
@@ -90,7 +91,7 @@ export default function UpgradePage() {
     {
       id: 'pro',
       name: 'Pro',
-      price: 'R499',
+      price: 499,
       period: '/month',
       description: 'Perfect for growing teams',
       features: [
@@ -98,7 +99,6 @@ export default function UpgradePage() {
         'Advanced tender management',
         'Priority support',
         'Advanced analytics',
-
         'Team collaboration tools',
         'Export capabilities',
       ],
@@ -306,7 +306,9 @@ export default function UpgradePage() {
                       <div className="space-y-2">
                         <div className="flex items-baseline justify-center gap-2">
                           <span className="text-4xl font-bold text-gray-900 dark:text-white">
-                            {tier.price}
+                            {typeof tier.price === 'number'
+                              ? formatCurrency(tier.price)
+                              : tier.price}
                           </span>
                           <span className="text-gray-600 dark:text-gray-300">
                             {tier.period}

@@ -8,7 +8,7 @@ import {
   MoreHorizontal,
   FileText,
   Calendar,
-  DollarSign,
+  Banknote,
   Filter,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -99,12 +99,17 @@ export function TenderList({
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(initialTotalCount); // TODO: use for pagination
-  const [showAllStatuses, setShowAllStatuses] = useState(defaultStatusFilter === 'all');
+  const [showAllStatuses, setShowAllStatuses] = useState(
+    defaultStatusFilter === 'all'
+  );
 
   // Filter tenders based on status filter for submitted-pending option
-  const filteredTenders = statusFilter === 'submitted-pending'
-    ? tenders.filter(t => t.status === 'submitted' || t.status === 'pending')
-    : tenders;
+  const filteredTenders =
+    statusFilter === 'submitted-pending'
+      ? tenders.filter(
+          (t) => t.status === 'submitted' || t.status === 'pending'
+        )
+      : tenders;
 
   const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredTenders.length / itemsPerPage);
@@ -143,7 +148,11 @@ export function TenderList({
 
     // Fetch fresh data for the new organization
     if (organizationId) {
-      fetchTenders('', 1, defaultStatusFilter === 'all' ? undefined : defaultStatusFilter);
+      fetchTenders(
+        '',
+        1,
+        defaultStatusFilter === 'all' ? undefined : defaultStatusFilter
+      );
     }
   }, [organizationId, fetchTenders, defaultStatusFilter]);
 
@@ -474,7 +483,7 @@ export function TenderList({
 
                         <div className="space-y-1">
                           <div className="flex items-center text-sm text-muted-foreground">
-                            <DollarSign className="h-3 w-3 mr-1" />
+                            <Banknote className="h-3 w-3 mr-1" />
                             {formatValue(tender.value)}
                           </div>
                           <div className="flex items-center text-sm text-muted-foreground">
@@ -541,8 +550,8 @@ export function TenderList({
               <div className="flex items-center justify-between mt-6">
                 <div className="text-sm text-muted-foreground">
                   Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                  {Math.min(currentPage * itemsPerPage, filteredTenders.length)} of{' '}
-                  {filteredTenders.length} tenders
+                  {Math.min(currentPage * itemsPerPage, filteredTenders.length)}{' '}
+                  of {filteredTenders.length} tenders
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button

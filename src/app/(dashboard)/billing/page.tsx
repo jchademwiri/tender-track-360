@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { formatCurrency } from '@/lib/format';
 import {
   Crown,
   ArrowLeft,
@@ -169,11 +170,8 @@ export default function BillingPage() {
     });
   };
 
-  const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-ZA', {
-      style: 'currency',
-      currency: currency || 'ZAR',
-    }).format(amount);
+  const formatCurrencyLocal = (amount: number, currency: string) => {
+    return formatCurrency(amount, { currency: currency || 'ZAR' });
   };
 
   if (error) {
@@ -279,10 +277,9 @@ export default function BillingPage() {
                       Monthly Price
                     </p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {formatCurrency(
-                        subscription.price,
-                        subscription.currency
-                      )}
+                      {formatCurrency(subscription.price, {
+                        currency: subscription.currency,
+                      })}
                     </p>
                   </div>
                   <div className="space-y-2">
@@ -557,7 +554,9 @@ export default function BillingPage() {
                             {invoice.status}
                           </Badge>
                           <span className="font-medium">
-                            {formatCurrency(invoice.amount, invoice.currency)}
+                            {formatCurrency(invoice.amount, {
+                              currency: invoice.currency,
+                            })}
                           </span>
                           {invoice.download_url && (
                             <Button

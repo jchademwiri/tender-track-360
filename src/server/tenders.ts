@@ -732,10 +732,54 @@ export async function getTenderStats(organizationId: string) {
         tender.submissionDate <= thirtyDaysFromNow
     ).length;
 
-    // Count overdue tenders
+    // Calculate overdue tenders
     const overdueCount = stats.filter(
       (tender) => tender.submissionDate && tender.submissionDate < now
     ).length;
+
+    // --- Trend Calculation (vs 30 days ago) ---
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    // Filter stats to represent the state 30 days ago
+    // Note: This relies on createdAt. For more accuracy on status changes, we'd need a history table.
+    // For MVP, assuming tenders created before 30 days ago represents the "previous" pool is a reasonable approximation for finding growth in volume/value.
+    const previousStats = stats.filter(
+      (t) => t.createdAt && t.createdAt < thirtyDaysAgo
+    );
+
+    const previousTotalTenders = previousStats.length;
+
+    // Status counts for previous period
+    const previousStatusCounts = previousStats.reduce(
+      (acc, tender) => {
+        acc[tender.status] = (acc[tender.status] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
+    // Previous Total Value
+    const previousTotalValue = previousStats.reduce((sum, tender) => {
+      const value = parseFloat(tender.value || '0');
+      return sum + (isNaN(value) ? 0 : value);
+    }, 0);
+
+    // Previous Win Rate
+    const previousWinRate =
+      previousTotalTenders > 0
+        ? (previousStatusCounts.won || 0) / previousTotalTenders
+        : 0;
+
+    // Calculate Percentage Changes
+    const calculateTrend = (current: number, previous: number) => {
+      if (previous === 0) {
+        return current > 0 ? 100 : 0; // 100% growth if starting from 0
+      }
+      return ((current - previous) / previous) * 100;
+    };
+
+    const valueTrend = calculateTrend(totalValue, previousTotalValue);
+    const winRateTrend = calculateTrend(winRate, previousWinRate);
 
     return {
       success: true,
@@ -753,6 +797,10 @@ export async function getTenderStats(organizationId: string) {
         averageValue,
         upcomingDeadlines,
         overdueCount,
+        trends: {
+          value: valueTrend,
+          winRate: winRateTrend,
+        },
       },
     };
   } catch (error) {

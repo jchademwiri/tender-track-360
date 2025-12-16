@@ -2,15 +2,10 @@ import { getCurrentUser } from '@/server';
 import { getProjectStats, getRecentProjectActivities } from '@/server/projects';
 import { RecentActivitySection } from '@/components/recent-activity-section';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  FolderOpen,
-  Receipt,
-  DollarSign,
-  TrendingUp,
-  Plus,
-} from 'lucide-react';
+import { FolderOpen, Receipt, Banknote, TrendingUp, Plus } from 'lucide-react';
 import { Button } from '@/components/ui';
 import Link from 'next/link';
+import { formatCurrency } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
@@ -110,11 +105,11 @@ export default async function ProjectsOverviewPage() {
             <CardTitle className="text-sm font-medium">
               Total PO Amount
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <Banknote className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              R{stats.totalPOAmount.toLocaleString()}
+              {formatCurrency(stats.totalPOAmount)}
             </div>
             <p className="text-xs text-muted-foreground">Combined PO value</p>
           </CardContent>

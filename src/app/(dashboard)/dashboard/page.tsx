@@ -16,7 +16,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, TrendingUp, DollarSign, Target, Calendar } from 'lucide-react';
+import { Plus, TrendingUp, Banknote, Target, Calendar } from 'lucide-react';
 import Link from 'next/link';
 
 // Force dynamic rendering
@@ -84,10 +84,10 @@ export default async function DashboardPage() {
           title="Total Pipeline Value"
           value={formatCurrency(dashboardData.tenderStats.totalValue)}
           description="Combined value of all tenders"
-          icon={<DollarSign className="h-4 w-4" />}
+          icon={<Banknote className="h-4 w-4" />}
           trend={{
-            value: 12.5,
-            isPositive: true,
+            value: dashboardData.tenderStats.trends?.value || 0,
+            isPositive: (dashboardData.tenderStats.trends?.value || 0) >= 0,
           }}
         />
         <MetricCard
@@ -96,8 +96,8 @@ export default async function DashboardPage() {
           description="Percentage of won tenders"
           icon={<Target className="h-4 w-4" />}
           trend={{
-            value: 5.2,
-            isPositive: true,
+            value: dashboardData.tenderStats.trends?.winRate || 0,
+            isPositive: (dashboardData.tenderStats.trends?.winRate || 0) >= 0,
           }}
         />
         <MetricCard
