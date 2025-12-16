@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/lib/format';
+import { AddPaymentMethodDialog } from '@/components/shared/dialogs/add-payment-method-dialog';
+import { getUserUsageStats } from '@/server/billing';
 import {
   Crown,
   ArrowLeft,
@@ -95,6 +97,7 @@ export default function BillingPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [animateItems, setAnimateItems] = useState(false);
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
 
   useEffect(() => {
     // Trigger animations after a short delay
@@ -113,9 +116,40 @@ export default function BillingPage() {
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
         // Mock data - replace with actual API responses
-        // Mock data removed for production readiness - waiting for API integration
-        setSubscription(null);
-        setUsage(null);
+        setSubscription({
+          id: 'sub_mock_123',
+          plan: 'Pro',
+          status: 'active',
+          current_period_start: new Date().toISOString(),
+          current_period_end: new Date(
+            Date.now() + 30 * 24 * 60 * 60 * 1000
+          ).toISOString(),
+          cancel_at_period_end: false,
+          price: 499,
+          currency: 'ZAR',
+          interval: 'month',
+        });
+
+        // Fetch real usage stats
+        const usageResult = await getUserUsageStats();
+
+        // Use real usage with Pro plan limits (2 Orgs, Unlimited Tenders, 10GB)
+        // Note: For tenders, we show the count but limit is technically simplified here for display
+        setUsage({
+          organizations: {
+            current: usageResult.usage.organizations,
+            limit: 2, // Pro Limit
+          },
+          tenders: {
+            current: usageResult.usage.tenders,
+            limit: 100, // Visual limit for progress bar, effectively unlimited in logic
+          },
+          storage: {
+            current: usageResult.usage.storage,
+            limit: 10000, // 10GB
+          },
+        });
+
         setPaymentMethods([]);
         setInvoices([]);
       } catch (err) {
@@ -138,8 +172,16 @@ export default function BillingPage() {
   };
 
   const handleManagePaymentMethod = () => {
-    // TODO: Implement payment method management
-    console.log('Manage payment method');
+    setIsPaymentDialogOpen(true);
+  };
+
+  const handleManageSubscription = () => {
+    // Redirect to upgrade page which serves as our "Manage" portal for now
+    router.push('/billing/upgrade');
+  };
+
+  const handleAddPaymentMethod = (method: PaymentMethod) => {
+    setPaymentMethods((prev) => [...prev, method]);
   };
 
   const handleDownloadInvoice = (invoiceId: string) => {
@@ -616,15 +658,6 @@ export default function BillingPage() {
 
                   <div className="space-y-3">
                     <Button
-                      onClick={handleUpgrade}
-                      className="w-full"
-                      size="lg"
-                    >
-                      <Crown className="h-5 w-5 mr-2" />
-                      Upgrade to Enterprise
-                    </Button>
-
-                    <Button
                       variant="outline"
                       className="w-full"
                       size="lg"
@@ -634,7 +667,12 @@ export default function BillingPage() {
                       Downgrade to Free
                     </Button>
 
-                    <Button variant="outline" className="w-full" size="lg">
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      size="lg"
+                      onClick={handleManageSubscription}
+                    >
                       <Settings className="h-5 w-5 mr-2" />
                       Manage Subscription
                     </Button>
@@ -671,6 +709,11 @@ export default function BillingPage() {
           </div>
         </div>
       </div>
+      <AddPaymentMethodDialog
+        open={isPaymentDialogOpen}
+        onOpenChange={setIsPaymentDialogOpen}
+        onAdd={handleAddPaymentMethod}
+      />
     </div>
   );
 }
