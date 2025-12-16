@@ -13,14 +13,15 @@ interface ReportStatsProps {
     activeProjects: number;
     winRate: number;
     pipelineValue: number;
-    revenueSecured: number;
+    totalWonValue: number;
+    poRevenue: number;
   };
 }
 
 export function ReportStatsCards({ stats }: ReportStatsProps) {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {/* Win Rate Card */}
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      {/* 1. Win Rate Card */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Win Rate</CardTitle>
@@ -34,15 +35,33 @@ export function ReportStatsCards({ stats }: ReportStatsProps) {
         </CardContent>
       </Card>
 
-      {/* Revenue Secured Card */}
-      <Card>
+      {/* 2. PO Revenue (Guaranteed) - New Card */}
+      <Card className="bg-emerald-500/10 border-emerald-500/20">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Revenue Secured</CardTitle>
-          <Banknote className="h-4 w-4 text-green-600" />
+          <Banknote className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+            {formatCurrency(stats.poRevenue)}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Guaranteed revenue (POs)
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* 3. Total Won Value (Booked) - Was Revenue Secured */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">
+            Booked Contracts
+          </CardTitle>
+          <Briefcase className="h-4 w-4 text-green-600" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {formatCurrency(stats.revenueSecured)}
+            {formatCurrency(stats.totalWonValue)}
           </div>
           <p className="text-xs text-muted-foreground">
             Total value of won tenders
@@ -50,7 +69,7 @@ export function ReportStatsCards({ stats }: ReportStatsProps) {
         </CardContent>
       </Card>
 
-      {/* Pipeline Value Card */}
+      {/* 4. Pipeline Value Card */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Pipeline Value</CardTitle>
@@ -61,16 +80,16 @@ export function ReportStatsCards({ stats }: ReportStatsProps) {
             {formatCurrency(stats.pipelineValue)}
           </div>
           <p className="text-xs text-muted-foreground">
-            {stats.pendingTenders} tenders pending decision
+            {stats.pendingTenders} pending decision
           </p>
         </CardContent>
       </Card>
 
-      {/* Active Projects Card */}
+      {/* 5. Active Projects Card */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-          <Briefcase className="h-4 w-4 text-indigo-500" />
+          <TrendingUp className="h-4 w-4 text-indigo-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.activeProjects}</div>

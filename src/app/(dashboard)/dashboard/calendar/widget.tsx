@@ -91,59 +91,79 @@ export function CalendarClient() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-4">
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="chk-tender"
-            checked={types.includes('tender_submission')}
-            onCheckedChange={(c) => {
-              const checked = Boolean(c);
-              setTypes((prev) =>
-                checked
-                  ? Array.from(new Set([...prev, 'tender_submission']))
-                  : prev.filter((t) => t !== 'tender_submission')
-              );
-            }}
-          />
-          <label htmlFor="chk-tender">Tenders</label>
-        </div>
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="chk-po-exp"
-            checked={types.includes('po_expected_delivery')}
-            onCheckedChange={(c) => {
-              const checked = Boolean(c);
-              setTypes((prev) =>
-                checked
-                  ? Array.from(new Set([...prev, 'po_expected_delivery']))
-                  : prev.filter((t) => t !== 'po_expected_delivery')
-              );
-            }}
-          />
-          <label htmlFor="chk-po-exp">PO Expected</label>
-        </div>
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="chk-po-del"
-            checked={types.includes('po_delivered')}
-            onCheckedChange={(c) => {
-              const checked = Boolean(c);
-              setTypes((prev) =>
-                checked
-                  ? Array.from(new Set([...prev, 'po_delivered']))
-                  : prev.filter((t) => t !== 'po_delivered')
-              );
-            }}
-          />
-          <label htmlFor="chk-po-del">PO Delivered</label>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-muted/20 rounded-lg border border-white/5">
+        <div className="flex flex-wrap items-center gap-6">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="chk-tender"
+              checked={types.includes('tender_submission')}
+              onCheckedChange={(c) => {
+                const checked = Boolean(c);
+                setTypes((prev) =>
+                  checked
+                    ? Array.from(new Set([...prev, 'tender_submission']))
+                    : prev.filter((t) => t !== 'tender_submission')
+                );
+              }}
+              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+            />
+            <label
+              htmlFor="chk-tender"
+              className="text-sm font-medium leading-none cursor-pointer"
+            >
+              Tenders
+            </label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="chk-po-exp"
+              checked={types.includes('po_expected_delivery')}
+              onCheckedChange={(c) => {
+                const checked = Boolean(c);
+                setTypes((prev) =>
+                  checked
+                    ? Array.from(new Set([...prev, 'po_expected_delivery']))
+                    : prev.filter((t) => t !== 'po_expected_delivery')
+                );
+              }}
+              className="data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500"
+            />
+            <label
+              htmlFor="chk-po-exp"
+              className="text-sm font-medium leading-none cursor-pointer"
+            >
+              PO Expected
+            </label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="chk-po-del"
+              checked={types.includes('po_delivered')}
+              onCheckedChange={(c) => {
+                const checked = Boolean(c);
+                setTypes((prev) =>
+                  checked
+                    ? Array.from(new Set([...prev, 'po_delivered']))
+                    : prev.filter((t) => t !== 'po_delivered')
+                );
+              }}
+              className="data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+            />
+            <label
+              htmlFor="chk-po-del"
+              className="text-sm font-medium leading-none cursor-pointer"
+            >
+              PO Delivered
+            </label>
+          </div>
         </div>
 
         <Select
           onValueChange={(v) => setStatus(v === 'all' ? undefined : v)}
           value={status ?? 'all'}
         >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Status" />
+          <SelectTrigger className="w-full md:w-[200px] bg-background/50">
+            <SelectValue placeholder="Filter by Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
