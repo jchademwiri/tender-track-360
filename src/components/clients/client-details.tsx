@@ -298,7 +298,7 @@ export function ClientDetails({ client, organizationId }: ClientDetailsProps) {
                   variant="outline"
                   className="w-full justify-start cursor-pointer"
                   onClick={() =>
-                    window.open('mailto:info@tendertrack360.co.za', '_blank')
+                    window.open(`mailto:${client.contactEmail}`, '_blank')
                   }
                 >
                   <Mail className="h-4 w-4 mr-2" />

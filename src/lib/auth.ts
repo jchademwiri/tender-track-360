@@ -56,7 +56,7 @@ export const auth = betterAuth({
       await resend.emails.send({
         from: 'Tender Track 360 <onboarding@resend.dev>',
         // MVP: Send all emails to info@tendertrack360.co.za
-        to: 'info@tendertrack360.co.za',
+        to: user.email,
         subject: 'Verify your email address',
         replyTo: process.env.REPLY_TO_EMAIL || 'info@tendertrack360.co.za',
         react: VerifyEmail({
@@ -77,7 +77,7 @@ export const auth = betterAuth({
         const { data, error } = await resend.emails.send({
           from: 'Tender Track 360 <onboarding@resend.dev>',
           // MVP: Send all emails to info@tendertrack360.co.za
-          to: 'info@tendertrack360.co.za',
+          to: user.email,
           subject: 'Reset your password',
           replyTo: process.env.REPLY_TO_EMAIL || 'info@tendertrack360.co.za',
           react: ResetPasswordEmail({
@@ -111,7 +111,7 @@ export const auth = betterAuth({
         await resend.emails.send({
           from: 'Tender Track 360 <onboarding@resend.dev>',
           // MVP: Send all emails to info@tendertrack360.co.za
-          to: 'info@tendertrack360.co.za',
+          to: data.email,
           subject: `You're invited to join ${data.organization.name}`,
           replyTo: process.env.REPLY_TO_EMAIL || 'info@tendertrack360.co.za',
           react: OrganizationInvitation({

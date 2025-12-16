@@ -177,8 +177,7 @@ export async function inviteMember(
 
       await resend.emails.send({
         from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
-        // MVP: Send all emails to info@tendertrack360.co.za
-        to: 'info@tendertrack360.co.za',
+        to: email,
         subject: `You're invited to join ${userMembership.organization.name}`,
         replyTo: process.env.REPLY_TO_EMAIL || 'info@tendertrack360.co.za',
         react: OrganizationInvitation({
@@ -400,8 +399,7 @@ export async function resendInvitation(
 
       await resend.emails.send({
         from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
-        // MVP: Send all emails to info@tendertrack360.co.za
-        to: 'info@tendertrack360.co.za',
+        to: invitationRecord.email,
         subject: `You're invited to join ${userMembership.organization.name}`,
         replyTo: process.env.REPLY_TO_EMAIL || 'info@tendertrack360.co.za',
         react: OrganizationInvitation({

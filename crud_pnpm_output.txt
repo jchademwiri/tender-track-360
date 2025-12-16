@@ -1,0 +1,45 @@
+
+> tender-track-360@0.1.0 test D:\websites\tender-track-360
+> jest "src/server/__tests__/crud-integration.test.ts"
+
+FAIL src/server/__tests__/crud-integration.test.ts (26.905 s)
+  Client CRUD Integration Tests
+    Create Client
+      ΓêÜ should create a new client successfully (1727 ms)
+      ΓêÜ should fail validation with invalid email (5 ms)
+    Read Client
+      ΓêÜ should get client by ID (538 ms)
+      ΓêÜ should list clients with pagination (3380 ms)
+    Update Client
+      ΓêÜ should update client details (1513 ms)
+    Delete Client
+      ΓêÜ should soft delete client (3245 ms)
+    Safe Deletion Constraints
+      ΓêÜ should prevent deleting Project with active Purchase Orders (998 ms)
+      ΓêÜ should prevent deleting Tender with active Projects (1005 ms)
+      ΓêÜ should prevent deleting Client with active Tenders (1045 ms)
+      ├ù should allow deletion after dependencies are removed (5004 ms)
+
+  ΓùÅ Client CRUD Integration Tests ΓÇ║ Safe Deletion Constraints ΓÇ║ should allow deletion after dependencies are removed
+
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      250 |     });
+      251 |
+    > 252 |     it('should allow deletion after dependencies are removed', async () => {
+          |     ^
+      253 |       // 1. Delete PO
+      254 |       await db
+      255 |         .update(purchaseOrder)
+
+      at it (src/server/__tests__/crud-integration.test.ts:252:5)
+      at describe (src/server/__tests__/crud-integration.test.ts:181:3)
+      at Object.describe (src/server/__tests__/crud-integration.test.ts:37:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 9 passed, 10 total
+Snapshots:   0 total
+Time:        27.002 s
+Ran all test suites matching /src\\server\\__tests__\\crud-integration.test.ts/i.
+ΓÇëELIFECYCLEΓÇë Test failed. See above for more details.

@@ -1,0 +1,38 @@
+
+> tender-track-360@0.1.0 test D:\websites\tender-track-360
+> jest "src/server/__tests__/ownership-transfer.test.ts"
+
+FAIL src/server/__tests__/ownership-transfer.test.ts (35.587 s)
+  Ownership Transfer Tests
+    Initiate Transfer
+      ΓêÜ should allow owner to initiate transfer (4879 ms)
+      ΓêÜ should fail if non-owner tries to initiate (1048 ms)
+    Cancel Transfer
+      ΓêÜ should allow owner to cancel pending transfer (5787 ms)
+    Accept Transfer
+      ΓêÜ should successfully transfer ownership (7862 ms)
+      ├ù should fail if wrong user tries to accept (7125 ms)
+
+  ΓùÅ Ownership Transfer Tests ΓÇ║ Accept Transfer ΓÇ║ should fail if wrong user tries to accept
+
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      216 |     }, 15000);
+      217 |
+    > 218 |     it('should fail if wrong user tries to accept', async () => {
+          |     ^
+      219 |       // Create another pending transfer (first reset roles if needed?
+      220 |       // The previous test changed roles. So owner is now newOwnerId.)
+      221 |
+
+      at it (src/server/__tests__/ownership-transfer.test.ts:218:5)
+      at describe (src/server/__tests__/ownership-transfer.test.ts:172:3)
+      at Object.describe (src/server/__tests__/ownership-transfer.test.ts:37:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 4 passed, 5 total
+Snapshots:   0 total
+Time:        35.671 s
+Ran all test suites matching /src\\server\\__tests__\\ownership-transfer.test.ts/i.
+ΓÇëELIFECYCLEΓÇë Test failed. See above for more details.

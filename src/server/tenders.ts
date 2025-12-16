@@ -376,8 +376,20 @@ export async function deleteTender(organizationId: string, tenderId: string) {
       return { success: false, error: 'Tender not found' };
     }
 
-    // TODO: Check if tender has active projects or follow-ups before deletion
-    // This will be implemented when project and follow-up functionality is added
+    // Check if tender has active projects before deletion
+    const activeProjects = await db
+      .select({ id: project.id })
+      .from(project)
+      .where(and(eq(project.tenderId, tenderId), isNull(project.deletedAt)))
+      .limit(1);
+
+    if (activeProjects.length > 0) {
+      return {
+        success: false,
+        error:
+          'Cannot delete tender with active projects. Please delete the projects first.',
+      };
+    }
 
     await db
       .update(tender)
@@ -702,23 +714,27 @@ export async function getTenderStats(organizationId: string) {
     }, 0);
 
     // Calculate win rate
-    const winRate = totalTenders > 0 ? (statusCounts.won || 0) / totalTenders : 0;
+    const winRate =
+      totalTenders > 0 ? (statusCounts.won || 0) / totalTenders : 0;
 
     // Calculate average value
     const averageValue = totalTenders > 0 ? totalValue / totalTenders : 0;
 
     // Count upcoming deadlines (next 30 days)
     const now = new Date();
-    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-    const upcomingDeadlines = stats.filter(tender =>
-      tender.submissionDate &&
-      tender.submissionDate > now &&
-      tender.submissionDate <= thirtyDaysFromNow
+    const thirtyDaysFromNow = new Date(
+      now.getTime() + 30 * 24 * 60 * 60 * 1000
+    );
+    const upcomingDeadlines = stats.filter(
+      (tender) =>
+        tender.submissionDate &&
+        tender.submissionDate > now &&
+        tender.submissionDate <= thirtyDaysFromNow
     ).length;
 
     // Count overdue tenders
-    const overdueCount = stats.filter(tender =>
-      tender.submissionDate && tender.submissionDate < now
+    const overdueCount = stats.filter(
+      (tender) => tender.submissionDate && tender.submissionDate < now
     ).length;
 
     return {
@@ -764,7 +780,10 @@ export async function getTenderStats(organizationId: string) {
 }
 
 // Get recent activity for dashboard
-export async function getRecentActivity(organizationId: string, limit: number = 10) {
+export async function getRecentActivity(
+  organizationId: string,
+  limit: number = 10
+) {
   try {
     // Get recent tenders
     const recentTenders = await db
@@ -834,10 +853,15 @@ export async function getRecentActivity(organizationId: string, limit: number = 
 }
 
 // Get upcoming deadlines for dashboard
-export async function getUpcomingDeadlines(organizationId: string, limit: number = 10) {
+export async function getUpcomingDeadlines(
+  organizationId: string,
+  limit: number = 10
+) {
   try {
     const now = new Date();
-    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const thirtyDaysFromNow = new Date(
+      now.getTime() + 30 * 24 * 60 * 60 * 1000
+    );
 
     const upcomingTenders = await db
       .select({
@@ -865,10 +889,13 @@ export async function getUpcomingDeadlines(organizationId: string, limit: number
       .limit(limit);
 
     // Calculate days until deadline for each tender
-    const tendersWithDays = upcomingTenders.map(tender => ({
+    const tendersWithDays = upcomingTenders.map((tender) => ({
       ...tender,
       daysUntilDeadline: tender.submissionDate
-        ? Math.ceil((tender.submissionDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+        ? Math.ceil(
+            (tender.submissionDate.getTime() - now.getTime()) /
+              (1000 * 60 * 60 * 24)
+          )
         : null,
     }));
 
@@ -939,7 +966,7 @@ export async function getTendersWithCustomSorting(
       .where(whereCondition)
       .orderBy(
         // First sort by custom status order
-        ...statusOrder.map(status => desc(eq(tender.status, status))),
+        ...statusOrder.map((status) => desc(eq(tender.status, status))),
         // Then by submission date (most recent first)
         desc(tender.submissionDate),
         // Finally by created date as fallback
@@ -1003,7 +1030,10 @@ export async function getTendersOverview(
     }
 
     if (filters.clientId) {
-      whereCondition = and(whereCondition, eq(tender.clientId, filters.clientId));
+      whereCondition = and(
+        whereCondition,
+        eq(tender.clientId, filters.clientId)
+      );
     }
 
     if (filters.search && filters.search.trim()) {

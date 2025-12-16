@@ -101,42 +101,49 @@ export function OwnershipTransferModal({
           {/* Member Selection */}
           <div className="space-y-2">
             <Label htmlFor="member">Select New Owner</Label>
-            <Select
-              value={formData.newOwnerId}
-              onValueChange={(value) =>
-                setFormData({ ...formData, newOwnerId: value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choose a member to transfer ownership to" />
-              </SelectTrigger>
-              <SelectContent>
-                {eligibleMembers.map((member) => (
-                  <SelectItem key={member.id} value={member.id}>
-                    <div className="flex items-center gap-2">
-                      <div>
-                        <p className="font-medium">{member.name}</p>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Mail className="h-3 w-3" />
-                          {member.email}
-                        </p>
-                      </div>
-                      <div className="ml-auto">
-                        <div className="flex items-center gap-1 text-xs">
-                          <Shield className="h-3 w-3" />
-                          {member.role}
+            {eligibleMembers.length > 0 ? (
+              <Select
+                value={formData.newOwnerId}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, newOwnerId: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a member to transfer ownership to" />
+                </SelectTrigger>
+                <SelectContent>
+                  {eligibleMembers.map((member) => (
+                    <SelectItem key={member.id} value={member.id}>
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <p className="font-medium">{member.name}</p>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Mail className="h-3 w-3" />
+                            {member.email}
+                          </p>
+                        </div>
+                        <div className="ml-auto">
+                          <div className="flex items-center gap-1 text-xs">
+                            <Shield className="h-3 w-3" />
+                            {member.role}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {eligibleMembers.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                No eligible members found. Only admins and managers can receive
-                ownership.
-              </p>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <div className="py-6 text-center border rounded-md bg-muted/20 border-dashed">
+                <UserX className="h-8 w-8 mx-auto text-muted-foreground opacity-50 mb-2" />
+                <p className="text-sm font-medium text-muted-foreground">
+                  No eligible members found
+                </p>
+                <p className="text-xs text-muted-foreground mt-1 px-4">
+                  Only other admins and managers can receive ownership. Invite a
+                  member or upgrade their role first.
+                </p>
+              </div>
             )}
           </div>
 

@@ -329,7 +329,7 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
                               </label>
                               <p className="text-foreground">
                                 <Link
-                                  href="mailto:info@tendertrack360.co.za"
+                                  href={`mailto:${tender.client.contactEmail}`}
                                   className="text-blue-600 hover:text-blue-800 hover:underline"
                                 >
                                   {tender.client.contactEmail}
@@ -396,8 +396,7 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
                 <Button
                   variant="outline"
                   className="w-full justify-start cursor-pointer"
-                  onClick={() =>
-                    window.open('mailto:info@tendertrack360.co.za', '_blank')
+                    window.open(`mailto:${tender.client?.contactEmail}`, '_blank')
                   }
                 >
                   <Mail className="h-4 w-4 mr-2" />
