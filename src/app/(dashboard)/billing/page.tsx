@@ -240,7 +240,7 @@ export default function BillingPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
         <div className="max-w-md w-full">
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
@@ -258,7 +258,7 @@ export default function BillingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
       <div className="bg-white dark:bg-gray-900 shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -274,7 +274,7 @@ export default function BillingPage() {
                 Back
               </Button>
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30">
                   <CreditCard className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
@@ -300,7 +300,7 @@ export default function BillingPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30">
                     <Crown className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
@@ -374,7 +374,7 @@ export default function BillingPage() {
           >
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30">
                   <Activity className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
@@ -484,7 +484,7 @@ export default function BillingPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30">
                     <CreditCard className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
@@ -569,7 +569,7 @@ export default function BillingPage() {
             >
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30">
                     <Receipt className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                   </div>
                   <div>
@@ -652,7 +652,7 @@ export default function BillingPage() {
             >
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30">
                     <Zap className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div>
@@ -665,7 +665,7 @@ export default function BillingPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div className="p-4 bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
                     <div className="flex items-center gap-2 mb-2">
                       <Star className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       <span className="font-medium text-blue-900 dark:text-blue-100">

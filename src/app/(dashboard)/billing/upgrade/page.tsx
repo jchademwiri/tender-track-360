@@ -229,7 +229,7 @@ export default function UpgradePage() {
 
   if (error && planParam) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
         <div className="max-w-md w-full">
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
@@ -247,7 +247,7 @@ export default function UpgradePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
       <div className="bg-white dark:bg-gray-900 shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -263,7 +263,7 @@ export default function UpgradePage() {
                 Back
               </Button>
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30">
                   <Crown className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
@@ -286,7 +286,7 @@ export default function UpgradePage() {
           <div
             className={`text-center space-y-6 transition-all duration-500 ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
           >
-            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30">
+            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-amber-100 via-orange-100 to-yellow-100 dark:from-amber-900/30 dark:via-orange-900/30 dark:to-yellow-900/30">
               <Crown className="h-12 w-12 text-amber-600 dark:text-amber-400" />
             </div>
 
@@ -311,7 +311,7 @@ export default function UpgradePage() {
                   key={tier.id}
                   className={`relative rounded-2xl border-2 p-8 transition-all duration-500 hover:shadow-xl ${
                     tier.popular
-                      ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 scale-105'
+                      ? 'border-blue-500 bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 scale-105'
                       : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                   } ${animateItems ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}
                   style={{ transitionDelay: `${300 + index * 100}ms` }}
