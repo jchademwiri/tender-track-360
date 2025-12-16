@@ -153,34 +153,43 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {Object.entries(dashboardData.tenderStats.statusCounts).map(([status, count]) => {
-                if (count === 0) return null;
-                const percentage = dashboardData.tenderStats.totalTenders > 0
-                  ? (count / dashboardData.tenderStats.totalTenders) * 100
-                  : 0;
-                const width = `${Math.max(percentage, 5)}%`;
+              {Object.entries(dashboardData.tenderStats.statusCounts).map(
+                ([status, count]) => {
+                  if (count === 0) return null;
+                  const percentage =
+                    dashboardData.tenderStats.totalTenders > 0
+                      ? (count / dashboardData.tenderStats.totalTenders) * 100
+                      : 0;
+                  const width = `${Math.max(percentage, 5)}%`;
 
-                return (
-                  <div key={status} className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="capitalize font-medium">{status}</span>
-                      <span className="text-muted-foreground">{count} ({percentage.toFixed(1)}%)</span>
+                  return (
+                    <div key={status} className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="capitalize font-medium">{status}</span>
+                        <span className="text-muted-foreground">
+                          {count} ({percentage.toFixed(1)}%)
+                        </span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all duration-500 ${
+                            status === 'won'
+                              ? 'bg-green-500'
+                              : status === 'lost'
+                                ? 'bg-red-500'
+                                : status === 'submitted'
+                                  ? 'bg-blue-500'
+                                  : status === 'pending'
+                                    ? 'bg-yellow-500'
+                                    : 'bg-gray-500'
+                          }`}
+                          style={{ width }}
+                        />
+                      </div>
                     </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full transition-all duration-500 ${
-                          status === 'won' ? 'bg-green-500' :
-                          status === 'lost' ? 'bg-red-500' :
-                          status === 'submitted' ? 'bg-blue-500' :
-                          status === 'pending' ? 'bg-yellow-500' :
-                          'bg-gray-500'
-                        }`}
-                        style={{ width }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                }
+              )}
             </div>
           </CardContent>
         </Card>
@@ -192,32 +201,8 @@ export default async function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {/* Simple bar chart using CSS */}
-              <div className="flex items-end justify-between h-32 gap-2">
-                {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((month) => {
-                  const height = `${Math.floor(Math.random() * 60) + 20}%`; // Sample data
-                  return (
-                    <div key={month} className="flex flex-col items-center flex-1">
-                      <div
-                        className="w-full bg-primary/80 rounded-t-sm transition-all duration-500 hover:bg-primary"
-                        style={{ height }}
-                      />
-                      <span className="text-xs text-muted-foreground mt-2">{month}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">+12.5%</div>
-                  <div className="text-xs text-muted-foreground">Value Growth</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">+8.3%</div>
-                  <div className="text-xs text-muted-foreground">Win Rate</div>
-                </div>
-              </div>
+            <div className="flex items-center justify-center h-48 text-muted-foreground">
+              <p>Not enough data for trends yet</p>
             </div>
           </CardContent>
         </Card>
@@ -229,31 +214,42 @@ export default async function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Latest project and tender activities</CardDescription>
+              <CardDescription>
+                Latest project and tender activities
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-start space-x-3 p-3 bg-muted/50 rounded-lg">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">New tender created</p>
-                    <p className="text-xs text-muted-foreground">2 hours ago</p>
+                {dashboardData.recentActivity.length > 0 ? (
+                  dashboardData.recentActivity.map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="flex items-start space-x-3 p-3 bg-muted/50 rounded-lg"
+                    >
+                      <div
+                        className={`w-2 h-2 rounded-full mt-2 ${
+                          activity.type.includes('created')
+                            ? 'bg-green-500'
+                            : activity.type.includes('status')
+                              ? 'bg-blue-500'
+                              : 'bg-gray-500'
+                        }`}
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">
+                          {activity.description}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(activity.timestamp).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-muted-foreground">
+                    <p className="text-sm">No recent activity</p>
                   </div>
-                </div>
-                <div className="flex items-start space-x-3 p-3 bg-muted/50 rounded-lg">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Project status updated to Active</p>
-                    <p className="text-xs text-muted-foreground">1 day ago</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3 p-3 bg-muted/50 rounded-lg">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Tender deadline approaching</p>
-                    <p className="text-xs text-muted-foreground">3 days ago</p>
-                  </div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -270,17 +266,19 @@ export default async function DashboardPage() {
             <CardContent>
               <div className="space-y-3">
                 {dashboardData.tenderStats.upcomingDeadlines > 0 ? (
-                  <div className="p-3 border rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Tender #12345</span>
-                      <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                        5 days
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      Office Supplies Procurement
+                  // TODO: The API currently returns a count, we need the actual items.
+                  // For MVP stability without changing the backend return type in this task,
+                  // we'll show a summary message or simply links to the tenders page.
+                  <div className="text-center py-4">
+                    <p className="text-sm font-medium mb-2">
+                      {dashboardData.tenderStats.upcomingDeadlines} tenders due
+                      soon
                     </p>
-                    <div className="text-sm font-medium">$25,000</div>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href="/dashboard/tenders?sort=deadline">
+                        View Tenders
+                      </Link>
+                    </Button>
                   </div>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">

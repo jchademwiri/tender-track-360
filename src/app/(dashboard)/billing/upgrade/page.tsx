@@ -75,7 +75,7 @@ export default function UpgradePage() {
     {
       id: 'free',
       name: 'Free',
-      price: '$0',
+      price: 'R0',
       period: '/month',
       description: 'Perfect for getting started',
       features: [
@@ -91,7 +91,7 @@ export default function UpgradePage() {
     {
       id: 'pro',
       name: 'Pro',
-      price: '$29',
+      price: 'R499',
       period: '/month',
       description: 'Perfect for growing teams',
       features: [
@@ -99,8 +99,7 @@ export default function UpgradePage() {
         'Advanced tender management',
         'Priority support',
         'Advanced analytics',
-        'Custom workflows',
-        'API access',
+
         'Team collaboration tools',
         'Export capabilities',
       ],
@@ -181,7 +180,9 @@ export default function UpgradePage() {
   const handleUpgradeToPro = async () => {
     setIsUpgrading(true);
     try {
-      // TODO: Implement actual upgrade flow with payment provider (Stripe, etc.)
+      // TODO: Implement actual upgrade flow with Paystack
+      // Documentation: https://paystack.com/docs/api/subscription/
+      // Guides: https://paystack.com/docs/guides/accept_payments_on_your_react_app/
       // For now, simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000));
 

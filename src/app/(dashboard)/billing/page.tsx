@@ -24,7 +24,13 @@ import {
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
@@ -100,62 +106,17 @@ export default function BillingPage() {
     const loadBillingData = async () => {
       try {
         setIsLoading(true);
-        // TODO: Replace with actual API calls
+        // TODO: Replace with actual API calls to Paystack
+        // Documentation: https://paystack.com/docs/
+        // Guides: https://paystack.com/docs/guides/accept_payments_on_your_react_app/
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
         // Mock data - replace with actual API responses
-        setSubscription({
-          id: 'sub_123',
-          plan: 'Pro',
-          status: 'active',
-          current_period_start: '2024-01-01',
-          current_period_end: '2024-02-01',
-          cancel_at_period_end: false,
-          price: 29,
-          currency: 'USD',
-          interval: 'month',
-        });
-
-        setUsage({
-          organizations: { current: 3, limit: 5 },
-          tenders: { current: 45, limit: 100 },
-          storage: { current: 250, limit: 1000 },
-        });
-
-        setPaymentMethods([
-          {
-            id: 'pm_123',
-            type: 'card',
-            last4: '4242',
-            brand: 'Visa',
-            expiry_month: 12,
-            expiry_year: 2025,
-            is_default: true,
-          },
-        ]);
-
-        setInvoices([
-          {
-            id: 'inv_001',
-            number: 'INV-001',
-            date: '2024-01-01',
-            status: 'paid',
-            amount: 29,
-            currency: 'USD',
-            description: 'Pro Plan - January 2024',
-            download_url: '#',
-          },
-          {
-            id: 'inv_002',
-            number: 'INV-002',
-            date: '2023-12-01',
-            status: 'paid',
-            amount: 29,
-            currency: 'USD',
-            description: 'Pro Plan - December 2023',
-            download_url: '#',
-          },
-        ]);
+        // Mock data removed for production readiness - waiting for API integration
+        setSubscription(null);
+        setUsage(null);
+        setPaymentMethods([]);
+        setInvoices([]);
       } catch (err) {
         setError('Failed to load billing information. Please try again.');
         console.error('Billing data load error:', err);
@@ -185,7 +146,6 @@ export default function BillingPage() {
     console.log('Download invoice:', invoiceId);
   };
 
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
@@ -210,9 +170,9 @@ export default function BillingPage() {
   };
 
   const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-ZA', {
       style: 'currency',
-      currency: currency,
+      currency: currency || 'ZAR',
     }).format(amount);
   };
 
@@ -282,13 +242,17 @@ export default function BillingPage() {
                     <Crown className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl">Current Subscription</CardTitle>
+                    <CardTitle className="text-xl">
+                      Current Subscription
+                    </CardTitle>
                     <CardDescription>
                       Your active subscription details and status
                     </CardDescription>
                   </div>
                 </div>
-                <Badge className={getStatusColor(subscription?.status || 'active')}>
+                <Badge
+                  className={getStatusColor(subscription?.status || 'active')}
+                >
                   {subscription?.status || 'Loading...'}
                 </Badge>
               </div>
@@ -315,7 +279,10 @@ export default function BillingPage() {
                       Monthly Price
                     </p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {formatCurrency(subscription.price, subscription.currency)}
+                      {formatCurrency(
+                        subscription.price,
+                        subscription.currency
+                      )}
                     </p>
                   </div>
                   <div className="space-y-2">
@@ -323,7 +290,8 @@ export default function BillingPage() {
                       Billing Period
                     </p>
                     <p className="text-sm text-gray-900 dark:text-white">
-                      {formatDate(subscription.current_period_start)} - {formatDate(subscription.current_period_end)}
+                      {formatDate(subscription.current_period_start)} -{' '}
+                      {formatDate(subscription.current_period_end)}
                     </p>
                   </div>
                   <div className="space-y-2">
@@ -381,15 +349,21 @@ export default function BillingPage() {
                         <span className="font-medium">Organizations</span>
                       </div>
                       <Badge variant="secondary">
-                        {usage.organizations.current}/{usage.organizations.limit}
+                        {usage.organizations.current}/
+                        {usage.organizations.limit}
                       </Badge>
                     </div>
                     <Progress
-                      value={(usage.organizations.current / usage.organizations.limit) * 100}
+                      value={
+                        (usage.organizations.current /
+                          usage.organizations.limit) *
+                        100
+                      }
                       className="h-2"
                     />
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {usage.organizations.limit - usage.organizations.current} organizations remaining
+                      {usage.organizations.limit - usage.organizations.current}{' '}
+                      organizations remaining
                     </p>
                   </div>
 
@@ -404,11 +378,14 @@ export default function BillingPage() {
                       </Badge>
                     </div>
                     <Progress
-                      value={(usage.tenders.current / usage.tenders.limit) * 100}
+                      value={
+                        (usage.tenders.current / usage.tenders.limit) * 100
+                      }
                       className="h-2"
                     />
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {usage.tenders.limit - usage.tenders.current} tenders remaining
+                      {usage.tenders.limit - usage.tenders.current} tenders
+                      remaining
                     </p>
                   </div>
 
@@ -419,15 +396,19 @@ export default function BillingPage() {
                         <span className="font-medium">Storage</span>
                       </div>
                       <Badge variant="secondary">
-                        {Math.round(usage.storage.current)}MB/{usage.storage.limit}MB
+                        {Math.round(usage.storage.current)}MB/
+                        {usage.storage.limit}MB
                       </Badge>
                     </div>
                     <Progress
-                      value={(usage.storage.current / usage.storage.limit) * 100}
+                      value={
+                        (usage.storage.current / usage.storage.limit) * 100
+                      }
                       className="h-2"
                     />
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {Math.round(usage.storage.limit - usage.storage.current)}MB remaining
+                      {Math.round(usage.storage.limit - usage.storage.current)}
+                      MB remaining
                     </p>
                   </div>
                 </div>
@@ -452,7 +433,11 @@ export default function BillingPage() {
                     </CardDescription>
                   </div>
                 </div>
-                <Button onClick={handleManagePaymentMethod} variant="outline" size="sm">
+                <Button
+                  onClick={handleManagePaymentMethod}
+                  variant="outline"
+                  size="sm"
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Add Payment Method
                 </Button>
@@ -477,10 +462,12 @@ export default function BillingPage() {
                         </div>
                         <div>
                           <p className="font-medium">
-                            {paymentMethod.brand} ending in {paymentMethod.last4}
+                            {paymentMethod.brand} ending in{' '}
+                            {paymentMethod.last4}
                           </p>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Expires {paymentMethod.expiry_month}/{paymentMethod.expiry_year}
+                            Expires {paymentMethod.expiry_month}/
+                            {paymentMethod.expiry_year}
                           </p>
                         </div>
                         {paymentMethod.is_default && (
@@ -563,8 +550,8 @@ export default function BillingPage() {
                               invoice.status === 'paid'
                                 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                                 : invoice.status === 'pending'
-                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                  : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                             }
                           >
                             {invoice.status}
@@ -623,12 +610,17 @@ export default function BillingPage() {
                       </span>
                     </div>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      You&#x27;re on the Pro plan with access to all premium features.
+                      You&#x27;re on the Pro plan with access to all premium
+                      features.
                     </p>
                   </div>
 
                   <div className="space-y-3">
-                    <Button onClick={handleUpgrade} className="w-full" size="lg">
+                    <Button
+                      onClick={handleUpgrade}
+                      className="w-full"
+                      size="lg"
+                    >
                       <Crown className="h-5 w-5 mr-2" />
                       Upgrade to Enterprise
                     </Button>
