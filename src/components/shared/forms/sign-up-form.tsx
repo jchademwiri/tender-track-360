@@ -152,7 +152,13 @@ export function SignUpForm({
                     variant="outline"
                     className="w-full cursor-pointer"
                     type="button"
-                    onClick={signInWithGoogle}
+                    onClick={() => {
+                      const params = new URLSearchParams(
+                        window.location.search
+                      );
+                      const next = params.get('next');
+                      signInWithGoogle(next || undefined);
+                    }}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                       <path

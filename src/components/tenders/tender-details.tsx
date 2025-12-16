@@ -396,7 +396,11 @@ export function TenderDetails({ tender, organizationId }: TenderDetailsProps) {
                 <Button
                   variant="outline"
                   className="w-full justify-start cursor-pointer"
-                    window.open(`mailto:${tender.client?.contactEmail}`, '_blank')
+                  onClick={() =>
+                    window.open(
+                      `mailto:${tender.client?.contactEmail}`,
+                      '_blank'
+                    )
                   }
                 >
                   <Mail className="h-4 w-4 mr-2" />
