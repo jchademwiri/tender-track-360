@@ -23,6 +23,7 @@ import { UserX } from 'lucide-react';
 
 interface Member {
   id: string;
+  userId: string;
   name: string;
   email: string;
   role: string;
@@ -95,16 +96,34 @@ export function OwnershipTransferModal({
               value={selectedMemberId}
               onValueChange={setSelectedMemberId}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Choose a member..." />
+              <SelectTrigger className="w-full h-auto flex items-center p-3 text-left">
+                <SelectValue placeholder="Select Member">
+                  {selectedMemberId ? (
+                    (() => {
+                      const member = eligibleMembers.find(
+                        (m) => m.userId === selectedMemberId
+                      );
+                      return member ? (
+                        <div className="flex flex-col text-left">
+                          <span className="text-xs text-muted-foreground">
+                            {member.email} - {member.name}
+                          </span>
+                        </div>
+                      ) : (
+                        'Select Member'
+                      );
+                    })()
+                  ) : (
+                    <span className="text-muted-foreground">Select Member</span>
+                  )}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {eligibleMembers.map((member) => (
-                  <SelectItem key={member.id} value={member.id}>
-                    <div className="flex flex-col">
-                      <span>{member.name}</span>
+                  <SelectItem key={member.userId} value={member.userId}>
+                    <div className="flex flex-col text-left">
                       <span className="text-xs text-muted-foreground">
-                        {member.email} • {member.role}
+                        {member.email} - {member.name}
                       </span>
                     </div>
                   </SelectItem>

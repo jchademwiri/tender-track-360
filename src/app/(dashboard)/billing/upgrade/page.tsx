@@ -204,11 +204,11 @@ export default function UpgradePage() {
 
       // Open email client or redirect to contact form
       window.location.href =
-        'mailto:sales@tendertrack360.com?subject=Enterprise%20Plan%20Inquiry&body=Hi%2C%0A%0AI%27m%20interested%20in%20the%20Enterprise%20plan.%20Please%20contact%20me%20to%20discuss%20pricing%20and%20features.%0A%0AThank%20you%21';
+        'mailto:sales@tendertrack360.co.za?subject=Enterprise%20Plan%20Inquiry&body=Hi%2C%0A%0AI%27m%20interested%20in%20the%20Enterprise%20plan.%20Please%20contact%20me%20to%20discuss%20pricing%20and%20features.%0A%0AThank%20you%21';
     } catch (error) {
       console.error('Contact sales failed:', error);
       setError(
-        'Failed to contact sales. Please email us directly at sales@tendertrack360.com'
+        'Failed to contact sales. Please email us directly at sales@tendertrack360.co.za'
       );
     } finally {
       setIsContactingSales(false);
@@ -233,7 +233,6 @@ export default function UpgradePage() {
       </div>
     );
   }
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">

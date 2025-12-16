@@ -1,5 +1,8 @@
 import { auth } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/db';
+import { user } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,6 +24,18 @@ export async function POST(request: NextRequest) {
       overrideDefaultEmailVerification: true,
     });
 
+    // Verification step: Explicitly set emailVerified: true in DB
+    // Since invitation acceptance implies verification for this flow
+    try {
+      await db
+        .update(user)
+        .set({ emailVerified: true })
+        .where(eq(user.email, email));
+    } catch (verifyError) {
+      console.error('Failed to auto-verify email:', verifyError);
+      // Continue, as account is created
+    }
+
     // signUpResult may include headers with Set-Cookie values
     const signUpHeaders: Headers | undefined = signUpResult?.headers;
 
@@ -29,11 +44,11 @@ export async function POST(request: NextRequest) {
       const acceptInvitationOptions: any = {
         body: { invitationId },
       };
-      
+
       if (signUpHeaders) {
         acceptInvitationOptions.headers = signUpHeaders;
       }
-      
+
       await auth.api.acceptInvitation(acceptInvitationOptions);
     } catch (acceptErr) {
       console.error('Accept invitation failed after signup:', acceptErr);

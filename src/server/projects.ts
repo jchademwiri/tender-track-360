@@ -8,15 +8,7 @@ import {
   purchaseOrder,
   organization,
 } from '@/db/schema';
-import {
-  eq,
-  and,
-  isNull,
-  ilike,
-  or,
-  desc,
-  ne,
-} from 'drizzle-orm';
+import { eq, and, isNull, ilike, or, desc, ne } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import {
@@ -610,8 +602,25 @@ export async function deleteProject(organizationId: string, projectId: string) {
       return { success: false, error: 'Project not found' };
     }
 
-    // TODO: Check if project has active purchase orders before deletion
-    // This will be implemented when purchase order functionality is added
+    // Check if project has active purchase orders before deletion
+    const activePOs = await db
+      .select({ id: purchaseOrder.id })
+      .from(purchaseOrder)
+      .where(
+        and(
+          eq(purchaseOrder.projectId, projectId),
+          isNull(purchaseOrder.deletedAt)
+        )
+      )
+      .limit(1);
+
+    if (activePOs.length > 0) {
+      return {
+        success: false,
+        error:
+          'Cannot delete project with active purchase orders. Please delete the purchase orders first.',
+      };
+    }
 
     await db
       .update(project)

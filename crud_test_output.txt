@@ -1,0 +1,28 @@
+
+> tender-track-360@0.1.0 test
+> jest src/server/__tests__/crud-integration.test.ts
+
+FAIL src/server/__tests__/crud-integration.test.ts (16.428 s)
+
+
+  ΓùÅ Test suite failed to run
+
+    Invalid: beforeAll() may not be used in a describe block containing no tests.
+
+      184 |     let projectId: string;
+      185 |
+    > 186 |     beforeAll(async () => {
+          |     ^
+      187 |       // Create Client
+      188 |       const clientRes = await createClient(testOrgId, {
+      189 |         name: `${TEST_PREFIX}_Safe_Client`,
+
+      at beforeAll (src/server/__tests__/crud-integration.test.ts:186:5)
+      at describe (src/server/__tests__/crud-integration.test.ts:181:3)
+      at Object.describe (src/server/__tests__/crud-integration.test.ts:37:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       6 passed, 6 total
+Snapshots:   0 total
+Time:        16.536 s, estimated 17 s
+Ran all test suites matching /src\\server\\__tests__\\crud-integration.test.ts/i.

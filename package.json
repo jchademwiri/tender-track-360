@@ -4,15 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "email": "email dev --port 3001",
+    "email": "node --import ./scripts/email-polyfill.js node_modules/react-email/dist/index.js dev --port 3001",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -58,7 +58,7 @@
     "drizzle-orm": "^0.43.1",
     "lucide-react": "^0.515.0",
     "nanoid": "^5.1.6",
-    "next": "15.6.0-canary.58",
+    "next": "16.1.0-canary.19",
     "next-themes": "^0.4.6",
     "postgres": "^3.4.5",
     "react": "19.2.0",
@@ -68,6 +68,7 @@
     "resend": "^6.0.1",
     "sonner": "^2.0.5",
     "tailwind-merge": "^3.3.1",
+    "web-streams-polyfill": "^4.2.0",
     "zod": "^3.25.64"
   },
   "devDependencies": {
@@ -83,6 +84,7 @@
     "@types/node": "^20",
     "@types/react": "19.2.0",
     "@types/react-dom": "19.2.0",
+    "baseline-browser-mapping": "^2.9.0",
     "drizzle-kit": "^0.31.1",
     "eslint": "^9",
     "eslint-config-next": "16.0.0",
@@ -98,7 +100,7 @@
     "tw-animate-css": "^1.3.4",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@10.5.2+sha512.da9dc28cd3ff40d0592188235ab25d3202add8a207afbedc682220e4a0029ffbff4562102b9e6e46b4e3f9e8bd53e6d05de48544b0c57d4b0179e22c76d1199b",
+  "packageManager": "pnpm@10.24.0",
   "overrides": {
     "@types/react": "19.1.11",
     "@types/react-dom": "19.1.11"
