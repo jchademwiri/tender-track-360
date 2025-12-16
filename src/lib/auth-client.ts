@@ -2,7 +2,7 @@ import { createAuthClient } from 'better-auth/react';
 import { organizationClient } from 'better-auth/client/plugins';
 
 export const authClient = createAuthClient({
-  baseURL: 'http://localhost:3000',
+  baseURL: process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
   plugins: [organizationClient()],
 });
 
@@ -32,7 +32,7 @@ export const signOut = async () => {
   } catch (error) {
     console.error('Auth client sign out error:', error);
     // Fallback to direct API call
-    const baseUrl = 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
 
     try {
       const response = await fetch(`${baseUrl}/api/auth/sign-out`, {
