@@ -39,14 +39,19 @@ export const signIn = async (email: string, password: string) => {
     };
   } catch (error) {
     const e = error as Error;
+    if (e.message === 'Email not verified') {
+      await sendVerificationEmail(email);
+      return {
+        success: false,
+        message: 'Email not verified. A new verification email has been sent.',
+      };
+    }
     return {
       success: false,
       message: e.message || 'An unknown error occurred',
     };
   }
 };
-
-
 
 export const signUp = async (name: string, email: string, password: string) => {
   try {
@@ -66,6 +71,26 @@ export const signUp = async (name: string, email: string, password: string) => {
     return {
       success: false,
       message: e.message || 'An unknown error occurred',
+    };
+  }
+};
+
+export const sendVerificationEmail = async (email: string) => {
+  try {
+    await auth.api.sendVerificationEmail({
+      body: {
+        email,
+      },
+    });
+    return {
+      success: true,
+      message: 'Verification email sent successfully',
+    };
+  } catch (error) {
+    const e = error as Error;
+    return {
+      success: false,
+      message: e.message || 'Failed to send verification email',
     };
   }
 };
