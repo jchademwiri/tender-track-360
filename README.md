@@ -1,4 +1,5 @@
 # Tender Track 360
+
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/jchademwiri/tender-track-360?utm_source=oss&utm_medium=github&utm_campaign=jchademwiri%2Ftender-track-360&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
 Tender Track 360 is a comprehensive web application designed to streamline and optimize the government tender management process for businesses. This platform digitizes the entire tender lifecycle, from discovery to award, enabling organizations to efficiently track, respond to, and analyze public procurement opportunities.
@@ -39,9 +40,25 @@ The primary goal of Tender Track 360 is to increase tender success rates by:
 - Enabling data-driven decision-making for tender opportunities
 - Streamlining collaboration between team members
 
+## Documentation
+
+Detailed documentation can be found in the `docs/` directory:
+
+- [Onboarding Flow](docs/ONBOARDING_FLOW_REPORT.md)
+- [Organization Roles & Permissions](docs/organization-role-permissions.md)
+- [Development Plan](docs/dev-plan.md)
+- [Features & Specs](docs/specs/)
+- [Search & Filters](docs/search-and-filters-README.md)
+
 ## Development Roadmap
 
-This repository contains the MVP version of Tender Track 360, with plans to incrementally enhance functionality based on user feedback and business requirements. Future development phases will introduce advanced analytics, AI-powered recommendations, integration with government tender portals, and a mobile companion app.
+This repository contains the MVP version of Tender Track 360, with plans to incrementally enhance functionality based on user feedback and business requirements.
+
+**Recent Updates:**
+
+- **Waitlist Integration**: Secure lead capture with database storage and `router.so` integration.
+- **Project Cleanup**: Streamlined codebase with unused assets moved to `archive/`.
+- **Documentation Centralization**: consolidated documentation in `docs/`.
 
 ## Getting Started - Installation and Setup Instructions
 
