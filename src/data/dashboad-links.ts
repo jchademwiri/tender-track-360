@@ -4,6 +4,7 @@ import {
   FolderKanban,
   LayoutDashboard,
   Users,
+  BarChart3,
 } from 'lucide-react';
 export const dashboadLinks = {
   navMain: [
@@ -77,25 +78,11 @@ export const dashboadLinks = {
       url: '/dashboard/calendar',
       icon: Calendar,
     },
-    // {
-    //   title: 'Reports',
-    //   url: '/dashboard/reports/overview',
-    //   icon: BarChart3,
-    //   items: [
-    //     {
-    //       title: 'Analytics',
-    //       url: '/dashboard/reports/analytics',
-    //     },
-    //     {
-    //       title: 'Performance',
-    //       url: '/dashboard/reports/performance',
-    //     },
-    //     {
-    //       title: 'Export Data',
-    //       url: '/dashboard/reports/export',
-    //     },
-    //   ],
-    // },
+    {
+      title: 'Reports',
+      url: '/dashboard/reports',
+      icon: BarChart3,
+    },
     {
       title: 'Clients',
       url: '/dashboard/clients',
