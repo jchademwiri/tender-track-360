@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -23,12 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/emails/*": [
-        "./emails/*"
-      ]
+      "@/*": ["./src/*"],
+      "@/emails/*": ["./emails/*"]
     }
   },
   "include": [
@@ -47,6 +39,8 @@
     "**/*.test.ts",
     "**/*.test.tsx",
     "src/**/*.spec.ts",
-    "src/**/*.spec.tsx"
+    "src/**/*.spec.tsx",
+    "archive",
+    "docs"
   ]
 }
