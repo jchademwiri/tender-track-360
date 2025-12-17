@@ -35,7 +35,7 @@ export default function AuthAwareNav() {
   return (
     <div className="flex items-center gap-3">
       <Button variant="ghost" asChild size="sm">
-        <Link href="/login">Sign In</Link>
+        {/* <Link href="/login">Sign In</Link> */}
       </Button>
       <Button size="sm" asChild>
         <Link href="/waitlist">Join Waitlist</Link>
