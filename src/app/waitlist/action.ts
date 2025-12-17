@@ -4,6 +4,7 @@ import { formSchema } from "./schema";
 
 type FormState = {
   message: string;
+
 };
 
 export async function submitWaitlistForm(
@@ -19,7 +20,7 @@ export async function submitWaitlistForm(
 
   try {
     const response = await fetch(
-      "https://app.router.so/api/endpoints/pd5bc40d",
+      "https://app.router.so/api/endpoints/ac4auqxl",
       {
         method: "POST",
         headers: {
