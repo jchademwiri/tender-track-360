@@ -57,7 +57,7 @@ export function WaitlistForm() {
       <CardHeader className="text-center space-y-4 pb-2">
         <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
           <Sparkles className="h-3 w-3" />
-          <span>Coming Soon</span>
+          <span className="text-green-500">Coming Soon</span>
         </div>
         <div className="space-y-2">
           <CardTitle className="text-3xl font-bold tracking-tight">
