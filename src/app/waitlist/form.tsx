@@ -55,9 +55,9 @@ export function WaitlistForm() {
   return (
     <Card className="max-w-md w-full mx-auto border-white/10 bg-card/50 backdrop-blur-sm shadow-xl">
       <CardHeader className="text-center space-y-4 pb-2">
-        <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+        <div className="mx-auto text-green-500 inline-flex items-center gap-2 rounded-full border border-green-500/20 px-3 py-1 text-xs font-medium ">
           <Sparkles className="h-3 w-3" />
-          <span className="text-green-500">Coming Soon</span>
+          <span className="">Coming Soon</span>
         </div>
         <div className="space-y-2">
           <CardTitle className="text-3xl font-bold tracking-tight">
@@ -129,7 +129,7 @@ export function WaitlistForm() {
 
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-11"
+              className="w-full bg-primary cursor-pointer hover:bg-primary/90 text-primary-foreground font-semibold h-11"
               disabled={isPending}
             >
               {isPending ? 'Joining...' : 'Join the Waitlist'}

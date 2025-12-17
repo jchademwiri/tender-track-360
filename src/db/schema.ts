@@ -207,6 +207,18 @@ export const sessionTracking = pgTable('session_tracking', {
 });
 
 /* =========================
+   WAITLIST
+========================= */
+export const waitlist = pgTable('waitlist', {
+  id: text('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  companyName: text('company_name'),
+  source: text('source').default('website'), // website, webhook, etc.
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/* =========================
    TENDER MANAGEMENT TABLES
 ========================= */
 
@@ -510,4 +522,6 @@ export const schema = {
   projectRelations,
   purchaseOrderRelations,
   followUpRelations,
+  // Other
+  waitlist,
 };
