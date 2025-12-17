@@ -32,6 +32,28 @@ This ensures:
 
 ## Proposed Changes
 
+### Database Schema
+
+#### [MODIFY] `src/db/schema.ts`
+
+- **Tender**: Add `documents` (jsonb) to store array of `{ id, name, key, size, type, uploadedAt }`.
+- **Project**: Add `appointmentLetters` (jsonb) to store array of appointment letter files.
+- **Purchase Order**: Add `documents` (jsonb) to store PO-related files.
+- **Organization**: `logo` field already exists.
+- **User**: `image` field already exists.
+
+```typescript
+// Example JSONB structure for documents
+type StoredFile = {
+  id: string;
+  name: string;
+  key: string; // R2 object key
+  size: number;
+  type: string;
+  uploadedAt: string;
+};
+```
+
 ### Dependencies
 
 #### [NEW] `package.json`
@@ -45,33 +67,43 @@ This ensures:
 
 #### [NEW] `src/lib/r2.ts`
 
-- Initialize `S3Client` with:
-  - Endpoint: `https://${process.env.CF_R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
-  - Credentials from env vars.
-  - Region: `auto`
+- Initialize `S3Client`.
+- **File Key Strategy**:
+  - Organization Logo: `organizations/${orgId}/logo-${timestamp}.${ext}`
+  - User Avatar: `users/${userId}/avatar-${timestamp}.${ext}`
+  - Tender Docs: `organizations/${orgId}/tenders/${tenderId}/docs/${fileId}-${filename}`
+  - Project Letters: `organizations/${orgId}/projects/${projectId}/appointment-letters/${fileId}-${filename}`
+  - PO Docs: `organizations/${orgId}/purchase-orders/${poId}/${fileId}-${filename}`
 
 ### Server Actions & API Routes
 
 #### [NEW] `src/server/storage.ts`
 
-- `getPresignedUploadUrl(fileName: string, fileType: string)`: Generates a `PutObjectCommand` signed URL for client-side uploads.
-- `deleteFile(fileKey: string)`: Deletes a file.
+- `getPresignedUploadUrl(...)`:
+  - Validates file type and size.
+  - Enforces organization-level isolation in key generation.
+- `deleteFile(...)`:
+  - Verifies permissions before deletion.
 
-#### [NEW] `src/app/api/downloads/[...fileKey]/route.ts` (Secure Download Endpoint)
+#### [NEW] `src/app/api/downloads/[...fileKey]/route.ts`
 
-- **GET** handler:
-  1. Authenticates user via `better-auth`.
-  2. Verifies user has access to the requested `fileKey` (check DB/permissions).
-  3. Generates a signed `GetObjectCommand` URL (TTL: 60s).
-  4. Returns `NextResponse.redirect(signedUrl)`.
+- Handles secure downloads for all the above file types.
+- Checks `organizationId` matching for the user.
 
 ### UI Components
 
 #### [NEW] `src/components/ui/file-upload.tsx`
 
-- A reusable React component for file uploads.
-- Handles file selection, requesting presigned URL, and uploading to R2.
-- Shows upload progress.
+- Generic component accepting `onUploadComplete(fileInfo: StoredFile)`.
+- Supports drag-and-drop, progress bar, and file validation.
+
+#### Integration Points
+
+- **Tender Details**: Add "Documents" card with file list and upload button.
+- **Project Details**: Add "Appointment Letters" section.
+- **Purchase Order**: Add "Attachments" section.
+- **Organization Settings**: Avatar cropper/uploader for logo.
+- **User Profile**: Avatar cropper/uploader for profile picture.
 
 ## Verification Plan
 
