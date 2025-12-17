@@ -11,9 +11,9 @@ export default function AuthAwareNav() {
   if (isPending) {
     return (
       <div className="flex items-center gap-3">
-        <Button variant="ghost" asChild size="sm">
+        {/* <Button variant="ghost" asChild size="sm">
           <Link href="/login">Sign In</Link>
-        </Button>
+        </Button> */}
         <Button size="sm" asChild>
           <Link href="/waitlist">Join Waitlist</Link>
         </Button>
@@ -34,9 +34,9 @@ export default function AuthAwareNav() {
 
   return (
     <div className="flex items-center gap-3">
-      <Button variant="ghost" asChild size="sm">
-        {/* <Link href="/login">Sign In</Link> */}
-      </Button>
+      {/* <Button variant="ghost" asChild size="sm">
+        <Link href="/login">Sign In</Link>
+      </Button> */}
       <Button size="sm" asChild>
         <Link href="/waitlist">Join Waitlist</Link>
       </Button>
