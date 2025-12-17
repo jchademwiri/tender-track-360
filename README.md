@@ -66,8 +66,7 @@ This repository contains the MVP version of Tender Track 360, with plans to incr
 
 Before you begin, ensure you have the following installed:
 
-- Node.js (v18.0.0 or later)
-- npm (v9.0.0 or later) or yarn (v1.22.0 or later)
+- Bun (v1.0.0 or later)
 - Git
 
 ## Getting Started
@@ -109,11 +108,7 @@ EMAIL_FROM=noreply@tendertrack360.com
 ### 3. Install Dependencies
 
 ```bash
-# Using npm
-npm install
-
-# Using yarn
-yarn install
+bun install
 ```
 
 ### 4. Database Setup
@@ -125,11 +120,7 @@ yarn install
 3. Initialize your database with the schema:
 
 ```bash
-# Using npm
-npm run db:push
-
-# Using yarn
-yarn db:push
+bun run db:push
 ```
 
 **For Production:**
@@ -141,11 +132,7 @@ yarn db:push
 ### 5. Run Development Server
 
 ```bash
-# Using npm
-npm run dev
-
-# Using yarn
-yarn dev
+bun run dev
 ```
 
 The application should now be running at [http://localhost:3000](http://localhost:3000).

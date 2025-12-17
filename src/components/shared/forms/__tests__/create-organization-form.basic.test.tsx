@@ -1,4 +1,8 @@
 /**
+ * @bun-test-environment jsdom
+ */
+
+/**
  * Basic tests for CreateorganizationForm component
  * These tests focus on form rendering, validation, and user interactions
  * without complex mocking of external dependencies

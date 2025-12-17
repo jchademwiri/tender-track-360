@@ -10,25 +10,25 @@ The application is designed to digitize the entire tender lifecycle, from discov
 
 ## Package Manager
 
-The project uses [pnpm](https://pnpm.io/) for package management. Always use `pnpm` for installing, removing, or updating dependencies.
+The project uses [bun](https://bun.sh/) for package management. Always use `bun` for installing, removing, or updating dependencies.
 
-- Install dependencies: `pnpm install`
-- Add a dependency: `pnpm add <package-name>`
-- Remove a dependency: `pnpm remove <package-name>`
+- Install dependencies: `bun install`
+- Add a dependency: `bun add <package-name>`
+- Remove a dependency: `bun remove <package-name>`
 
 ## Key Commands
 
 The following scripts are available in `package.json`:
 
--   **`pnpm dev`**: Starts the development server.
--   **`pnpm build`**: Creates a production-ready build of the application.
--   **`pnpm start`**: Starts the production server.
--   **`pnpm lint`**: Lints the codebase using ESLint.
--   **`pnpm test`**: Runs tests using Jest.
--   **`pnpm db:push`**: Pushes the Drizzle schema to the database.
--   **`pnpm db:generate`**: Generates Drizzle migration files.
--   **`pnpm db:migrate`**: Applies generated migrations to the database.
--   **`pnpm db:studio`**: Opens the Drizzle Studio to view and manage data.
+-   **`bun dev`**: Starts the development server.
+-   **`bun build`**: Creates a production-ready build of the application.
+-   **`bun start`**: Starts the production server.
+-   **`bun lint`**: Lints the codebase using ESLint.
+-   **`bun test`**: Runs tests using Jest.
+-   **`bun db:push`**: Pushes the Drizzle schema to the database.
+-   **`bun db:generate`**: Generates Drizzle migration files.
+-   **`bun db:migrate`**: Applies generated migrations to the database.
+-   **`bun db:studio`**: Opens the Drizzle Studio to view and manage data.
 
 ## Development Conventions
 
