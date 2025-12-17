@@ -254,7 +254,7 @@ export function CreateOrganizationForm({
     return (
       <div className="flex flex-col items-center justify-center py-8 space-y-4 animate-in fade-in-0 zoom-in-95 duration-200">
         <div className="relative">
-          <div className="size-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full flex items-center justify-center">
+          <div className="size-16 bg-linear-to-br from-amber-100 to-orange-100 rounded-full flex items-center justify-center">
             <AlertCircle className="size-8 text-amber-600" />
           </div>
         </div>
@@ -279,7 +279,7 @@ export function CreateOrganizationForm({
       <div className="flex flex-col items-center justify-center py-8 space-y-4 animate-in fade-in-0 zoom-in-95 duration-200">
         <div className="relative">
           {/* Main success circle with faster animations */}
-          <div className="size-16 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center">
+          <div className="size-16 bg-linear-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center">
             <Check className="size-8 text-green-600 animate-in zoom-in-50 duration-150" />
           </div>
 
