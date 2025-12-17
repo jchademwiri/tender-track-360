@@ -22,6 +22,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Loader, Check, X, AlertCircle, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useDebounce } from '@/hooks/use-debounce';
 
 const createOrganizationFormSchema = z.object({
   name: z
@@ -69,18 +70,35 @@ export function CreateOrganizationForm({
     useState<SlugValidationState>('idle');
   const [slugCheckTimeout, setSlugCheckTimeout] =
     useState<NodeJS.Timeout | null>(null);
-  const nameRef = useRef('');
   const router = useRouter();
 
   const form = useForm<z.infer<typeof createOrganizationFormSchema>>({
     resolver: zodResolver(createOrganizationFormSchema),
-    mode: 'onChange', // Show validation errors on change
+    mode: 'onSubmit', // Show validation errors on change
     defaultValues: {
       name: '',
       slug: '',
       logo: 'https://www.jacobc.co.za/jacobc.jpg',
     },
   });
+
+  const watchedName = form.watch('name');
+  const debouncedName = useDebounce(watchedName, 500);
+
+  useEffect(() => {
+    if (debouncedName) {
+      form.trigger('name');
+      if (!slugManuallyChanged) {
+        const newSlug = slugify(debouncedName);
+        form.setValue('slug', newSlug, {
+          shouldValidate: true,
+        });
+        if (newSlug) {
+          debouncedSlugCheck(newSlug);
+        }
+      }
+    }
+  }, [debouncedName, form, slugManuallyChanged]);
 
   // Slugify helper
   function slugify(text: string) {
@@ -303,16 +321,6 @@ export function CreateOrganizationForm({
                   {...field}
                   onChange={(e) => {
                     field.onChange(e);
-                    nameRef.current = e.target.value;
-                    if (!slugManuallyChanged) {
-                      const newSlug = slugify(e.target.value);
-                      form.setValue('slug', newSlug, {
-                        shouldValidate: true,
-                      });
-                      if (newSlug) {
-                        debouncedSlugCheck(newSlug);
-                      }
-                    }
                   }}
                 />
               </FormControl>
@@ -359,7 +367,7 @@ export function CreateOrganizationForm({
                             .replace(/[^a-z0-9\-]/g, '');
                           field.onChange(value);
                           setSlugManuallyChanged(
-                            value !== slugify(nameRef.current)
+                            value !== slugify(debouncedName)
                           );
                           if (value) {
                             debouncedSlugCheck(value);
