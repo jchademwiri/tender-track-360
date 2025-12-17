@@ -1,4 +1,0 @@
-npm warn Unknown project config "node-linker". This will stop working in the next major version of npm.
-npm warn Unknown project config "symlinks". This will stop working in the next major version of npm.
-archive/examples/index.ts(1,15): error TS2307: Cannot find module '../create-organization-card' or its corresponding type declarations.
-archive/session-manager.ts(5,29): error TS2307: Cannot find module './audit-logger' or its corresponding type declarations.
