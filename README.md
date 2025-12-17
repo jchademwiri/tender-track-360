@@ -1,4 +1,5 @@
 # Tender Track 360
+
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/jchademwiri/tender-track-360?utm_source=oss&utm_medium=github&utm_campaign=jchademwiri%2Ftender-track-360&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
 Tender Track 360 is a comprehensive web application designed to streamline and optimize the government tender management process for businesses. This platform digitizes the entire tender lifecycle, from discovery to award, enabling organizations to efficiently track, respond to, and analyze public procurement opportunities.
@@ -26,7 +27,7 @@ Built with modern web technologies, Tender Track 360 provides a centralized hub 
 - **Backend**: Next.js Server Actions
 - **Database**: PostgreSQL (local) / Neon (production) with Drizzle ORM
 - **Authentication**: Better Auth
-- **File Storage**: UploadThing
+- **File Storage**: Cloudflare R2 (Planned)
 - **Deployment**: Vercel
 
 ## Project Goals
@@ -39,9 +40,25 @@ The primary goal of Tender Track 360 is to increase tender success rates by:
 - Enabling data-driven decision-making for tender opportunities
 - Streamlining collaboration between team members
 
+## Documentation
+
+Detailed documentation can be found in the `docs/` directory:
+
+- [Onboarding Flow](docs/ONBOARDING_FLOW_REPORT.md)
+- [Organization Roles & Permissions](docs/organization-role-permissions.md)
+- [Development Plan](docs/dev-plan.md)
+- [Features & Specs](docs/specs/)
+- [Search & Filters](docs/search-and-filters-README.md)
+
 ## Development Roadmap
 
-This repository contains the MVP version of Tender Track 360, with plans to incrementally enhance functionality based on user feedback and business requirements. Future development phases will introduce advanced analytics, AI-powered recommendations, integration with government tender portals, and a mobile companion app.
+This repository contains the MVP version of Tender Track 360, with plans to incrementally enhance functionality based on user feedback and business requirements.
+
+**Recent Updates:**
+
+- **Waitlist Integration**: Secure lead capture with database storage and `router.so` integration.
+- **Project Cleanup**: Streamlined codebase with unused assets moved to `archive/`.
+- **Documentation Centralization**: consolidated documentation in `docs/`.
 
 ## Getting Started - Installation and Setup Instructions
 
@@ -49,8 +66,7 @@ This repository contains the MVP version of Tender Track 360, with plans to incr
 
 Before you begin, ensure you have the following installed:
 
-- Node.js (v18.0.0 or later)
-- npm (v9.0.0 or later) or yarn (v1.22.0 or later)
+- Bun (v1.0.0 or later)
 - Git
 
 ## Getting Started
@@ -75,9 +91,11 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/tender-track-360
 BETTER_AUTH_SECRET=your_generated_secret
 BETTER_AUTH_URL=http://localhost:3000
 
-# UploadThing Configuration
-UPLOADTHING_SECRET=your_uploadthing_secret
-UPLOADTHING_APP_ID=your_uploadthing_app_id
+# Cloudflare R2 Configuration (Planned)
+# R2_ACCESS_KEY_ID=your_access_key
+# R2_SECRET_ACCESS_KEY=your_secret_key
+# R2_BUCKET_NAME=your_bucket_name
+# R2_ACCOUNT_ID=your_account_id
 
 # Optional: Email Service (for notifications)
 EMAIL_SERVER_HOST=smtp.example.com
@@ -90,11 +108,7 @@ EMAIL_FROM=noreply@tendertrack360.com
 ### 3. Install Dependencies
 
 ```bash
-# Using npm
-npm install
-
-# Using yarn
-yarn install
+bun install
 ```
 
 ### 4. Database Setup
@@ -106,11 +120,7 @@ yarn install
 3. Initialize your database with the schema:
 
 ```bash
-# Using npm
-npm run db:push
-
-# Using yarn
-yarn db:push
+bun run db:push
 ```
 
 **For Production:**
@@ -122,18 +132,14 @@ yarn db:push
 ### 5. Run Development Server
 
 ```bash
-# Using npm
-npm run dev
-
-# Using yarn
-yarn dev
+bun run dev
 ```
 
 The application should now be running at [http://localhost:3000](http://localhost:3000).
 
 ### 6. Initial Setup
 
-1. **UploadThing Setup**: Create an account at [uploadthing.com](https://uploadthing.com) and get your API keys
+1. **Storage Setup**: Configure Cloudflare R2 (or compatible S3 storage)
 2. **Better Auth Setup**: The authentication system will be automatically configured with your database
 3. **Initial Admin User**: Register the first user through the application interface, which will automatically be assigned admin role
 
@@ -155,7 +161,7 @@ Detailed instructions for other deployment options will be added as they are sup
 
 - **Database Connection Issues**: Ensure your PostgreSQL/Neon DATABASE_URL is correct in the .env file
 - **Authentication Problems**: Check that Better Auth is properly configured with your database
-- **File Upload Issues**: Verify your UploadThing API keys and app configuration
+- **File Storage**: Verify R2/S3 credentials
 - **Build Errors**: Make sure all dependencies are installed correctly
 
 For additional help, please create an issue in the GitHub repository.

@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
-import { signIn } from '@/server';
+import { signIn, sendVerificationEmail } from '@/server';
 import Link from 'next/link';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -40,6 +40,8 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<'div'>) {
   const [isLoading, setIsLoading] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [emailToVerify, setEmailToVerify] = useState('');
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof loginFormSchema>>({
@@ -64,6 +66,25 @@ export function LoginForm({
       } catch (e) {
         window.location.replace('/dashboard');
       }
+    } else {
+      toast.error(message as string);
+      if (
+        (message as string).toLowerCase().includes('verify') ||
+        (message as string).toLowerCase().includes('verification')
+      ) {
+        setShowResend(true);
+        setEmailToVerify(values.email);
+      }
+    }
+    setIsLoading(false);
+  }
+
+  async function onResendVerification() {
+    setIsLoading(true);
+    const { success, message } = await sendVerificationEmail(emailToVerify);
+    if (success) {
+      toast.success(message as string);
+      setShowResend(false);
     } else {
       toast.error(message as string);
     }
@@ -145,6 +166,18 @@ export function LoginForm({
                     'Login'
                   )}
                 </Button>
+
+                {showResend && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={onResendVerification}
+                    disabled={isLoading}
+                    className="w-full"
+                  >
+                    Resend Verification Email
+                  </Button>
+                )}
 
                 <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                   <span className="relative z-10 bg-card px-2 text-muted-foreground">

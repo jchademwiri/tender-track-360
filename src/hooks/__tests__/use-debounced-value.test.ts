@@ -1,3 +1,7 @@
+/**
+ * @bun-test-environment jsdom
+ */
+
 import { renderHook, act } from '@testing-library/react';
 import { useDebouncedValue } from '../use-debounced-value';
 
