@@ -27,7 +27,7 @@ Built with modern web technologies, Tender Track 360 provides a centralized hub 
 - **Backend**: Next.js Server Actions
 - **Database**: PostgreSQL (local) / Neon (production) with Drizzle ORM
 - **Authentication**: Better Auth
-- **File Storage**: UploadThing
+- **File Storage**: Cloudflare R2 (Planned)
 - **Deployment**: Vercel
 
 ## Project Goals
@@ -92,9 +92,11 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/tender-track-360
 BETTER_AUTH_SECRET=your_generated_secret
 BETTER_AUTH_URL=http://localhost:3000
 
-# UploadThing Configuration
-UPLOADTHING_SECRET=your_uploadthing_secret
-UPLOADTHING_APP_ID=your_uploadthing_app_id
+# Cloudflare R2 Configuration (Planned)
+# R2_ACCESS_KEY_ID=your_access_key
+# R2_SECRET_ACCESS_KEY=your_secret_key
+# R2_BUCKET_NAME=your_bucket_name
+# R2_ACCOUNT_ID=your_account_id
 
 # Optional: Email Service (for notifications)
 EMAIL_SERVER_HOST=smtp.example.com
@@ -150,7 +152,7 @@ The application should now be running at [http://localhost:3000](http://localhos
 
 ### 6. Initial Setup
 
-1. **UploadThing Setup**: Create an account at [uploadthing.com](https://uploadthing.com) and get your API keys
+1. **Storage Setup**: Configure Cloudflare R2 (or compatible S3 storage)
 2. **Better Auth Setup**: The authentication system will be automatically configured with your database
 3. **Initial Admin User**: Register the first user through the application interface, which will automatically be assigned admin role
 
@@ -172,7 +174,7 @@ Detailed instructions for other deployment options will be added as they are sup
 
 - **Database Connection Issues**: Ensure your PostgreSQL/Neon DATABASE_URL is correct in the .env file
 - **Authentication Problems**: Check that Better Auth is properly configured with your database
-- **File Upload Issues**: Verify your UploadThing API keys and app configuration
+- **File Storage**: Verify R2/S3 credentials
 - **Build Errors**: Make sure all dependencies are installed correctly
 
 For additional help, please create an issue in the GitHub repository.
