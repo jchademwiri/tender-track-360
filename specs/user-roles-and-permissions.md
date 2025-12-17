@@ -10,7 +10,7 @@ The primary goal is to ensure a clear, secure, and hierarchical permission syste
 
 The system employs a clear hierarchical structure. Users with higher-level roles inherit all permissions from the roles below them.
 
-`Owner` > `Admin` > `Manager` > `Specialist` > `Viewer`
+`Owner` > `Admin` > `Manager` > `Specialist`
 
 ## 3. Role Definitions
 
@@ -52,50 +52,41 @@ The system employs a clear hierarchical structure. Users with higher-level roles
     -   Completing assigned tasks and collaborating with team members.
 -   **Scope**: Can view and edit all tenders across the organization. All edits are recorded in an audit log.
 
-### 👁️ Viewer
-
--   **Purpose**: Read-only access for stakeholders, consultants, or team members who need to be informed but not participate in the work.
--   **Key Responsibilities**:
-    -   Viewing tender information and progress across the entire organization.
-    -   Accessing and downloading documents for review.
-    -   Monitoring tender outcomes.
--   **Scope**: Strictly read-only, but with visibility into all tenders in the organization. Cannot create, edit, or delete any data.
-
 ## 4. Permission Matrix
 
 This matrix details the specific permissions for each role across key functional areas.
 
-| Feature / Action                | Owner | Admin | Manager | Specialist | Viewer | Notes                                                  |
-| ------------------------------- | :---: | :---: | :-----: | :--------: | :----: | ------------------------------------------------------ |
-| **Organization Management**     |       |       |         |            |        |                                                        |
-| View Organization Details       |   ✅   |   ✅   |    ✅    |     ✅      |   ✅    | All users can view the basic details of their organization. |
-| Edit Organization Details       |   ✅   |   ✅   |    ✅    |     ❌      |   ❌    | Specialist and Viewer have read-only access.           |
-| Transfer Ownership              |   ✅   |   ❌   |    ❌    |     ❌      |   ❌    | Only the current Owner can initiate a transfer.        |
-| Delete Organization             |   ✅   |   ❌   |    ❌    |     ❌      |   ❌    | A critical, owner-only, multi-step action.             |
-|                                 |       |       |         |            |        |                                                        |
-| **User & Member Management**    |       |       |         |            |        |                                                        |
-| View All Members                |   ✅   |   ✅   |    ✅    |     ✅      |   ✅    | Team members are visible to everyone in the organization. |
-| Invite New Members              |   ✅   |   ✅   |    ✅    |     ❌      |   ❌    |                                                        |
-| Cancel/Resend Invitations       |   ✅   |   ✅   |    ✅    |     ❌      |   ❌    |                                                        |
-| Remove Member                   |   ✅   |   ✅   |    ✅    |     ❌      |   ❌    |                                                        |
-| Change Member Role              |   ✅   |   ✅   |    ✅    |     ❌      |   ❌    | Cannot elevate a user to a role higher than their own. |
-|                                 |       |       |         |            |        |                                                        |
-| **Tender Management**           |       |       |         |            |        |                                                        |
-| Create New Tenders              |   ✅   |   ✅   |    ✅    |     ✅      |   ❌    |                                                        |
-| View All Tenders                |   ✅   |   ✅   |    ✅    |     ✅      |   ✅    |                                                        |
-| Edit/Update Tenders             |   ✅   |   ✅   |    ✅    |     ✅      |   ❌    | Specialist edits are recorded in an audit log.         |
-| Change Tender Status            |   ✅   |   ✅   |    ✅    |     ✅      |   ❌    | Some status changes may require Manager+ approval.     |
-| Delete Tenders                  |   ✅   |   ✅   |    ❌    |     ❌      |   ❌    | Manager can typically only archive or mark as lost.    |
-|                                 |       |       |         |            |        |                                                        |
-| **Document Management**         |       |       |         |            |        |                                                        |
-| Upload Documents                |   ✅   |   ✅   |    ✅    |     ✅      |   ❌    | Specialist can add documents to any tender.            |
-| Download Documents              |   ✅   |   ✅   |    ✅    |     ✅      |   ✅    |                                                        |
-| Delete Documents                |   ✅   |   ✅   |    ✅    |     ❌      |   ❌    | Specialist cannot delete documents.                    |
-|                                 |       |       |         |            |        |                                                        |
-| **System & Settings**           |       |       |         |            |        |                                                        |
-| Access System-Wide Analytics    |   ✅   |   ✅   |    ✅    |     ❌      |   ❌    |                                                        |
-| Access Security / Audit Logs    |   ✅   |   ✅   |    ❌    |     ❌      |   ❌    |                                                        |
-| Configure Organization Settings |   ✅   |   ✅   |    ❌    |     ❌      |   ❌    | e.g., Default roles, notification policies.            |
+| Feature / Action                | Owner | Admin | Manager | Specialist | Notes                                                  |
+| ------------------------------- | :---: | :---: | :-----: | :--------: | ------------------------------------------------------ |
+| **Organization Management**     |       |       |         |            |                                                        |
+| View Organization Details       |   ✅   |   ✅   |    ✅    |     ✅      | All users can view the basic details of their organization. |
+| Edit Organization Details       |   ✅   |   ✅   |    ✅    |     ❌      | Specialist has read-only access.           |
+| Transfer Ownership              |   ✅   |   ❌   |    ❌    |     ❌      | Only the current Owner can initiate a transfer.        |
+| Delete Organization             |   ✅   |   ❌   |    ❌    |     ❌      | A critical, owner-only, multi-step action.             |
+|                                 |       |       |         |            |                                                        |
+| **User & Member Management**    |       |       |         |            |                                                        |
+| View All Members                |   ✅   |   ✅   |    ✅    |     ✅      | Team members are visible to everyone in the organization. |
+| Invite New Members              |   ✅   |   ✅   |    ✅    |     ❌      |                                                        |
+| Cancel/Resend Invitations       |   ✅   |   ✅   |    ✅    |     ❌      |                                                        |
+| Remove Member                   |   ✅   |   ✅   |    ✅    |     ❌      |                                                        |
+| Change Member Role              |   ✅   |   ✅   |    ✅    |     ❌      | Cannot elevate a user to a role higher than their own. |
+|                                 |       |       |         |            |                                                        |
+| **Tender Management**           |       |       |         |            |                                                        |
+| Create New Tenders              |   ✅   |   ✅   |    ✅    |     ✅      |                                                        |
+| View All Tenders                |   ✅   |   ✅   |    ✅    |     ✅      |                                                        |
+| Edit/Update Tenders             |   ✅   |   ✅   |    ✅    |     ✅      | Specialist edits are recorded in an audit log.         |
+| Change Tender Status            |   ✅   |   ✅   |    ✅    |     ✅      | Some status changes may require Manager+ approval.     |
+| Delete Tenders                  |   ✅   |   ✅   |    ❌    |     ❌      | Manager can typically only archive or mark as lost.    |
+|                                 |       |       |         |            |                                                        |
+| **Document Management**         |       |       |         |            |                                                        |
+| Upload Documents                |   ✅   |   ✅   |    ✅    |     ✅      | Specialist can add documents to any tender.            |
+| Download Documents              |   ✅   |   ✅   |    ✅    |     ✅      |                                                        |
+| Delete Documents                |   ✅   |   ✅   |    ✅    |     ❌      | Specialist cannot delete documents.                    |
+|                                 |       |       |         |            |                                                        |
+| **System & Settings**           |       |       |         |            |                                                        |
+| Access System-Wide Analytics    |   ✅   |   ✅   |    ✅    |     ❌      |                                                        |
+| Access Security / Audit Logs    |   ✅   |   ✅   |    ❌    |     ❌      |                                                        |
+| Configure Organization Settings |   ✅   |   ✅   |    ❌    |     ❌      | e.g., Default roles, notification policies.            |
 
 ## 5. Technical Implementation Notes
 
@@ -119,18 +110,9 @@ This logic applies to irreversible actions like deleting an organization or tran
 const isOwner = userRole === 'owner';
 ```
 
-### Read-Only Access
-
-This logic is used to present a read-only view of data.
-
-```typescript
-// Check if the user has read-only permissions
-const isReadOnly = userRole === 'viewer';
-```
-
 ### Content-Specific Access
 
-The system is moving away from content-specific access for tenders. All roles (except Viewer) can interact with all tenders, and Viewers have read-only access to all tenders.
+The system is moving away from content-specific access for tenders. All roles can interact with all tenders.
 
 ```typescript
 // Pseudo-code for checking access to a tender
