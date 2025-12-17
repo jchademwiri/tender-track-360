@@ -48,7 +48,7 @@ The following scripts are available in `package.json`:
 - always follow a test driven development approach
 - we are using typescript, tailwindcss, shadcn ui, bun
 - always run bun run build when you are done with code changes
-- commit and stage you changes, with a detailed commit message
+- create a detailed commit message
 
 ## Authentication
 
