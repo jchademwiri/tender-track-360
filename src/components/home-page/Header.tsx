@@ -28,9 +28,18 @@ export function Header() {
     >
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
-          <span className="text-xl font-bold text-foreground">
-            Tender Track 360
-          </span>
+          {/* Logo for larger screens */}
+          <img
+            src="/logo.svg"
+            alt="Tender Track 360"
+            className="hidden md:block h-8 w-auto"
+          />
+          {/* Logo icon for small screens */}
+          <img
+            src="/logo-icon.svg"
+            alt="Tender Track 360"
+            className="md:hidden h-8 w-auto"
+          />
         </Link>
 
         <nav className="flex items-center gap-3">

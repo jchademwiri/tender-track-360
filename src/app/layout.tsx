@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Tender Track 360',
   description: 'Your Gatway to Online Tender Management System',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
