@@ -1,6 +1,9 @@
 import { getCurrentUser } from '@/server';
 import { getPurchaseOrderById } from '@/server/purchase-orders';
 import { POForm } from '@/components/purchase-orders/po-form';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 interface EditPurchaseOrderPageProps {
   params: Promise<{ id: string }>;
@@ -13,6 +16,20 @@ export default async function EditPurchaseOrderPage({
 }: EditPurchaseOrderPageProps) {
   const { id } = await params;
   const { session } = await getCurrentUser();
+
+  // Check permissions
+  const { success: hasPermission } = await auth.api.hasPermission({
+    headers: await headers(),
+    body: {
+      permissions: {
+        purchase_order: ['update'], // Must have update permission to access edit page
+      },
+    },
+  });
+
+  if (!hasPermission) {
+    redirect('/dashboard');
+  }
 
   if (!session.activeOrganizationId) {
     return (

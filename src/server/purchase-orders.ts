@@ -24,6 +24,28 @@ export async function getPurchaseOrders(
   status?: string
 ) {
   try {
+    const { auth } = await import('@/lib/auth');
+    const { headers } = await import('next/headers');
+
+    const { success: hasPermission } = await auth.api.hasPermission({
+      headers: await headers(),
+      body: {
+        permissions: {
+          purchase_order: ['read'],
+        },
+      },
+    });
+
+    if (!hasPermission) {
+      return {
+        purchaseOrders: [],
+        totalCount: 0,
+        currentPage: 1,
+        totalPages: 0,
+        error: 'Insufficient permissions',
+      };
+    }
+
     const offset = (page - 1) * limit;
 
     let whereCondition = and(
@@ -108,6 +130,25 @@ export async function createPurchaseOrder(
   data: PurchaseOrderCreateInput
 ) {
   try {
+    const { auth } = await import('@/lib/auth');
+    const { headers } = await import('next/headers');
+
+    const { success: hasPermission } = await auth.api.hasPermission({
+      headers: await headers(),
+      body: {
+        permissions: {
+          purchase_order: ['create'],
+        },
+      },
+    });
+
+    if (!hasPermission) {
+      return {
+        success: false,
+        error: 'Insufficient permissions to create purchase order',
+      };
+    }
+
     // Validate input
     const validatedData = PurchaseOrderCreateSchema.parse(data);
 
@@ -178,6 +219,25 @@ export async function getPurchaseOrderById(
   poId: string
 ) {
   try {
+    const { auth } = await import('@/lib/auth');
+    const { headers } = await import('next/headers');
+
+    const { success: hasPermission } = await auth.api.hasPermission({
+      headers: await headers(),
+      body: {
+        permissions: {
+          purchase_order: ['read'],
+        },
+      },
+    });
+
+    if (!hasPermission) {
+      return {
+        success: false,
+        error: 'Insufficient permissions to view purchase order',
+      };
+    }
+
     const poData = await db
       .select({
         id: purchaseOrder.id,
@@ -228,6 +288,25 @@ export async function updatePurchaseOrder(
   data: PurchaseOrderUpdateInput
 ) {
   try {
+    const { auth } = await import('@/lib/auth');
+    const { headers } = await import('next/headers');
+
+    const { success: hasPermission } = await auth.api.hasPermission({
+      headers: await headers(),
+      body: {
+        permissions: {
+          purchase_order: ['update'],
+        },
+      },
+    });
+
+    if (!hasPermission) {
+      return {
+        success: false,
+        error: 'Insufficient permissions to update purchase order',
+      };
+    }
+
     // Validate input
     const validatedData = PurchaseOrderUpdateSchema.parse(data);
 
@@ -363,7 +442,7 @@ export async function updatePurchaseOrderStatus(
         headers: await headers(),
         body: {
           permissions: {
-            project: ['update'], // Admin/owner level permission
+            purchase_order: ['update'], // Use specific PO update permission
           },
         },
       });
@@ -412,6 +491,25 @@ export async function deletePurchaseOrder(
   poId: string
 ) {
   try {
+    const { auth } = await import('@/lib/auth');
+    const { headers } = await import('next/headers');
+
+    const { success: hasPermission } = await auth.api.hasPermission({
+      headers: await headers(),
+      body: {
+        permissions: {
+          purchase_order: ['delete'],
+        },
+      },
+    });
+
+    if (!hasPermission) {
+      return {
+        success: false,
+        error: 'Insufficient permissions to delete purchase order',
+      };
+    }
+
     // Check if purchase order exists and belongs to organization
     const existingPO = await db
       .select()

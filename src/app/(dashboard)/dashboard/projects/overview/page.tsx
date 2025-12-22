@@ -11,6 +11,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function ProjectsOverviewPage() {
   const { session } = await getCurrentUser();
+  const { auth } = await import('@/lib/auth');
+  const { headers } = await import('next/headers');
+  const headersList = await headers();
 
   if (!session.activeOrganizationId) {
     return (
@@ -55,18 +58,41 @@ export default async function ProjectsOverviewPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button asChild size={'lg'}>
-            <Link href="/dashboard/projects/create">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Project
-            </Link>
-          </Button>
-          <Button asChild size={'lg'}>
-            <Link href="/dashboard/projects/purchase-orders/create">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Purchase Order
-            </Link>
-          </Button>
+          {(
+            await auth.api.hasPermission({
+              headers: headersList,
+              body: {
+                permissions: {
+                  project: ['create'],
+                },
+              },
+            })
+          ).success && (
+            <Button asChild size={'lg'}>
+              <Link href="/dashboard/projects/create">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Project
+              </Link>
+            </Button>
+          )}
+
+          {(
+            await auth.api.hasPermission({
+              headers: headersList,
+              body: {
+                permissions: {
+                  purchase_order: ['create'],
+                },
+              },
+            })
+          ).success && (
+            <Button asChild size={'lg'}>
+              <Link href="/dashboard/projects/purchase-orders/create">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Purchase Order
+              </Link>
+            </Button>
+          )}
         </div>
       </header>
 

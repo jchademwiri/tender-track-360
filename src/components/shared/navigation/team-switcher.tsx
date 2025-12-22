@@ -35,8 +35,10 @@ import type { OrganizationWithStats } from '@/server/organizations';
 
 export function TeamSwitcher({
   organizations,
+  activeOrganizationId,
 }: {
   organizations: OrganizationWithStats[];
+  activeOrganizationId?: string | null;
 }) {
   const { isMobile } = useSidebar();
   const router = useRouter();
@@ -46,14 +48,25 @@ export function TeamSwitcher({
 
   // Find the active organization from the list or use the first one as fallback
   const activeOrg = React.useMemo(() => {
-    if (activeOrganization) {
+    // Priority:
+    // 1. Client-side active organization (if available/switched)
+    // 2. Server-side active organization (passed via prop)
+    // 3. Fallback to first organization
+
+    // Note: We prioritize the prop for the initial render to match server HTML,
+    // but we need to verify if `activeOrganization` is already defined (e.g. from hydration state).
+    // Actually, to prevent hydration mismatch, we should rely on the Prop if `activeOrganization` is undefined,
+    // OR if we want to ensure the HTML matches, we should use the Prop as the default.
+
+    const targetId = activeOrganization?.id || activeOrganizationId;
+
+    if (targetId) {
       return (
-        organizations.find((org) => org.id === activeOrganization.id) ||
-        organizations[0]
+        organizations.find((org) => org.id === targetId) || organizations[0]
       );
     }
     return organizations[0];
-  }, [activeOrganization, organizations]);
+  }, [activeOrganization, organizations, activeOrganizationId]);
 
   const handleOrganizationSwitch = async (
     organization: OrganizationWithStats

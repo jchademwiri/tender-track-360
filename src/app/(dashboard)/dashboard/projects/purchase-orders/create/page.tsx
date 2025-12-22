@@ -1,10 +1,27 @@
 import { getCurrentUser } from '@/server';
 import { POForm } from '@/components/purchase-orders/po-form';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default async function NewPurchaseOrderPage() {
   const { session } = await getCurrentUser();
+
+  // Check permissions
+  const { success: hasPermission } = await auth.api.hasPermission({
+    headers: await headers(),
+    body: {
+      permissions: {
+        purchase_order: ['create'],
+      },
+    },
+  });
+
+  if (!hasPermission) {
+    redirect('/dashboard/projects/purchase-orders'); // Or just /dashboard if they cant see list
+  }
 
   if (!session.activeOrganizationId) {
     return (

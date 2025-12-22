@@ -12,6 +12,7 @@ const statement = {
   document: ['create', 'read', 'update', 'delete'],
   user: ['create', 'read', 'update', 'delete', 'manage'],
   organization: ['update', 'delete', 'transfer'],
+  purchase_order: ['create', 'read', 'update', 'delete'],
 } as const;
 
 const ac = createAccessControl(statement);
@@ -31,6 +32,7 @@ const owner = ac.newRole({
   document: ['create', 'read', 'update', 'delete'],
   user: ['create', 'read', 'update', 'delete', 'manage'],
   organization: ['update', 'delete', 'transfer'],
+  purchase_order: ['create', 'read', 'update', 'delete'],
 } as any);
 
 const admin = ac.newRole({
@@ -42,6 +44,7 @@ const admin = ac.newRole({
   document: ['create', 'read', 'update', 'delete'],
   user: ['create', 'read', 'update', 'delete', 'manage'],
   organization: ['update'], // Explicitly EXCLUDE delete and transfer
+  purchase_order: ['create', 'read', 'update', 'delete'],
 } as any);
 
 const manager = ac.newRole({
@@ -60,6 +63,7 @@ const manager = ac.newRole({
   task: ['create', 'read', 'update', 'delete'],
   document: ['create', 'read', 'update', 'delete'],
   user: ['create', 'read', 'update'],
+  purchase_order: ['create', 'read', 'update'],
 } as any);
 
 const member = ac.newRole({
@@ -75,6 +79,7 @@ const member = ac.newRole({
   ],
   task: ['create', 'read', 'update', 'delete'],
   document: ['create', 'read', 'update', 'delete'],
+  // Member has NO access to purchase_order
 } as any);
 
 export { owner, admin, manager, member, ac, statement };

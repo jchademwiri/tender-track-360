@@ -1,14 +1,37 @@
 import { getCurrentUser } from '@/server';
 import { getPurchaseOrders } from '@/server/purchase-orders';
 import { POList } from '@/components/purchase-orders/po-list';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-export default async function PurchaseOrdersPage() {
+export default async function PurchaseOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const { session } = await getCurrentUser();
+
+  // Check permissions
+  const { success: hasPermission } = await auth.api.hasPermission({
+    headers: await headers(),
+    body: {
+      permissions: {
+        purchase_order: ['read'],
+      },
+    },
+  });
+
+  if (!hasPermission) {
+    redirect('/dashboard');
+  }
+
+  const resolvedSearchParams = await searchParams; // Correct Promise resolution as per Next.js 15
 
   if (!session.activeOrganizationId) {
     return (
