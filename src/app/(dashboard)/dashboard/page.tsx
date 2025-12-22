@@ -23,6 +23,10 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
+  const { auth } = await import('@/lib/auth');
+  const { headers } = await import('next/headers');
+  const headersList = await headers();
+
   // Check if user has an organization
   const sessionCheck = await checkUserSession();
 
@@ -57,18 +61,41 @@ export default async function DashboardPage() {
               Create Tender
             </Link>
           </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/dashboard/projects/purchase-orders/create">
-              <Plus className="mr-2 h-4 w-4" />
-              Create PO
-            </Link>
-          </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/dashboard/projects/create">
-              <Plus className="mr-2 h-4 w-4" />
-              Create Project
-            </Link>
-          </Button>
+          {(
+            await auth.api.hasPermission({
+              headers: headersList,
+              body: {
+                permissions: {
+                  purchase_order: ['create'],
+                },
+              },
+            })
+          ).success && (
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/dashboard/projects/purchase-orders/create">
+                <Plus className="mr-2 h-4 w-4" />
+                Create PO
+              </Link>
+            </Button>
+          )}
+
+          {(
+            await auth.api.hasPermission({
+              headers: headersList,
+              body: {
+                permissions: {
+                  project: ['create'],
+                },
+              },
+            })
+          ).success && (
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/dashboard/projects/create">
+                <Plus className="mr-2 h-4 w-4" />
+                Create Project
+              </Link>
+            </Button>
+          )}
           <Button variant="outline" size="sm" asChild>
             <Link href="/dashboard/clients/create">
               <Plus className="mr-2 h-4 w-4" />
