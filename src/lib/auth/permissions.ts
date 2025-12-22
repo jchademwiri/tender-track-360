@@ -6,24 +6,75 @@ import {
 
 const statement = {
   ...defaultStatements,
-  project: ['create', 'share', 'update', 'delete'],
+  project: ['create', 'read', 'update', 'delete', 'share'],
+  tender: ['create', 'read', 'update', 'delete'],
+  task: ['create', 'read', 'update', 'delete'],
+  document: ['create', 'read', 'update', 'delete'],
+  user: ['create', 'read', 'update', 'delete', 'manage'],
+  organization: ['update', 'delete', 'transfer'],
 } as const;
 
 const ac = createAccessControl(statement);
 
+// Conditional permission type for draft-only delete
+interface ConditionalPermission {
+  action: string;
+  condition: (data: { status: string }) => boolean;
+}
+
 const owner = ac.newRole({
-  ...defaultStatements,
-  ...adminAc.statements,
-  project: ['create', 'update', 'delete'],
-});
+  member: ['create', 'update', 'delete'],
+  invitation: ['create', 'cancel'],
+  project: ['create', 'read', 'update', 'delete', 'share'],
+  tender: ['create', 'read', 'update', 'delete'],
+  task: ['create', 'read', 'update', 'delete'],
+  document: ['create', 'read', 'update', 'delete'],
+  user: ['create', 'read', 'update', 'delete', 'manage'],
+  organization: ['update', 'delete', 'transfer'],
+} as any);
+
 const admin = ac.newRole({
-  project: ['create', 'update'],
-});
+  member: ['create', 'update', 'delete'],
+  invitation: ['create', 'cancel'],
+  project: ['create', 'read', 'update', 'delete', 'share'],
+  tender: ['create', 'read', 'update', 'delete'],
+  task: ['create', 'read', 'update', 'delete'],
+  document: ['create', 'read', 'update', 'delete'],
+  user: ['create', 'read', 'update', 'delete', 'manage'],
+  organization: ['update'], // Explicitly EXCLUDE delete and transfer
+} as any);
+
 const manager = ac.newRole({
-  project: ['create'],
-});
+  member: ['create', 'update'],
+  invitation: ['create', 'cancel'],
+  project: ['create', 'read', 'update'],
+  tender: [
+    'create',
+    'read',
+    'update',
+    {
+      action: 'delete',
+      condition: (tender: { status: string }) => tender.status === 'draft',
+    } as ConditionalPermission,
+  ],
+  task: ['create', 'read', 'update', 'delete'],
+  document: ['create', 'read', 'update', 'delete'],
+  user: ['create', 'read', 'update'],
+} as any);
+
 const member = ac.newRole({
-  project: ['create', 'update'],
-});
+  project: ['read'],
+  tender: [
+    'create',
+    'read',
+    'update',
+    {
+      action: 'delete',
+      condition: (tender: { status: string }) => tender.status === 'draft',
+    } as ConditionalPermission,
+  ],
+  task: ['create', 'read', 'update', 'delete'],
+  document: ['create', 'read', 'update', 'delete'],
+} as any);
 
 export { owner, admin, manager, member, ac, statement };
