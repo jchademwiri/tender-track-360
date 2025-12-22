@@ -28,6 +28,8 @@ import { Building2, Save, Upload, Trash2, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Role } from '@/db/schema';
 import { updateOrganizationDetails } from '@/server/organization-members';
+import { updateOrganizationLogo } from '@/server/organizations';
+import { AvatarUpload } from '../../../settings/profile/components/avatar-upload';
 
 interface GeneralTabProps {
   organization: {
@@ -98,6 +100,16 @@ export function GeneralTab({
     },
   });
 
+  const handleLogoUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return await updateOrganizationLogo(organization.id, formData);
+  };
+
+  const handleLogoRemove = () => {
+    form.setValue('logo', '');
+  };
+
   const onSubmit = async (data: OrganizationFormData) => {
     if (!canEdit) {
       toast.error('You do not have permission to edit this organization');
@@ -146,29 +158,16 @@ export function GeneralTab({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-col items-center space-y-4">
-            <Avatar className="h-24 w-24">
-              <AvatarImage
-                src={organization.logo || ''}
-                alt={`${organization.name} logo`}
-              />
-              <AvatarFallback className="text-lg bg-primary/10">
-                {getOrganizationInitials(organization.name)}
-              </AvatarFallback>
-            </Avatar>
-            {canEdit && (
-              <div className="flex gap-2">
-                <Button type="button" size="sm" variant="outline">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Logo
-                </Button>
-                {organization.logo && (
-                  <Button type="button" size="sm" variant="outline">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            )}
+          <div className="flex justify-center py-4">
+            <AvatarUpload
+              currentImage={form.watch('logo')}
+              userName={organization.name}
+              onImageChange={(url) => form.setValue('logo', url || '')}
+              onImageRemove={handleLogoRemove}
+              disabled={!canEdit}
+              uploadAction={handleLogoUpload}
+              entityName="Organization Logo"
+            />
           </div>
         </CardContent>
       </Card>
@@ -273,28 +272,6 @@ export function GeneralTab({
                       </FormControl>
                       <FormDescription>
                         Primary contact phone number.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="logo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Logo URL</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="url"
-                          placeholder="https://example.com/logo.png"
-                          disabled={!canEdit}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Direct URL to your organization logo.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

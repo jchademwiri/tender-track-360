@@ -593,6 +593,14 @@ export async function updateOrganizationLogo(
     return { success: true, logoUrl: signedUrl };
   } catch (error) {
     console.error('Error updating organization logo:', error);
-    return { success: false, error: 'Failed to update organization logo' };
+    if (error instanceof Error) {
+      console.error('Stack:', error.stack);
+    }
+    return {
+      success: false,
+      error:
+        'Failed to update organization logo: ' +
+        (error instanceof Error ? error.message : String(error)),
+    };
   }
 }

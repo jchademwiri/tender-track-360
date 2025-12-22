@@ -131,7 +131,7 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
         if (result?.success) {
           // Upload files if any
           if (files.length > 0) {
-            const entityId = mode === 'create' ? result.tender.id : tender?.id;
+            const entityId = mode === 'create' ? result.tender?.id : tender?.id;
 
             if (entityId) {
               await Promise.all(
