@@ -11,9 +11,12 @@ export const env = createEnv({
     RESEND_API_KEY: z
       .string()
       .min(1, { message: 'RESEND_API_KEY is required' }),
-    UPLOADTHING_TOKEN: z
-      .string()
-      .min(1, { message: 'UPLOADTHING_TOKEN is required' }),
+    // Cloudflare R2
+    R2_ACCOUNT_ID: z.string().optional(),
+    R2_ACCESS_KEY_ID: z.string().optional(),
+    R2_SECRET_ACCESS_KEY: z.string().optional(),
+    R2_BUCKET_NAME: z.string().optional(),
+
     GOOGLE_CLIENT_ID: z.string().min(1, {
       message: 'GOOGLE_CLIENT_ID is required',
     }),
@@ -29,13 +32,21 @@ export const env = createEnv({
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
+
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
+
     RESEND_API_KEY: process.env.RESEND_API_KEY,
-    UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
+    REPLY_TO_EMAIL: process.env.REPLY_TO_EMAIL,
+
+    R2_ACCOUNT_ID: process.env.R2_ACCOUNT_ID,
+    R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID,
+    R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY,
+    R2_BUCKET_NAME: process.env.R2_BUCKET_NAME,
+
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-    REPLY_TO_EMAIL: process.env.REPLY_TO_EMAIL,
+
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
   },
 });

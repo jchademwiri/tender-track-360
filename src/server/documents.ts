@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/db';
-import { document } from '@/db/schema';
+import { document, tender, project } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth';
@@ -37,11 +37,31 @@ export async function uploadDocument(
       return { success: false, error: 'No file provided' };
     }
 
-    // 3. Upload to Storage
+    // 3. Determine Storage Path
+    const fileExtension = file.name.split('.').pop();
+    let uniqueKey = `${organizationId}/${nanoid()}.${fileExtension}`; // Default fallback
+
+    if (linkedEntity?.tenderId) {
+      const parentTender = await db.query.tender.findFirst({
+        where: eq(tender.id, linkedEntity.tenderId),
+        columns: { tenderNumber: true },
+      });
+      if (parentTender?.tenderNumber) {
+        uniqueKey = `tenders/${parentTender.tenderNumber}/${file.name}`;
+      }
+    } else if (linkedEntity?.projectId) {
+      const parentProject = await db.query.project.findFirst({
+        where: eq(project.id, linkedEntity.projectId),
+        columns: { projectNumber: true },
+      });
+      if (parentProject?.projectNumber) {
+        uniqueKey = `projects/${parentProject.projectNumber}/${file.name}`;
+      }
+    }
+
+    // 4. Upload to Storage
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const fileExtension = file.name.split('.').pop();
-    const uniqueKey = `${organizationId}/${nanoid()}.${fileExtension}`; // structure: orgId/random.ext
 
     // Perform upload
     const storageKey = await StorageService.uploadFile(
@@ -50,7 +70,7 @@ export async function uploadDocument(
       file.type
     );
 
-    // 4. Save to Database
+    // 5. Save to Database
     const newDocument = await db
       .insert(document)
       .values({
@@ -66,7 +86,7 @@ export async function uploadDocument(
       })
       .returning();
 
-    // 5. Revalidate
+    // 6. Revalidate
     if (linkedEntity?.tenderId) {
       revalidatePath(`/dashboard/tenders/${linkedEntity.tenderId}`);
     }

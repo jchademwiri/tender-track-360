@@ -1,87 +1,131 @@
 'use client';
 
-import { useCallback } from 'react';
-import { useDropzone, type FileRejection } from 'react-dropzone';
-import { Upload, X, File as FileIcon } from 'lucide-react';
+import * as React from 'react';
+import {
+  useDropzone,
+  type FileRejection,
+  type DropzoneOptions,
+} from 'react-dropzone';
+import { UploadCloud, X, File as FileIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
-interface FileUploaderProps {
-  onFilesSelected: (files: File[]) => void;
-  maxFiles?: number;
-  accept?: Record<string, string[]>;
-  disabled?: boolean;
+interface FileUploaderProps extends Omit<DropzoneOptions, 'onDrop'> {
+  value?: File[];
+  onValueChange?: (files: File[]) => void;
   className?: string;
+  maxFiles?: number;
+  maxSize?: number;
 }
 
 export function FileUploader({
-  onFilesSelected,
-  maxFiles = 1,
-  accept = {
-    'application/pdf': ['.pdf'],
-    'image/*': ['.png', '.jpg', '.jpeg', '.webp'],
-    'application/msword': ['.doc'],
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [
-      '.docx',
-    ],
-    'application/vnd.ms-excel': ['.xls'],
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
-      '.xlsx',
-    ],
-  },
-  disabled = false,
+  value = [],
+  onValueChange,
   className,
+  maxFiles = 5,
+  maxSize = 1024 * 1024 * 10, // 10MB
+  ...dropzoneProps
 }: FileUploaderProps) {
-  const onDrop = useCallback(
-    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-      if (acceptedFiles.length > 0) {
-        onFilesSelected(acceptedFiles);
+  const onDrop = React.useCallback(
+    (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+      if (onValueChange) {
+        // Prevent duplicates based on name and size
+        const currentFiles = value || [];
+        const newFiles = acceptedFiles.filter(
+          (newFile) =>
+            !currentFiles.some(
+              (currentFile) =>
+                currentFile.name === newFile.name &&
+                currentFile.size === newFile.size
+            )
+        );
+
+        const combinedFiles = [...currentFiles, ...newFiles].slice(0, maxFiles);
+        onValueChange(combinedFiles);
       }
 
-      if (fileRejections.length > 0) {
-        console.warn('Files rejected:', fileRejections);
-        // Could trigger a toast here
+      if (rejectedFiles.length > 0) {
+        console.warn('Files rejected:', rejectedFiles);
       }
     },
-    [onFilesSelected]
+    [value, maxFiles, onValueChange]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     maxFiles,
-    accept,
-    disabled,
+    maxSize,
+    ...dropzoneProps,
   });
 
+  const removeFile = (indexToRemove: number) => {
+    if (onValueChange) {
+      const newFiles = value.filter((_, index) => index !== indexToRemove);
+      onValueChange(newFiles);
+    }
+  };
+
   return (
-    <div
-      {...getRootProps()}
-      className={cn(
-        'border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors',
-        isDragActive
-          ? 'border-primary bg-primary/5'
-          : 'border-muted-foreground/25 hover:border-primary/50',
-        disabled && 'opacity-50 cursor-not-allowed',
-        className
-      )}
-    >
-      <input {...getInputProps()} />
-      <div className="flex flex-col items-center justify-center space-y-2">
-        <div className="p-2 rounded-full bg-muted">
-          <Upload className="h-6 w-6 text-muted-foreground" />
+    <div className={cn('space-y-4', className)}>
+      <div
+        {...getRootProps()}
+        className={cn(
+          'border-2 border-dashed rounded-lg p-6 cursor-pointer transition-colors',
+          isDragActive
+            ? 'border-primary bg-primary/5'
+            : 'border-muted-foreground/25 hover:border-primary/50',
+          'flex flex-col items-center justify-center text-center space-y-2'
+        )}
+      >
+        <input {...getInputProps()} />
+        <div className="p-4 bg-background rounded-full border shadow-sm">
+          <UploadCloud className="h-8 w-8 text-muted-foreground" />
         </div>
         <div className="space-y-1">
           <p className="text-sm font-medium">
-            {isDragActive
-              ? 'Drop files here'
-              : 'Drag & drop files here or click to browse'}
+            Click to upload or drag and drop
           </p>
           <p className="text-xs text-muted-foreground">
-            Supported formats: PDF, Images, Word, Excel (Max details handled by
-            caller)
+            PDF, Word, Excel, Images (max {Math.round(maxSize / 1024 / 1024)}MB)
           </p>
         </div>
       </div>
+
+      {value.length > 0 && (
+        <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+          <div className="space-y-4">
+            {value.map((file, index) => (
+              <div
+                key={`${file.name}-${index}`}
+                className="flex items-center justify-between p-3 bg-muted/50 rounded-lg group"
+              >
+                <div className="flex items-center space-x-3 overflow-hidden">
+                  <div className="p-2 bg-background rounded-md border">
+                    <FileIcon className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                    <p className="text-sm font-medium truncate">{file.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => removeFile(index)}
+                >
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Remove file</span>
+                </Button>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      )}
     </div>
   );
 }
