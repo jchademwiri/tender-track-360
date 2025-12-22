@@ -33,14 +33,5 @@
     ".next\\dev/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "**/__tests__/**",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "src/**/*.spec.ts",
-    "src/**/*.spec.tsx",
-    "archive",
-    "docs"
-  ]
+  "exclude": ["node_modules", "archive", "docs"]
 }
