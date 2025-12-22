@@ -18,6 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Plus, TrendingUp, Banknote, Target, Calendar } from 'lucide-react';
 import Link from 'next/link';
+import { UpcomingDeadlinesList } from '@/components/dashboard/upcoming-deadlines-list';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -291,30 +292,9 @@ export default async function DashboardPage() {
               <CardDescription>Tenders due in the next 30 days</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {dashboardData.tenderStats.upcomingDeadlines > 0 ? (
-                  // TODO: The API currently returns a count, we need the actual items.
-                  // For MVP stability without changing the backend return type in this task,
-                  // we'll show a summary message or simply links to the tenders page.
-                  <div className="text-center py-4">
-                    <p className="text-sm font-medium mb-2">
-                      {dashboardData.tenderStats.upcomingDeadlines} tenders due
-                      soon
-                    </p>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href="/dashboard/tenders?sort=deadline">
-                        View Tenders
-                      </Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No upcoming deadlines</p>
-                    <p className="text-xs">All tenders are up to date</p>
-                  </div>
-                )}
-              </div>
+              <UpcomingDeadlinesList
+                deadlines={dashboardData.upcomingDeadlines}
+              />
             </CardContent>
           </Card>
         </div>
