@@ -5,6 +5,7 @@ import { BenefitsSection } from '@/components/home-page/BenefitsSection';
 import { PricingSection } from '@/components/home-page/PricingSection';
 import { TestimonialsSection } from '@/components/home-page/TestimonialsSection';
 import { FooterSection } from '@/components/home-page/FooterSection';
+import { TrustedBy } from '@/components/home-page/TrustedBy';
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <Header />
       <main>
         <HeroSection />
+        <TrustedBy />
         <FeaturesSection />
         <BenefitsSection />
         <PricingSection />

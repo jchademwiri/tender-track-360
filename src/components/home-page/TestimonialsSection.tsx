@@ -83,26 +83,6 @@ export function TestimonialsSection({
             </div>
           ))}
         </div>
-
-        <div className="text-center mt-12">
-          <div className="text-sm text-muted-foreground mb-4">
-            Trusted by leading organizations
-          </div>
-          <div className="flex justify-center items-center space-x-8 opacity-60">
-            <div className="bg-muted h-8 w-24 rounded flex items-center justify-center text-xs font-medium text-muted-foreground">
-              TechCorp
-            </div>
-            <div className="bg-muted h-8 w-24 rounded flex items-center justify-center text-xs font-medium text-muted-foreground">
-              Global Inc
-            </div>
-            <div className="bg-muted h-8 w-24 rounded flex items-center justify-center text-xs font-medium text-muted-foreground">
-              Innovation
-            </div>
-            <div className="bg-muted h-8 w-24 rounded flex items-center justify-center text-xs font-medium text-muted-foreground">
-              Solutions
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
