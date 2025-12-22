@@ -562,15 +562,6 @@ export async function updateOrganizationLogo(
     const timestamp = Date.now();
     const uniqueKey = `organizations/${safeName}-${organizationId}/logo/logo-${timestamp}.${fileExtension}`;
 
-    // Cleanup: Delete old logo if it exists
-    if (orgDetails?.logo && !orgDetails.logo.startsWith('http')) {
-      try {
-        await StorageService.deleteFile(orgDetails.logo);
-      } catch (e) {
-        console.error('Failed to delete old organization logo:', e);
-      }
-    }
-
     const storageKey = await StorageService.uploadFile(
       buffer,
       uniqueKey,
@@ -583,6 +574,16 @@ export async function updateOrganizationLogo(
       .set({ logo: storageKey })
       .where(eq(organization.id, organizationId));
 
+    // Cleanup: Delete old logo if it exists (perform AFTER successful upload and DB update)
+    if (orgDetails?.logo && !orgDetails.logo.startsWith('http')) {
+      try {
+        await StorageService.deleteFile(orgDetails.logo);
+      } catch (e) {
+        console.error('Failed to delete old organization logo:', e);
+        // Do not fail the request if cleanup fails, as the new logo is already live
+      }
+    }
+
     revalidatePath(`/dashboard/organization/${organizationId}/settings`); // Revalidate settings page
     revalidatePath('/dashboard/organization'); // Revalidate list
     revalidatePath('/dashboard'); // Revalidate sidebar potentially
@@ -590,7 +591,7 @@ export async function updateOrganizationLogo(
     // Return signed URL for immediate display
     const signedUrl = await StorageService.getSignedUrl(storageKey);
 
-    return { success: true, logoUrl: signedUrl };
+    return { success: true, imageUrl: signedUrl };
   } catch (error) {
     console.error('Error updating organization logo:', error);
     if (error instanceof Error) {

@@ -161,21 +161,11 @@ export const updateUserImage = async (formData: FormData) => {
     // Explicitly using forward slashes for S3-style folders
     const uniqueKey = `users/${safeName}-${session.user.id}/profile-${timestamp}.${fileExtension}`;
 
-    // Cleanup: Delete old image if it exists
-    // Fetch current user image first
+    // Fetch current user image first (for later cleanup)
     const currentUser = await db.query.user.findFirst({
       where: eq(user.id, session.user.id),
       columns: { image: true },
     });
-
-    if (currentUser?.image && !currentUser.image.startsWith('http')) {
-      try {
-        await StorageService.deleteFile(currentUser.image);
-      } catch (e) {
-        console.error('Failed to delete old user image:', e);
-        // Continue with upload even if delete fails
-      }
-    }
 
     const storageKey = await StorageService.uploadFile(
       buffer,
@@ -188,6 +178,16 @@ export const updateUserImage = async (formData: FormData) => {
       .update(user)
       .set({ image: storageKey })
       .where(eq(user.id, session.user.id));
+
+    // Cleanup: Delete old image if it exists (perform AFTER successful upload and DB update)
+    if (currentUser?.image && !currentUser.image.startsWith('http')) {
+      try {
+        await StorageService.deleteFile(currentUser.image);
+      } catch (e) {
+        console.error('Failed to delete old user image:', e);
+        // Do not fail the request if cleanup fails
+      }
+    }
 
     revalidatePath('/dashboard/settings/profile');
 
