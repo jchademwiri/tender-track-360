@@ -544,31 +544,28 @@ export async function updateOrganizationLogo(
     const buffer = Buffer.from(arrayBuffer);
     const fileExtension = file.name.split('.').pop() || 'jpg';
 
-    // Sanitize org name for folder path
-    // We need to fetch the org name first since we only have ID here, OR just use ID.
-    // Plan said: organizations/[org_name]-[org_id]/logo/[filename]
-    // Let's fetch the org name quickly or use "org" prefix if we want to save a DB call,
-    // but better to stick to plan. We have checked membership, maybe we can get name from there?
-    // userMembership.organization.name is available!
+    // Fetch organization details (name for path, logo for cleanup)
+    const orgDetailsResult = await db
+      .select({
+        name: organization.name,
+        logo: organization.logo,
+      })
+      .from(organization)
+      .where(eq(organization.id, organizationId))
+      .limit(1);
+
+    const orgDetails = orgDetailsResult[0];
 
     // Sanitize org name for folder path
-    const orgName = userMembership.organization.name || 'org';
+    const orgName = orgDetails?.name || 'org';
     const safeName = orgName.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
     const timestamp = Date.now();
     const uniqueKey = `organizations/${safeName}-${organizationId}/logo/logo-${timestamp}.${fileExtension}`;
 
     // Cleanup: Delete old logo if it exists
-    const currentOrgResult = await db
-      .select({ logo: organization.logo })
-      .from(organization)
-      .where(eq(organization.id, organizationId))
-      .limit(1);
-
-    const currentOrg = currentOrgResult[0];
-
-    if (currentOrg?.logo && !currentOrg.logo.startsWith('http')) {
+    if (orgDetails?.logo && !orgDetails.logo.startsWith('http')) {
       try {
-        await StorageService.deleteFile(currentOrg.logo);
+        await StorageService.deleteFile(orgDetails.logo);
       } catch (e) {
         console.error('Failed to delete old organization logo:', e);
       }
