@@ -37,7 +37,7 @@ interface DangerZoneProps {
   userRole: Role;
   organizationName: string;
   memberCount: number;
-  hasActiveContracts: boolean;
+  hasActiveProjects: boolean;
 }
 
 export function DangerZone({
@@ -45,7 +45,7 @@ export function DangerZone({
   userRole,
   organizationName,
   memberCount,
-  hasActiveContracts,
+  hasActiveProjects,
 }: DangerZoneProps) {
   const [showDeletionModal, setShowDeletionModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
@@ -163,10 +163,10 @@ export function DangerZone({
                   <Users className="h-3 w-3" />
                   {memberCount} member{memberCount !== 1 ? 's' : ''}
                 </div>
-                {hasActiveContracts && (
+                {hasActiveProjects && (
                   <div className="flex items-center gap-1">
                     <AlertTriangle className="h-3 w-3 text-amber-500" />
-                    Active contracts
+                    Active projects
                   </div>
                 )}
               </div>
@@ -187,15 +187,15 @@ export function DangerZone({
               </Badge>
             </div>
 
-            {hasActiveContracts && (
+            {hasActiveProjects && (
               <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/10 rounded-lg border border-amber-200 dark:border-amber-800">
                 <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
                 <div className="text-xs text-amber-700 dark:text-amber-300">
                   <p className="font-medium">
-                    Warning: Active contracts detected
+                    Warning: Active projects detected
                   </p>
                   <p>
-                    Deleting this organization may affect ongoing contracts and
+                    Deleting this organization may affect ongoing projects and
                     business relationships.
                   </p>
                 </div>

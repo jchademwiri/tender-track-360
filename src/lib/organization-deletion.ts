@@ -1,6 +1,15 @@
 import { db } from '@/db';
-import { organization } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import {
+  organization,
+  member,
+  tender,
+  project,
+  client,
+  followUp,
+  type Organization,
+  type Member,
+} from '@/db/schema';
+import { eq, and, isNotNull, count } from 'drizzle-orm';
 
 export interface DeletionConfirmation {
   organizationName: string;
@@ -17,7 +26,7 @@ export interface DeletionValidationResult {
   warnings: string[];
   relatedDataCount: {
     tenders: number;
-    contracts: number;
+    projects: number;
     members: number;
     followUps: number;
   };
@@ -31,7 +40,7 @@ export interface OrganizationDeletionResult {
   permanentDeletionScheduledAt?: Date;
   affectedRecords: {
     tenders: number;
-    contracts: number;
+    projects: number;
     members: number;
     followUps: number;
   };
@@ -50,7 +59,7 @@ export interface SoftDeletedOrganization {
   canPermanentlyDelete: boolean;
   relatedDataCount: {
     tenders: number;
-    contracts: number;
+    projects: number;
     members: number;
     followUps: number;
   };
@@ -61,22 +70,93 @@ class OrganizationDeletionManager {
   private readonly DEFAULT_SOFT_DELETE_GRACE_PERIOD_DAYS = 30;
 
   async validateDeletionRequest(
-    _organizationId: string, // eslint-disable-line @typescript-eslint/no-unused-vars
-    _confirmation: DeletionConfirmation, // eslint-disable-line @typescript-eslint/no-unused-vars
-    _userRole: string // eslint-disable-line @typescript-eslint/no-unused-vars
+    organizationId: string,
+    _confirmation: DeletionConfirmation,
+    _userRole: string
   ): Promise<DeletionValidationResult> {
-    // TODO: Implement validation logic
-    return {
-      isValid: true,
-      errors: [],
-      warnings: [],
-      relatedDataCount: {
-        tenders: 0,
-        contracts: 0,
-        members: 0,
-        followUps: 0,
-      },
-    };
+    try {
+      // 1. Check if organization exists
+      const org = await db.query.organization.findFirst({
+        where: eq(organization.id, organizationId),
+        with: {
+          projects: true,
+        },
+      });
+
+      if (!org) {
+        return {
+          isValid: false,
+          errors: ['Organization not found'],
+          warnings: [],
+          relatedDataCount: {
+            tenders: 0,
+            projects: 0,
+            members: 0,
+            followUps: 0,
+          },
+        };
+      }
+
+      // 2. Count related data
+      const [membersCount] = await db
+        .select({ count: count() })
+        .from(member)
+        .where(eq(member.organizationId, organizationId));
+      const [tendersCount] = await db
+        .select({ count: count() })
+        .from(tender)
+        .where(eq(tender.organizationId, organizationId));
+      const [projectsCount] = await db
+        .select({ count: count() })
+        .from(project)
+        .where(eq(project.organizationId, organizationId));
+      const [followUpsCount] = await db
+        .select({ count: count() })
+        .from(followUp)
+        .where(eq(followUp.organizationId, organizationId));
+
+      const relatedDataCount = {
+        members: membersCount?.count || 0,
+        tenders: tendersCount?.count || 0,
+        projects: projectsCount?.count || 0,
+        followUps: followUpsCount?.count || 0,
+      };
+
+      // 3. Check for active interactions (contracts/projects)
+      // This maps to "Active Contracts" in the requirements
+      const activeProjects = org.projects.filter((p) => p.status === 'active');
+
+      const warnings: string[] = [];
+      if (activeProjects.length > 0) {
+        warnings.push(`There are ${activeProjects.length} active projects.`);
+      }
+
+      if (relatedDataCount.members > 1) {
+        warnings.push(
+          `There are ${relatedDataCount.members} members in this organization.`
+        );
+      }
+
+      return {
+        isValid: true,
+        errors: [],
+        warnings,
+        relatedDataCount,
+      };
+    } catch (error) {
+      console.error('Error validating deletion request:', error);
+      return {
+        isValid: false,
+        errors: ['An unexpected error occurred during validation'],
+        warnings: [],
+        relatedDataCount: {
+          tenders: 0,
+          projects: 0,
+          members: 0,
+          followUps: 0,
+        },
+      };
+    }
   }
 
   async generateDeletionToken(): Promise<string> {
@@ -88,11 +168,51 @@ class OrganizationDeletionManager {
     format: 'json' | 'csv',
     userId: string
   ): Promise<string | null> {
-    // TODO: Implement data export
-    console.log(
-      `Exporting data for organization ${organizationId} in ${format} format by user ${userId}`
-    );
-    return `https://exports.example.com/${organizationId}-${Date.now()}.${format}`;
+    try {
+      console.log(`Exporting data for org ${organizationId} by ${userId}`);
+
+      // Fetch all organization data with relations
+      const orgData = await db.query.organization.findFirst({
+        where: eq(organization.id, organizationId),
+        with: {
+          members: {
+            with: { user: true },
+          },
+          tenders: {
+            with: { client: true },
+          },
+          projects: {
+            with: { purchaseOrders: true },
+          },
+          clients: true,
+        },
+      });
+
+      if (!orgData) return null;
+
+      if (format === 'json') {
+        const jsonString = JSON.stringify(orgData, null, 2);
+        // Create a Data URI for immediate download
+        const base64Data = Buffer.from(jsonString).toString('base64');
+        return `data:application/json;base64,${base64Data}`;
+      } else {
+        // Simple CSV implementation for MVP (Organization details only)
+        // In a real app, we'd probably want multiple CSVs (zip) or a complex flattening
+        const headers = ['id', 'name', 'slug', 'createdAt'].join(',');
+        const row = [
+          orgData.id,
+          orgData.name,
+          orgData.slug,
+          orgData.createdAt,
+        ].join(',');
+        const csvContent = `${headers}\n${row}`;
+        const base64Data = Buffer.from(csvContent).toString('base64');
+        return `data:text/csv;base64,${base64Data}`;
+      }
+    } catch (error) {
+      console.error('Error exporting data', error);
+      return null;
+    }
   }
 
   async softDeleteOrganization(
@@ -112,7 +232,7 @@ class OrganizationDeletionManager {
           deletionType: 'soft',
           affectedRecords: {
             tenders: 0,
-            contracts: 0,
+            projects: 0,
             members: 0,
             followUps: 0,
           },
@@ -126,7 +246,7 @@ class OrganizationDeletionManager {
           deletionType: 'soft',
           affectedRecords: {
             tenders: 0,
-            contracts: 0,
+            projects: 0,
             members: 0,
             followUps: 0,
           },
@@ -156,14 +276,14 @@ class OrganizationDeletionManager {
         deletionId: crypto.randomUUID(),
         deletionType: 'soft',
         permanentDeletionScheduledAt: permanentDeletionDate,
-        affectedRecords: { tenders: 0, contracts: 0, members: 0, followUps: 0 },
+        affectedRecords: { tenders: 0, projects: 0, members: 0, followUps: 0 },
       };
     } catch (error) {
       console.error('Error soft deleting organization:', error);
       return {
         success: false,
         deletionType: 'soft',
-        affectedRecords: { tenders: 0, contracts: 0, members: 0, followUps: 0 },
+        affectedRecords: { tenders: 0, projects: 0, members: 0, followUps: 0 },
         error: 'Failed to delete organization',
       };
     }
@@ -174,11 +294,39 @@ class OrganizationDeletionManager {
     userId: string,
     reason?: string
   ): Promise<{ success: boolean; error?: string }> {
-    // TODO: Implement restoration logic
-    console.log(
-      `Restoring organization ${organizationId} by user ${userId} with reason: ${reason}`
-    );
-    return { success: true };
+    try {
+      console.log(
+        `Restoring organization ${organizationId} by user ${userId} with reason: ${reason}`
+      );
+
+      // Check if organization exists and is actually deleted
+      const org = await db.query.organization.findFirst({
+        where: eq(organization.id, organizationId),
+      });
+
+      if (!org) {
+        return { success: false, error: 'Organization not found' };
+      }
+
+      if (!org.deletedAt) {
+        return { success: false, error: 'Organization is not deleted' };
+      }
+
+      await db
+        .update(organization)
+        .set({
+          deletedAt: null,
+          deletedBy: null,
+          deletionReason: null,
+          permanentDeletionScheduledAt: null,
+        })
+        .where(eq(organization.id, organizationId));
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error restoring organization:', error);
+      return { success: false, error: 'Failed to restore organization' };
+    }
   }
 
   async permanentlyDeleteOrganization(
@@ -202,7 +350,7 @@ class OrganizationDeletionManager {
           deletionType: 'permanent',
           affectedRecords: {
             tenders: 0,
-            contracts: 0,
+            projects: 0,
             members: 0,
             followUps: 0,
           },
@@ -210,26 +358,47 @@ class OrganizationDeletionManager {
         };
       }
 
-      // TODO: In a real implementation, you would:
-      // 1. Delete related data (tenders, contracts, etc.)
-      // 2. Remove all members
-      // 3. Clean up any associated files/resources
-      // For now, we'll just delete the organization record
+      // 0. Use a transaction for atomicity
+      return await db.transaction(async (tx) => {
+        // 1. Delete all related data first (though cascading delete handles most references, being explicit is safer/clearer for some logic)
+        // However, with `onDelete: 'cascade'` defined in schema, deleting the organization triggers cascading deletes.
+        // Let's rely on the cascading delete for efficiency, but we'll fetch counts first to return accurate stats.
 
-      // Delete the organization permanently
-      await db.delete(organization).where(eq(organization.id, organizationId));
+        const [membersCount] = await tx
+          .select({ count: count() })
+          .from(member)
+          .where(eq(member.organizationId, organizationId));
+        const [tendersCount] = await tx
+          .select({ count: count() })
+          .from(tender)
+          .where(eq(tender.organizationId, organizationId));
+        const [projectsCount] = await tx
+          .select({ count: count() })
+          .from(project)
+          .where(eq(project.organizationId, organizationId));
 
-      return {
-        success: true,
-        deletionType: 'permanent',
-        affectedRecords: { tenders: 0, contracts: 0, members: 0, followUps: 0 },
-      };
+        // Delete the organization - this will cascade to members, projects, tenders etc.
+        await tx
+          .delete(organization)
+          .where(eq(organization.id, organizationId));
+
+        return {
+          success: true,
+          deletionType: 'permanent',
+          affectedRecords: {
+            tenders: tendersCount?.count || 0,
+            projects: projectsCount?.count || 0,
+            members: membersCount?.count || 0,
+            followUps: 0, // Cascade handles these
+          },
+        };
+      });
     } catch (error) {
       console.error('Error permanently deleting organization:', error);
       return {
         success: false,
         deletionType: 'permanent',
-        affectedRecords: { tenders: 0, contracts: 0, members: 0, followUps: 0 },
+        affectedRecords: { tenders: 0, projects: 0, members: 0, followUps: 0 },
         error: 'Failed to permanently delete organization',
       };
     }
@@ -238,9 +407,38 @@ class OrganizationDeletionManager {
   async getSoftDeletedOrganizations(
     userId: string
   ): Promise<SoftDeletedOrganization[]> {
-    // TODO: Implement getting soft deleted organizations
-    console.log(`Getting soft deleted organizations for user ${userId}`);
-    return [];
+    try {
+      const deletedOrgs = await db.query.organization.findMany({
+        where: and(
+          isNotNull(organization.deletedAt),
+          eq(organization.deletedBy, userId) // Only show orgs deleted by this user? Or maybe all deleted orgs if they are owner?
+          // Since we don't have a clear "owner" link after deletion (member table might be cleared or relations invalid),
+          // relying on `deletedBy` is a safe bet for "My Deleted Organizations"
+        ),
+      });
+
+      return deletedOrgs.map((org) => ({
+        id: org.id,
+        name: org.name,
+        deletedAt: org.deletedAt!,
+        deletedBy: org.deletedBy!,
+        deletionReason: org.deletionReason || undefined,
+        permanentDeletionScheduledAt: org.permanentDeletionScheduledAt!,
+        daysUntilPermanentDeletion: Math.max(
+          0,
+          Math.ceil(
+            (org.permanentDeletionScheduledAt!.getTime() - Date.now()) /
+              (1000 * 60 * 60 * 24)
+          )
+        ),
+        canRestore: true,
+        canPermanentlyDelete: true,
+        relatedDataCount: { tenders: 0, projects: 0, members: 0, followUps: 0 }, // Fetch real counts if needed
+      }));
+    } catch (error) {
+      console.error('Error fetching soft deleted orgs', error);
+      return [];
+    }
   }
 
   async forcePermanentDeletion(
@@ -253,7 +451,7 @@ class OrganizationDeletionManager {
       return {
         success: false,
         deletionType: 'permanent',
-        affectedRecords: { tenders: 0, contracts: 0, members: 0, followUps: 0 },
+        affectedRecords: { tenders: 0, projects: 0, members: 0, followUps: 0 },
         error: 'Only organization owners can force permanent deletion',
       };
     }
