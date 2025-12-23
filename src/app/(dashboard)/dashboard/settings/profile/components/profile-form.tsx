@@ -206,22 +206,6 @@ export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
                 )}
               />
 
-              {/* Email field - read-only for now */}
-              <div className="space-y-2">
-                <FormLabel htmlFor="email-readonly">Email Address</FormLabel>
-                <Input
-                  id="email-readonly"
-                  value={optimisticUser.email}
-                  disabled
-                  className="bg-muted"
-                  aria-describedby="email-readonly-description"
-                  readOnly
-                />
-                <FormDescription id="email-readonly-description">
-                  Email address cannot be changed from this form
-                </FormDescription>
-              </div>
-
               {isEditing && (
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 pt-4">
                   <Button

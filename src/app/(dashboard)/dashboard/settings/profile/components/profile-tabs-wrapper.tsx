@@ -71,10 +71,10 @@ export function ProfileTabsWrapper({
       tabs={createProfileTabs(
         {
           personal: (
-            <div className="grid gap-6 lg:grid-cols-2">
-              {/* Left Column - Profile & Account Info */}
-              <div className="space-y-6">
-                {/* Profile Form - Editable Profile Information */}
+            <div className="space-y-6">
+              {/* Profile Edit Card */}
+              <div className="grid gap-6">
+                {/* Main Profile Settings */}
                 <ProfileForm
                   user={{
                     id: currentUser.id,
@@ -85,103 +85,48 @@ export function ProfileTabsWrapper({
                   onSubmit={updateProfile}
                 />
 
-                {/* Account Information - Read-only details */}
-                <section aria-labelledby="account-info-heading">
+                {/* Account Details & Organization */}
+                <div className="grid gap-6 md:grid-cols-2">
+                  <OrganizationInfo membership={organizationMembership} />
+
+                  {/* Account Metadata Card */}
                   <Card>
                     <CardHeader>
-                      <CardTitle
-                        id="account-info-heading"
-                        className="flex items-center space-x-2 text-base sm:text-lg"
-                      >
-                        <Shield
-                          className="h-4 w-4 sm:h-5 sm:w-5"
-                          aria-hidden="true"
-                        />
-                        <span>Account Information</span>
+                      <CardTitle className="flex items-center space-x-2 text-base">
+                        <Shield className="h-4 w-4" aria-hidden="true" />
+                        <span>Account Access</span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                        <div className="space-y-1">
-                          <label
-                            className="text-sm font-medium text-muted-foreground"
-                            id="email-verification-label"
-                          >
-                            Email Verification Status
-                          </label>
-                          <div
-                            className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-1"
-                            aria-labelledby="email-verification-label"
-                          >
-                            <p className="text-sm sm:text-base break-all">
-                              {currentUser.email}
-                            </p>
-                            {currentUser.emailVerified ? (
-                              <Badge
-                                variant="secondary"
-                                className="text-xs w-fit"
-                                aria-label="Email verification status: verified"
-                              >
-                                Verified
-                              </Badge>
-                            ) : (
-                              <Badge
-                                variant="destructive"
-                                className="text-xs w-fit"
-                                aria-label="Email verification status: not verified"
-                              >
-                                Unverified
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                        <div className="space-y-1">
-                          <label
-                            className="text-sm font-medium text-muted-foreground"
-                            id="account-created-label"
-                          >
-                            Account Created
-                          </label>
-                          <p
-                            className="mt-1 text-sm sm:text-base"
-                            aria-labelledby="account-created-label"
-                          >
-                            {formatDate(currentUser.createdAt)}
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <label
-                            className="text-sm font-medium text-muted-foreground"
-                            id="last-updated-label"
-                          >
-                            Last Updated
-                          </label>
-                          <p
-                            className="mt-1 text-sm sm:text-base"
-                            aria-labelledby="last-updated-label"
-                          >
-                            {formatDate(currentUser.updatedAt)}
-                          </p>
-                        </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          User ID
+                        </label>
+                        <p className="font-mono text-sm bg-muted p-2 rounded-md break-all">
+                          {currentUser.id}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          Last Updated
+                        </label>
+                        <p className="text-sm">
+                          {formatDate(currentUser.updatedAt)}
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
-                </section>
-
-                {/* Organization Information */}
-                <OrganizationInfo membership={organizationMembership} />
+                </div>
               </div>
 
-              {/* Right Column - Email Settings */}
-              <div className="space-y-6">
-                {/* Email Settings */}
+              {/* Email & Security (Lower Section) */}
+              <div className="grid gap-6 md:grid-cols-2">
                 <EmailSettings
                   email={currentUser.email}
                   emailVerified={currentUser.emailVerified}
                   onResendVerification={resendVerificationEmail}
                 />
 
-                {/* Password Management */}
                 <PasswordForm onSubmit={changePassword} />
               </div>
             </div>
