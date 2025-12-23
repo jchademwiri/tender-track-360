@@ -1,7 +1,13 @@
 'use server';
 
 import { db } from '@/db';
-import { document, tender, project } from '@/db/schema';
+import {
+  document,
+  tender,
+  project,
+  organization,
+  purchaseOrder,
+} from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth';
@@ -13,7 +19,11 @@ import { nanoid } from 'nanoid';
 export async function uploadDocument(
   organizationId: string,
   formData: FormData,
-  linkedEntity?: { tenderId?: string; projectId?: string }
+  linkedEntity?: {
+    tenderId?: string;
+    projectId?: string;
+    purchaseOrderId?: string;
+  }
 ) {
   try {
     // 1. Check Session
@@ -38,8 +48,20 @@ export async function uploadDocument(
     }
 
     // 3. Determine Storage Path
+    // Fetch organization details for path construction
+    const org = await db.query.organization.findFirst({
+      where: eq(organization.id, organizationId),
+      columns: { slug: true, name: true },
+    });
+
+    const orgIdentifier = org?.slug || org?.name || 'org';
+    const safeOrgIdentifier = orgIdentifier
+      .replace(/[^a-zA-Z0-9]/g, '_')
+      .toLowerCase();
+    const orgPathSegment = `organizations/${safeOrgIdentifier}`; // Using organizations (plural)
+
     const fileExtension = file.name.split('.').pop();
-    let uniqueKey = `${organizationId}/${nanoid()}.${fileExtension}`; // Default fallback
+    let uniqueKey = `${orgPathSegment}/general/${nanoid()}.${fileExtension}`; // Fallback
 
     if (linkedEntity?.tenderId) {
       const parentTender = await db.query.tender.findFirst({
@@ -47,7 +69,7 @@ export async function uploadDocument(
         columns: { tenderNumber: true },
       });
       if (parentTender?.tenderNumber) {
-        uniqueKey = `tenders/${parentTender.tenderNumber}/${file.name}`;
+        uniqueKey = `${orgPathSegment}/tenders/${parentTender.tenderNumber}/${file.name}`;
       }
     } else if (linkedEntity?.projectId) {
       const parentProject = await db.query.project.findFirst({
@@ -55,7 +77,26 @@ export async function uploadDocument(
         columns: { projectNumber: true },
       });
       if (parentProject?.projectNumber) {
-        uniqueKey = `projects/${parentProject.projectNumber}/${file.name}`;
+        uniqueKey = `${orgPathSegment}/projects/${parentProject.projectNumber}/documents/${file.name}`;
+      }
+    } else if (linkedEntity?.purchaseOrderId) {
+      // Fetch PO and its parent project
+      const po = await db.query.purchaseOrder.findFirst({
+        where: eq(purchaseOrder.id, linkedEntity.purchaseOrderId),
+        with: {
+          project: {
+            columns: { projectNumber: true },
+          },
+        },
+      });
+
+      if (po && po.project?.projectNumber) {
+        // Path: organizations/[slug]/projects/[num]/purchase-orders/[month]/[po-num]/filename
+        const poDate = po.poDate ? new Date(po.poDate) : new Date();
+        const monthFolder = poDate.toISOString().slice(0, 7); // YYYY-MM
+        const poFolder = po.poNumber;
+
+        uniqueKey = `${orgPathSegment}/projects/${po.project.projectNumber}/purchase-orders/${monthFolder}/${poFolder}/${file.name}`;
       }
     }
 
@@ -82,6 +123,7 @@ export async function uploadDocument(
         type: file.type,
         tenderId: linkedEntity?.tenderId,
         projectId: linkedEntity?.projectId,
+        purchaseOrderId: linkedEntity?.purchaseOrderId,
         uploadedBy: userId,
       })
       .returning();
@@ -89,8 +131,14 @@ export async function uploadDocument(
     // 6. Revalidate
     if (linkedEntity?.tenderId) {
       revalidatePath(`/dashboard/tenders/${linkedEntity.tenderId}`);
+    } else if (linkedEntity?.projectId) {
+      revalidatePath(`/dashboard/projects/${linkedEntity.projectId}`);
+    } else if (linkedEntity?.purchaseOrderId) {
+      // Assuming route for PO details
+      revalidatePath(
+        `/dashboard/projects/purchase-orders/${linkedEntity.purchaseOrderId}`
+      );
     }
-    // if projectId...
 
     return { success: true, document: newDocument[0] };
   } catch (error) {
