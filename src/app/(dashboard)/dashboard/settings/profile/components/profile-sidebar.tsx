@@ -34,6 +34,7 @@ import {
   Save,
   X,
   Loader2,
+  Clock,
 } from 'lucide-react';
 import { AvatarUpload } from './avatar-upload';
 import { updateUserImage } from '@/server/users';
@@ -69,6 +70,7 @@ interface User {
   image: string | null;
   emailVerified: boolean;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 interface ProfileSidebarProps {
@@ -326,6 +328,21 @@ export function ProfileSidebar({
               </p>
               <p className="text-sm font-semibold">
                 {formatDate(currentUser.createdAt)}
+              </p>
+            </div>
+          </div>
+
+          {/* Last Updated */}
+          <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              <Clock className="h-4 w-4" />
+            </div>
+            <div className="text-left space-y-0.5">
+              <p className="text-xs font-medium text-muted-foreground">
+                Last Updated
+              </p>
+              <p className="text-sm font-semibold">
+                {formatDate(currentUser.updatedAt)}
               </p>
             </div>
           </div>
