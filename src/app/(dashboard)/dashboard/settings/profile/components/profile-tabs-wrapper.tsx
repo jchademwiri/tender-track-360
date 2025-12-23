@@ -50,7 +50,10 @@ export function ProfileTabsWrapper({
           personal: (
             <div className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
-                <OrganizationInfo membership={organizationMembership} />
+                <OrganizationInfo
+                  membership={organizationMembership}
+                  userUpdatedAt={currentUser.updatedAt}
+                />
                 <PasswordForm onSubmit={changePassword} />
               </div>
             </div>
