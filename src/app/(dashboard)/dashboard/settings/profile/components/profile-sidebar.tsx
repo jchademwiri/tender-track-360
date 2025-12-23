@@ -315,67 +315,6 @@ export function ProfileSidebar({
             </Badge>
           )}
         </div>
-
-        <div className="grid grid-cols-1 gap-4 pt-4 border-t border-border">
-          {/* Member Since */}
-          <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              <CalendarDays className="h-4 w-4" />
-            </div>
-            <div className="text-left space-y-0.5">
-              <p className="text-xs font-medium text-muted-foreground">
-                Member Since
-              </p>
-              <p className="text-sm font-semibold">
-                {formatDate(currentUser.createdAt)}
-              </p>
-            </div>
-          </div>
-
-          {/* Last Updated */}
-          <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              <Clock className="h-4 w-4" />
-            </div>
-            <div className="text-left space-y-0.5">
-              <p className="text-xs font-medium text-muted-foreground">
-                Last Updated
-              </p>
-              <p className="text-sm font-semibold">
-                {formatDate(currentUser.updatedAt)}
-              </p>
-            </div>
-          </div>
-
-          {/* Organization Info */}
-          {organizationMembership ? (
-            <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
-              <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600">
-                <Building2 className="h-4 w-4" />
-              </div>
-              <div className="text-left space-y-0.5 w-full overflow-hidden">
-                <p className="text-xs font-medium text-muted-foreground">
-                  Organization
-                </p>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold truncate pr-2">
-                    {organizationMembership.organization.name}
-                  </p>
-                  <Badge
-                    variant="secondary"
-                    className="text-[10px] uppercase font-bold px-1.5 h-5"
-                  >
-                    {organizationMembership.role}
-                  </Badge>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center p-3 rounded-lg border border-dashed text-muted-foreground text-sm">
-              No Active Organization
-            </div>
-          )}
-        </div>
       </CardContent>
     </Card>
   );
