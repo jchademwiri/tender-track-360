@@ -70,6 +70,7 @@ export default async function ProfileSettingsPage() {
             <ProfileSidebar
               currentUser={currentUser}
               organizationMembership={organizationMembership}
+              updateProfile={updateProfile}
             />
           </aside>
 
@@ -79,7 +80,6 @@ export default async function ProfileSettingsPage() {
               currentUser={currentUser}
               organizationMembership={organizationMembership}
               userSessions={userSessions}
-              updateProfile={updateProfile}
               resendVerificationEmail={handleResendVerification}
               changePassword={changePassword}
             />
