@@ -350,6 +350,12 @@ export const document = pgTable('document', {
   projectId: text('project_id').references(() => project.id, {
     onDelete: 'cascade',
   }),
+  purchaseOrderId: text('purchase_order_id').references(
+    () => purchaseOrder.id,
+    {
+      onDelete: 'cascade',
+    }
+  ),
   uploadedBy: text('uploaded_by')
     .notNull()
     .references(() => user.id),
@@ -550,6 +556,10 @@ export const documentRelations = relations(document, ({ one }) => ({
   project: one(project, {
     fields: [document.projectId],
     references: [project.id],
+  }),
+  purchaseOrder: one(purchaseOrder, {
+    fields: [document.purchaseOrderId],
+    references: [purchaseOrder.id],
   }),
   uploader: one(user, {
     fields: [document.uploadedBy],
