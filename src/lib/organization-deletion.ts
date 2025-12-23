@@ -5,7 +5,7 @@ import {
   tender,
   project,
   client,
-  followUp,
+  tenderExtension,
   type Organization,
   type Member,
 } from '@/db/schema';
@@ -28,7 +28,7 @@ export interface DeletionValidationResult {
     tenders: number;
     projects: number;
     members: number;
-    followUps: number;
+    extensions: number;
   };
 }
 
@@ -42,7 +42,7 @@ export interface OrganizationDeletionResult {
     tenders: number;
     projects: number;
     members: number;
-    followUps: number;
+    extensions: number;
   };
   error?: string;
 }
@@ -61,7 +61,7 @@ export interface SoftDeletedOrganization {
     tenders: number;
     projects: number;
     members: number;
-    followUps: number;
+    extensions: number;
   };
 }
 
@@ -92,7 +92,7 @@ class OrganizationDeletionManager {
             tenders: 0,
             projects: 0,
             members: 0,
-            followUps: 0,
+            extensions: 0,
           },
         };
       }
@@ -110,16 +110,16 @@ class OrganizationDeletionManager {
         .select({ count: count() })
         .from(project)
         .where(eq(project.organizationId, organizationId));
-      const [followUpsCount] = await db
+      const [extensionsCount] = await db
         .select({ count: count() })
-        .from(followUp)
-        .where(eq(followUp.organizationId, organizationId));
+        .from(tenderExtension)
+        .where(eq(tenderExtension.organizationId, organizationId));
 
       const relatedDataCount = {
         members: membersCount?.count || 0,
         tenders: tendersCount?.count || 0,
         projects: projectsCount?.count || 0,
-        followUps: followUpsCount?.count || 0,
+        extensions: extensionsCount?.count || 0,
       };
 
       // 3. Check for active interactions (contracts/projects)
@@ -153,7 +153,7 @@ class OrganizationDeletionManager {
           tenders: 0,
           projects: 0,
           members: 0,
-          followUps: 0,
+          extensions: 0,
         },
       };
     }
@@ -234,7 +234,7 @@ class OrganizationDeletionManager {
             tenders: 0,
             projects: 0,
             members: 0,
-            followUps: 0,
+            extensions: 0,
           },
           error: 'Organization not found',
         };
@@ -248,7 +248,7 @@ class OrganizationDeletionManager {
             tenders: 0,
             projects: 0,
             members: 0,
-            followUps: 0,
+            extensions: 0,
           },
           error: 'Organization is already deleted',
         };
@@ -276,14 +276,14 @@ class OrganizationDeletionManager {
         deletionId: crypto.randomUUID(),
         deletionType: 'soft',
         permanentDeletionScheduledAt: permanentDeletionDate,
-        affectedRecords: { tenders: 0, projects: 0, members: 0, followUps: 0 },
+        affectedRecords: { tenders: 0, projects: 0, members: 0, extensions: 0 },
       };
     } catch (error) {
       console.error('Error soft deleting organization:', error);
       return {
         success: false,
         deletionType: 'soft',
-        affectedRecords: { tenders: 0, projects: 0, members: 0, followUps: 0 },
+        affectedRecords: { tenders: 0, projects: 0, members: 0, extensions: 0 },
         error: 'Failed to delete organization',
       };
     }
@@ -352,7 +352,7 @@ class OrganizationDeletionManager {
             tenders: 0,
             projects: 0,
             members: 0,
-            followUps: 0,
+            extensions: 0,
           },
           error: 'Organization not found',
         };
@@ -389,7 +389,7 @@ class OrganizationDeletionManager {
             tenders: tendersCount?.count || 0,
             projects: projectsCount?.count || 0,
             members: membersCount?.count || 0,
-            followUps: 0, // Cascade handles these
+            extensions: 0, // Cascade handles these
           },
         };
       });
@@ -398,7 +398,7 @@ class OrganizationDeletionManager {
       return {
         success: false,
         deletionType: 'permanent',
-        affectedRecords: { tenders: 0, projects: 0, members: 0, followUps: 0 },
+        affectedRecords: { tenders: 0, projects: 0, members: 0, extensions: 0 },
         error: 'Failed to permanently delete organization',
       };
     }
@@ -433,7 +433,12 @@ class OrganizationDeletionManager {
         ),
         canRestore: true,
         canPermanentlyDelete: true,
-        relatedDataCount: { tenders: 0, projects: 0, members: 0, followUps: 0 }, // Fetch real counts if needed
+        relatedDataCount: {
+          tenders: 0,
+          projects: 0,
+          members: 0,
+          extensions: 0,
+        }, // Fetch real counts if needed
       }));
     } catch (error) {
       console.error('Error fetching soft deleted orgs', error);
@@ -451,7 +456,7 @@ class OrganizationDeletionManager {
       return {
         success: false,
         deletionType: 'permanent',
-        affectedRecords: { tenders: 0, projects: 0, members: 0, followUps: 0 },
+        affectedRecords: { tenders: 0, projects: 0, members: 0, extensions: 0 },
         error: 'Only organization owners can force permanent deletion',
       };
     }

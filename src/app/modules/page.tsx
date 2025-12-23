@@ -63,8 +63,8 @@ export default function ModuleDiagram() {
       name: 'Tender Management',
       icon: FileText,
       accent: 'tender',
-      tables: ['tender', 'followUp'],
-      description: 'Tenders, follow-ups',
+      tables: ['tender', 'tenderExtension'],
+      description: 'Tenders, extensions',
     },
     {
       name: 'Project Management',
