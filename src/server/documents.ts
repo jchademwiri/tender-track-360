@@ -65,7 +65,21 @@ export async function uploadDocument(
     const fileExtension = file.name.split('.').pop();
     let uniqueKey = `${orgPathSegment}/general/${nanoid()}.${fileExtension}`; // Fallback
 
-    if (linkedEntity?.tenderId) {
+    if (linkedEntity?.extensionId) {
+      // Fetch Extension and its parent Tender
+      const ext = await db.query.tenderExtension.findFirst({
+        where: eq(tenderExtension.id, linkedEntity.extensionId),
+        with: {
+          tender: {
+            columns: { tenderNumber: true },
+          },
+        },
+      });
+
+      if (ext && ext.tender?.tenderNumber) {
+        uniqueKey = `${orgPathSegment}/tenders/${ext.tender.tenderNumber}/extensions/${file.name}`;
+      }
+    } else if (linkedEntity?.tenderId) {
       const parentTender = await db.query.tender.findFirst({
         where: eq(tender.id, linkedEntity.tenderId),
         columns: { tenderNumber: true },

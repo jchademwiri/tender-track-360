@@ -79,7 +79,15 @@ export async function createTenderExtension(
     // 4. Handle File Upload
     const file = formData.get('file');
     if (file && file instanceof File && file.size > 0) {
-      const uploadResult = await uploadDocument(organizationId, formData, {
+      // Prefix filename with "Extension - " as requested
+      const extensionPrefix = 'Extension - ';
+      const newFileName = `${extensionPrefix}${file.name}`;
+      const newFile = new File([file], newFileName, { type: file.type });
+
+      const newFormData = new FormData();
+      newFormData.append('file', newFile);
+
+      const uploadResult = await uploadDocument(organizationId, newFormData, {
         tenderId: validatedData.tenderId,
         extensionId: extensionId,
       });
