@@ -545,16 +545,15 @@ export async function updateOrganizationLogo(
     const fileExtension = file.name.split('.').pop() || 'jpg';
 
     // Fetch organization details (name for path, logo for cleanup)
-    const orgDetailsResult = await db
-      .select({
-        name: organization.name,
-        logo: organization.logo,
-      })
-      .from(organization)
-      .where(eq(organization.id, organizationId))
-      .limit(1);
-
-    const orgDetails = orgDetailsResult[0];
+    // Fetch organization details (name for path, logo for cleanup, slug for folder)
+    const orgDetails = await db.query.organization.findFirst({
+      where: eq(organization.id, organizationId),
+      columns: {
+        name: true,
+        logo: true,
+        slug: true,
+      },
+    });
 
     // Sanitize org name for folder path
     const orgIdentifier = orgDetails?.slug || orgDetails?.name || 'org';
