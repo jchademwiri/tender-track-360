@@ -6,7 +6,7 @@ import {
   member,
   type Role,
 } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc, lt, or } from 'drizzle-orm';
 import { Resend } from 'resend';
 import OwnershipTransferEmail from '@/emails/ownership-transfer';
 import { env } from '@/env';
@@ -193,7 +193,7 @@ class OwnershipTransferManager {
     acceptingUserId: string
   ): Promise<OwnershipTransferResult> {
     try {
-      return await db.transaction(async (tx) => {
+      const result = await db.transaction(async (tx) => {
         // 1. Get Transfer Record
         const transfer = await tx.query.ownershipTransfer.findFirst({
           where: eq(ownershipTransfer.id, transferId),
@@ -264,6 +264,13 @@ class OwnershipTransferManager {
           transferId,
         };
       });
+
+      // Send emails after transaction commits
+      if (result.success && result.transferId) {
+        await this.sendTransferCompletionEmails(result.transferId);
+      }
+
+      return result;
     } catch (error) {
       console.error('Error accepting ownership transfer:', error);
       return {
@@ -311,6 +318,8 @@ class OwnershipTransferManager {
         .set({ status: 'cancelled', cancelledAt: new Date() })
         .where(eq(ownershipTransfer.id, transferId));
 
+      await this.sendTransferCancellationEmails(transferId);
+
       return {
         success: true,
         transferId,
@@ -351,47 +360,203 @@ class OwnershipTransferManager {
   }
 
   async getPendingTransfers(userId: string): Promise<PendingTransfer[]> {
-    // TODO: Implement getting pending transfers
-    console.log(`Getting pending transfers for user ${userId}`);
-    return [];
+    try {
+      // Find transfers where user is either sender or recipient
+      const transfers = await db.query.ownershipTransfer.findMany({
+        where: and(
+          eq(ownershipTransfer.status, 'pending'),
+          or(
+            eq(ownershipTransfer.fromUserId, userId),
+            eq(ownershipTransfer.toUserId, userId)
+          )
+        ),
+        with: {
+          organization: true,
+          fromUser: true,
+          toUser: true,
+        },
+        orderBy: [desc(ownershipTransfer.createdAt)],
+      });
+
+      return transfers.map((t) => ({
+        id: t.id,
+        organizationId: t.organizationId,
+        organizationName: t.organization.name,
+        fromUserId: t.fromUserId,
+        fromUserName: t.fromUser.name,
+        fromUserEmail: t.fromUser.email,
+        toUserId: t.toUserId,
+        toUserName: t.toUser.name,
+        toUserEmail: t.toUser.email,
+        status: t.status as 'pending' | 'accepted' | 'cancelled' | 'expired',
+        createdAt: t.createdAt,
+        expiresAt: t.expiresAt,
+        transferMessage: t.transferMessage || undefined,
+        reason: t.reason || undefined,
+      }));
+    } catch (error) {
+      console.error('Error getting pending transfers', error);
+      return [];
+    }
   }
 
   async getTransferByToken(token: string): Promise<PendingTransfer | null> {
-    // TODO: Implement getting transfer by token
-    console.log(`Getting transfer by token: ${token}`);
-    return null;
+    try {
+      const transfer = await db.query.ownershipTransfer.findFirst({
+        where: eq(ownershipTransfer.transferToken, token),
+        with: {
+          organization: true,
+          fromUser: true,
+          toUser: true,
+        },
+      });
+
+      if (!transfer) return null;
+
+      return {
+        id: transfer.id,
+        organizationId: transfer.organizationId,
+        organizationName: transfer.organization.name,
+        fromUserId: transfer.fromUserId,
+        fromUserName: transfer.fromUser.name,
+        fromUserEmail: transfer.fromUser.email,
+        toUserId: transfer.toUserId,
+        toUserName: transfer.toUser.name,
+        toUserEmail: transfer.toUser.email,
+        status: transfer.status as
+          | 'pending'
+          | 'accepted'
+          | 'cancelled'
+          | 'expired',
+        createdAt: transfer.createdAt,
+        expiresAt: transfer.expiresAt,
+        transferMessage: transfer.transferMessage || undefined,
+        reason: transfer.reason || undefined,
+      };
+    } catch (error) {
+      console.error('Error getting transfer by token:', error);
+      return null;
+    }
   }
 
   async getTransferHistory(organizationId: string): Promise<PendingTransfer[]> {
-    // TODO: Implement getting transfer history
-    console.log(`Getting transfer history for organization: ${organizationId}`);
-    return [];
+    try {
+      // Only show history for the organization
+      const transfers = await db.query.ownershipTransfer.findMany({
+        where: eq(ownershipTransfer.organizationId, organizationId),
+        with: {
+          organization: true,
+          fromUser: true,
+          toUser: true,
+        },
+        orderBy: [desc(ownershipTransfer.createdAt)],
+      });
+
+      return transfers.map((t) => ({
+        id: t.id,
+        organizationId: t.organizationId,
+        organizationName: t.organization.name,
+        fromUserId: t.fromUserId,
+        fromUserName: t.fromUser.name,
+        fromUserEmail: t.fromUser.email,
+        toUserId: t.toUserId,
+        toUserName: t.toUser.name,
+        toUserEmail: t.toUser.email,
+        status: t.status as 'pending' | 'accepted' | 'cancelled' | 'expired',
+        createdAt: t.createdAt,
+        expiresAt: t.expiresAt,
+        transferMessage: t.transferMessage || undefined,
+        reason: t.reason || undefined,
+      }));
+    } catch (error) {
+      console.error('Error getting transfer history:', error);
+      return [];
+    }
   }
 
   async expireOldTransfers(): Promise<void> {
-    // TODO: Implement expiring old transfers
-    console.log('Expiring old transfers');
+    try {
+      await db
+        .update(ownershipTransfer)
+        .set({ status: 'expired' })
+        .where(
+          and(
+            eq(ownershipTransfer.status, 'pending'),
+            lt(ownershipTransfer.expiresAt, new Date())
+          )
+        );
+    } catch (error) {
+      console.error('Error expiring old transfers:', error);
+    }
   }
 
   private async sendTransferNotificationEmail(
     transferId: string
   ): Promise<void> {
-    // TODO: Implement email notification
+    // Already handled in initiateOwnershipTransfer, but good for retries
     console.log(`Sending transfer notification email for: ${transferId}`);
   }
 
   private async sendTransferCompletionEmails(
     transferId: string
   ): Promise<void> {
-    // TODO: Implement completion emails
-    console.log(`Sending transfer completion emails for: ${transferId}`);
+    try {
+      const transfer = await db.query.ownershipTransfer.findFirst({
+        where: eq(ownershipTransfer.id, transferId),
+        with: {
+          organization: true,
+          fromUser: true,
+          toUser: true,
+        },
+      });
+
+      if (!transfer) return;
+
+      // Notify New Owner
+      await resend.emails.send({
+        from: 'Tender Track 360 <hello@contact.tendertrack360.co.za>',
+        to: transfer.toUser.email,
+        subject: `Ownership Transferred: ${transfer.organization.name}`,
+        html: `<p>Congratulations! You are now the owner of <strong>${transfer.organization.name}</strong>.</p>`,
+      });
+
+      // Notify Old Owner
+      await resend.emails.send({
+        from: 'Tender Track 360 <hello@contact.tendertrack360.co.za>',
+        to: transfer.fromUser.email, // Assuming fromUser still has access or we just email them
+        subject: `Ownership Transfer Complete: ${transfer.organization.name}`,
+        html: `<p>You have successfully transferred ownership of <strong>${transfer.organization.name}</strong> to ${transfer.toUser.name}.</p>`,
+      });
+    } catch (error) {
+      console.error('Failed to send transfer completion emails:', error);
+    }
   }
 
   private async sendTransferCancellationEmails(
     transferId: string
   ): Promise<void> {
-    // TODO: Implement cancellation emails
-    console.log(`Sending transfer cancellation emails for: ${transferId}`);
+    try {
+      const transfer = await db.query.ownershipTransfer.findFirst({
+        where: eq(ownershipTransfer.id, transferId),
+        with: {
+          organization: true,
+          toUser: true,
+          fromUser: true, // Needed for logging or notifying initiator if they didn't cancel?
+        },
+      });
+
+      if (!transfer) return;
+
+      // Notify intended recipient that it was cancelled
+      await resend.emails.send({
+        from: 'Tender Track 360 <hello@contact.tendertrack360.co.za>',
+        to: transfer.toUser.email,
+        subject: `Ownership Transfer Cancelled: ${transfer.organization.name}`,
+        html: `<p>The ownership transfer request for <strong>${transfer.organization.name}</strong> has been cancelled.</p>`,
+      });
+    } catch (error) {
+      console.error('Failed to send transfer cancellation emails:', error);
+    }
   }
 }
 
