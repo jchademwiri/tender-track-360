@@ -368,6 +368,9 @@ export const document = pgTable('document', {
 ========================= */
 export const organizationRelations = relations(organization, ({ many }) => ({
   members: many(member),
+  projects: many(project),
+  tenders: many(tender),
+  clients: many(client),
 }));
 
 export const memberRelations = relations(member, ({ one }) => ({

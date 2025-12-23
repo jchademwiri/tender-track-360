@@ -427,7 +427,7 @@ export function SecurityTab({
           userRole={userRole}
           organizationName={organization.name}
           memberCount={organization.memberCount}
-          hasActiveContracts={false} // TODO: Get real contract data
+          hasActiveProjects={false} // TODO: Get real project data
         />
       )}
     </div>
