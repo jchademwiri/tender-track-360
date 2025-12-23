@@ -104,7 +104,7 @@ export function DocumentManager({
         </CardHeader>
         <CardContent className="space-y-4">
           <FileUploader
-            onFilesSelected={handleUpload}
+            onValueChange={handleUpload}
             disabled={uploading || isPending}
             maxFiles={5}
           />
