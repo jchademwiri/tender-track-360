@@ -20,6 +20,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Edit, Save, X, Loader2 } from 'lucide-react';
 import { AvatarUpload } from './avatar-upload';
+import { updateUserImage } from '@/server/users';
 
 // Validation schema for profile form
 const profileFormSchema = z.object({
@@ -115,8 +116,9 @@ export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
   };
 
   const handleImageChange = (imageUrl: string | null) => {
-    updateOptimisticUser({ image: imageUrl });
-    // In a real app, you would also update the image on the server here
+    startTransition(() => {
+      updateOptimisticUser({ image: imageUrl });
+    });
   };
 
   const handleImageRemove = () => {
@@ -127,6 +129,12 @@ export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
   const handleCancel = () => {
     form.reset({ name: user.name }); // Reset to original values
     setIsEditing(false);
+  };
+
+  const handleUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return await updateUserImage(formData);
   };
 
   return (
@@ -171,6 +179,7 @@ export function ProfileForm({ user, onSubmit }: ProfileFormProps) {
                   onImageChange={handleImageChange}
                   onImageRemove={handleImageRemove}
                   disabled={isPending}
+                  uploadAction={handleUpload}
                 />
               </div>
               <FormField

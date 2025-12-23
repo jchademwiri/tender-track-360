@@ -38,6 +38,8 @@ import {
   TenderCreateSchema,
   type TenderCreateInput,
 } from '@/lib/validations/tender';
+import { FileUploader } from '@/components/ui/file-uploader';
+import { uploadDocument } from '@/server/documents';
 
 interface TenderWithClient {
   id: string;
@@ -76,6 +78,7 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
   const [loadingClients, setLoadingClients] = useState(true);
 
   const form = useForm<TenderCreateInput>({
@@ -126,6 +129,23 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
         }
 
         if (result?.success) {
+          // Upload files if any
+          if (files.length > 0) {
+            const entityId = mode === 'create' ? result.tender?.id : tender?.id;
+
+            if (entityId) {
+              await Promise.all(
+                files.map(async (file) => {
+                  const formData = new FormData();
+                  formData.append('file', file);
+                  await uploadDocument(organizationId, formData, {
+                    tenderId: entityId,
+                  });
+                })
+              );
+            }
+          }
+
           router.push('/dashboard/tenders');
           router.refresh();
         } else {
@@ -401,6 +421,37 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
               </CardContent>
             </Card>
           </div>
+
+          {/* Documents */}
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center text-lg">
+                <FileText className="h-5 w-5 mr-2 text-purple-600" />
+                Documents
+              </CardTitle>
+              <p className="text-sm text-muted-foreground mt-2">
+                Upload tender documents, specifications, or requirements (PDF,
+                Word, Excel, Images)
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6 p-6">
+              <FileUploader
+                value={files}
+                onValueChange={setFiles}
+                maxFiles={10}
+                accept={{
+                  'application/pdf': ['.pdf'],
+                  'image/*': ['.png', '.jpg', '.jpeg', '.webp'],
+                  'application/msword': ['.doc'],
+                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                    ['.docx'],
+                  'application/vnd.ms-excel': ['.xls'],
+                  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                    ['.xlsx'],
+                }}
+              />
+            </CardContent>
+          </Card>
 
           {/* Form Actions */}
           <div className="flex items-center rounded-lg justify-end space-x-4 pt-8 border-t bg-card px-6 py-6">

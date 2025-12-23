@@ -139,6 +139,22 @@ export const notificationPreferences = pgTable('notification_preferences', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const notification = pgTable('notification', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  message: text('message').notNull(),
+  type: text('type').default('info').notNull(), // info, success, warning, error
+  read: boolean('read').default(false).notNull(),
+  link: text('link'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 /* =========================
    OWNERSHIP TRANSFER
 ========================= */
@@ -318,6 +334,28 @@ export const followUp = pgTable('follow_up', {
   deletedAt: timestamp('deleted_at'), // Soft deletion
 });
 
+// Document table for file attachments
+export const document = pgTable('document', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id')
+    .notNull()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  url: text('url').notNull(),
+  size: text('size').notNull(), // String to store bytes size
+  type: text('type').notNull(), // MIME type
+  tenderId: text('tender_id').references(() => tender.id, {
+    onDelete: 'cascade',
+  }),
+  projectId: text('project_id').references(() => project.id, {
+    onDelete: 'cascade',
+  }),
+  uploadedBy: text('uploaded_by')
+    .notNull()
+    .references(() => user.id),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 /* =========================
    RELATIONS
    ⚠️ Moved here AFTER all tables are defined
@@ -350,6 +388,7 @@ export const invitationRelations = relations(invitation, ({ one }) => ({
 
 export type NotificationPreferences =
   typeof notificationPreferences.$inferSelect;
+export type Notification = typeof notification.$inferSelect;
 
 export type OwnershipTransfer = typeof ownershipTransfer.$inferSelect;
 export type SecurityAuditLog = typeof securityAuditLog.$inferSelect;
@@ -361,6 +400,7 @@ export type Tender = typeof tender.$inferSelect;
 export type Project = typeof project.$inferSelect;
 export type PurchaseOrder = typeof purchaseOrder.$inferSelect;
 export type FollowUp = typeof followUp.$inferSelect;
+export type Document = typeof document.$inferSelect;
 
 // Notification Preferences Relations
 export const notificationPreferencesRelations = relations(
@@ -372,6 +412,17 @@ export const notificationPreferencesRelations = relations(
     }),
   })
 );
+
+export const notificationRelations = relations(notification, ({ one }) => ({
+  user: one(user, {
+    fields: [notification.userId],
+    references: [user.id],
+  }),
+  organization: one(organization, {
+    fields: [notification.organizationId],
+    references: [organization.id],
+  }),
+}));
 
 // Ownership Transfer Relations
 export const ownershipTransferRelations = relations(
@@ -487,6 +538,25 @@ export const followUpRelations = relations(followUp, ({ one }) => ({
   }),
 }));
 
+export const documentRelations = relations(document, ({ one }) => ({
+  organization: one(organization, {
+    fields: [document.organizationId],
+    references: [organization.id],
+  }),
+  tender: one(tender, {
+    fields: [document.tenderId],
+    references: [tender.id],
+  }),
+  project: one(project, {
+    fields: [document.projectId],
+    references: [project.id],
+  }),
+  uploader: one(user, {
+    fields: [document.uploadedBy],
+    references: [user.id],
+  }),
+}));
+
 /* =========================
    EXPORT SCHEMA
 ========================= */
@@ -499,6 +569,7 @@ export const schema = {
   member,
   invitation,
   notificationPreferences,
+  notification,
   ownershipTransfer,
   securityAuditLog,
   sessionTracking,
@@ -508,11 +579,13 @@ export const schema = {
   project,
   purchaseOrder,
   followUp,
+  document,
   // Relations
   organizationRelations,
   memberRelations,
   invitationRelations,
   notificationPreferencesRelations,
+  notificationRelations,
   ownershipTransferRelations,
   securityAuditLogRelations,
   sessionTrackingRelations,
@@ -522,6 +595,7 @@ export const schema = {
   projectRelations,
   purchaseOrderRelations,
   followUpRelations,
+  documentRelations,
   // Other
   waitlist,
 };
