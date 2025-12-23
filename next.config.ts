@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
   experimental: {
     // Enhanced Server and Client Actions
     serverActions: {
-      bodySizeLimit: '2mb',
+      bodySizeLimit: '5mb',
     },
     // Optimized Module Resolution
     optimizePackageImports: [

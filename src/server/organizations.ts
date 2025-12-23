@@ -10,6 +10,9 @@ import { eq, inArray, and, isNull } from 'drizzle-orm';
 import { count } from 'drizzle-orm';
 import { desc } from 'drizzle-orm';
 import { getCurrentUser } from './users';
+import { StorageService } from '@/lib/storage';
+import { nanoid } from 'nanoid';
+import { revalidatePath } from 'next/cache';
 
 // Enhanced organization data with member counts and user roles
 export interface OrganizationWithStats extends Organization {
@@ -104,11 +107,17 @@ export async function getActiveOrganizations(): Promise<
 
         const memberCount = memberCountResult[0]?.count || 0;
 
+        let logoUrl = membership.organization.logo;
+        if (logoUrl && !logoUrl.startsWith('http')) {
+          logoUrl = await StorageService.getSignedUrl(logoUrl);
+        }
+
         return {
           ...membership.organization,
+          logo: logoUrl,
           memberCount,
           userRole: membership.role as Role,
-          lastActivity: membership.organization.createdAt, // Placeholder for now
+          lastActivity: membership.organization.createdAt,
         };
       })
     );
@@ -236,6 +245,16 @@ export async function getOrganizationBySlugWithUserRole(slug: string) {
       .where(eq(member.organizationId, organizationBySlug.id));
 
     const memberCount = memberCountResult[0]?.count || 0;
+
+    // Generate signed URL for logo if it exists
+    if (
+      organizationBySlug.logo &&
+      !organizationBySlug.logo.startsWith('http')
+    ) {
+      organizationBySlug.logo = await StorageService.getSignedUrl(
+        organizationBySlug.logo
+      );
+    }
 
     return {
       ...organizationBySlug,
@@ -483,5 +502,107 @@ export async function getPendingInvitations(
   } catch (error) {
     console.error('Error fetching pending invitations:', error);
     throw new Error('Failed to fetch pending invitations');
+  }
+}
+
+export async function updateOrganizationLogo(
+  organizationId: string,
+  formData: FormData
+) {
+  try {
+    const { currentUser } = await getCurrentUser();
+
+    if (!currentUser?.id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    // Verify user has access to this organization and has appropriate role
+    const userMembership = await getUserOrganizationMembership(
+      currentUser.id,
+      organizationId
+    );
+
+    if (!userMembership || !['owner', 'admin'].includes(userMembership.role)) {
+      return { success: false, error: 'Insufficient permissions' };
+    }
+
+    const file = formData.get('file') as File;
+    if (!file) {
+      return { success: false, error: 'No file provided' };
+    }
+
+    // specific validation for images
+    if (!file.type.startsWith('image/')) {
+      return { success: false, error: 'File must be an image' };
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      return { success: false, error: 'File size must be less than 5MB' };
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const fileExtension = file.name.split('.').pop() || 'jpg';
+
+    // Fetch organization details (name for path, logo for cleanup)
+    // Fetch organization details (name for path, logo for cleanup, slug for folder)
+    const orgDetails = await db.query.organization.findFirst({
+      where: eq(organization.id, organizationId),
+      columns: {
+        name: true,
+        logo: true,
+        slug: true,
+      },
+    });
+
+    // Sanitize org name for folder path
+    const orgIdentifier = orgDetails?.slug || orgDetails?.name || 'org';
+    const safeIdentifier = orgIdentifier
+      .replace(/[^a-zA-Z0-9]/g, '_')
+      .toLowerCase();
+    const timestamp = Date.now();
+    const uniqueKey = `organizations/${safeIdentifier}/logo/logo-${timestamp}.${fileExtension}`;
+
+    const storageKey = await StorageService.uploadFile(
+      buffer,
+      uniqueKey,
+      file.type
+    );
+
+    // Update organization record
+    await db
+      .update(organization)
+      .set({ logo: storageKey })
+      .where(eq(organization.id, organizationId));
+
+    // Cleanup: Delete old logo if it exists (perform AFTER successful upload and DB update)
+    if (orgDetails?.logo && !orgDetails.logo.startsWith('http')) {
+      try {
+        await StorageService.deleteFile(orgDetails.logo);
+      } catch (e) {
+        console.error('Failed to delete old organization logo:', e);
+        // Do not fail the request if cleanup fails, as the new logo is already live
+      }
+    }
+
+    revalidatePath(`/dashboard/organization/${organizationId}/settings`); // Revalidate settings page
+    revalidatePath('/dashboard/organization'); // Revalidate list
+    revalidatePath('/dashboard'); // Revalidate sidebar potentially
+
+    // Return signed URL for immediate display
+    const signedUrl = await StorageService.getSignedUrl(storageKey);
+
+    return { success: true, imageUrl: signedUrl };
+  } catch (error) {
+    console.error('Error updating organization logo:', error);
+    if (error instanceof Error) {
+      console.error('Stack:', error.stack);
+    }
+    return {
+      success: false,
+      error:
+        'Failed to update organization logo: ' +
+        (error instanceof Error ? error.message : String(error)),
+    };
   }
 }

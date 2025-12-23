@@ -1,6 +1,9 @@
 import { getCurrentUser } from '@/server';
 import { getPurchaseOrderById } from '@/server/purchase-orders';
 import { PODetails } from '@/components/purchase-orders/po-details';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,9 +11,25 @@ interface PurchaseOrderPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function PurchaseOrderPage({ params }: PurchaseOrderPageProps) {
+export default async function PurchaseOrderPage({
+  params,
+}: PurchaseOrderPageProps) {
   const { id } = await params;
   const { session } = await getCurrentUser();
+
+  // Check permissions
+  const { success: hasPermission } = await auth.api.hasPermission({
+    headers: await headers(),
+    body: {
+      permissions: {
+        purchase_order: ['read'],
+      },
+    },
+  });
+
+  if (!hasPermission) {
+    redirect('/dashboard');
+  }
 
   if (!session.activeOrganizationId) {
     return (
@@ -37,12 +56,18 @@ export default async function PurchaseOrderPage({ params }: PurchaseOrderPagePro
             Purchase Order Not Found
           </h2>
           <p className="text-gray-600">
-            The purchase order you&#x27;re looking for doesn&#x27;t exist or you don&#x27;t have access to it.
+            The purchase order you&#x27;re looking for doesn&#x27;t exist or you
+            don&#x27;t have access to it.
           </p>
         </div>
       </div>
     );
   }
 
-  return <PODetails po={result.purchaseOrder} organizationId={session.activeOrganizationId} />;
+  return (
+    <PODetails
+      po={result.purchaseOrder}
+      organizationId={session.activeOrganizationId}
+    />
+  );
 }

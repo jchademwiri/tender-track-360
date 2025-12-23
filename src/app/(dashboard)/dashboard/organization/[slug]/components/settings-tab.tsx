@@ -29,16 +29,19 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Save, Bell, Users, Globe, Clock } from 'lucide-react';
+import { Save, Bell, Users, Globe, Clock, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Role } from '@/db/schema';
 import { updateOrganizationSettings } from '@/server/organization-members';
+import { updateOrganizationLogo } from '@/server/organizations';
+import { AvatarUpload } from '../../../settings/profile/components/avatar-upload';
 
 interface SettingsTabProps {
   organization: {
     id: string;
     name: string;
     metadata?: string | null;
+    logo?: string | null;
   };
   userRole: Role;
   currentUser: {
@@ -79,8 +82,25 @@ export function SettingsTab({
   currentUser: _currentUser, // eslint-disable-line @typescript-eslint/no-unused-vars
 }: SettingsTabProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(
+    organization.logo || null
+  );
   const canEdit = canEditSettings(userRole);
   const canEditOwner = canEditOwnerSettings(userRole);
+
+  const handleLogoUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return await updateOrganizationLogo(organization.id, formData);
+  };
+
+  const handleLogoRemove = () => {
+    // Implement removal logic if needed, for now just UI update or separate action
+    // We could add updateOrganizationLogo(id, emptyFormData?) or dedicated remove
+    // For now, let's just toast
+    setLogoUrl(null);
+    toast.info('Logo removed (UI only for now)');
+  };
 
   // Parse metadata if it exists
   const metadata = organization.metadata
@@ -134,6 +154,32 @@ export function SettingsTab({
 
   return (
     <div className="space-y-6">
+      {/* Organization Identity */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-5 w-5" />
+            Organization Identity
+          </CardTitle>
+          <CardDescription>
+            Update your organization's logo and branding
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex justify-center py-4">
+            <AvatarUpload
+              currentImage={logoUrl}
+              userName={organization.name}
+              onImageChange={setLogoUrl}
+              onImageRemove={handleLogoRemove}
+              disabled={!canEdit}
+              uploadAction={handleLogoUpload}
+              entityName="Organization Logo"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Member Management Settings */}

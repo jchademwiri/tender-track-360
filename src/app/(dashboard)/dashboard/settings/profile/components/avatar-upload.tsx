@@ -23,6 +23,10 @@ interface AvatarUploadProps {
   onImageChange: (imageUrl: string | null) => void;
   onImageRemove: () => void;
   disabled?: boolean;
+  uploadAction: (
+    file: File
+  ) => Promise<{ success: boolean; imageUrl?: string; error?: string }>;
+  entityName?: string; // e.g. "Profile picture" or "Organization logo"
 }
 
 export function AvatarUpload({
@@ -31,6 +35,8 @@ export function AvatarUpload({
   onImageChange,
   onImageRemove,
   disabled = false,
+  uploadAction,
+  entityName = 'Profile picture',
 }: AvatarUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -116,25 +122,37 @@ export function AvatarUpload({
     if (!previewImage) return;
 
     try {
-      // In a real application, you would upload to your server here
-      // For now, we'll simulate the upload
       const file = fileInputRef.current?.files?.[0];
       if (!file) return;
 
-      const imageUrl = await simulateUpload(file);
-      onImageChange(imageUrl);
-      setShowUploadDialog(false);
-      setPreviewImage(null);
-      toast.success('Profile picture updated successfully');
+      setIsUploading(true);
+      setUploadProgress(10); // Start progress
+
+      const result = await uploadAction(file);
+
+      setUploadProgress(100);
+      setIsUploading(false);
+
+      if (result.success && result.imageUrl) {
+        onImageChange(result.imageUrl);
+        setShowUploadDialog(false);
+        setPreviewImage(null);
+        toast.success(`${entityName} updated successfully`);
+      } else {
+        toast.error(
+          result.error || `Failed to update ${entityName.toLowerCase()}`
+        );
+      }
     } catch (error) {
-      toast.error('Failed to upload profile picture');
+      setIsUploading(false);
+      toast.error(`Failed to upload ${entityName.toLowerCase()}`);
       console.error('Upload error:', error);
     }
   };
 
   const handleRemoveImage = () => {
     onImageRemove();
-    toast.success('Profile picture removed');
+    toast.success(`${entityName} removed`);
   };
 
   const handleCancelUpload = () => {
@@ -162,10 +180,13 @@ export function AvatarUpload({
 
         {/* Upload Overlay */}
         <div
-          className={`absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${
+          className={`absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 ${
             disabled ? 'cursor-not-allowed' : 'cursor-pointer'
           }`}
-          onClick={() => !disabled && fileInputRef.current?.click()}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent bubbling issues
+            if (!disabled) fileInputRef.current?.click();
+          }}
         >
           <Camera className="h-6 w-6 text-white" />
         </div>
@@ -212,10 +233,10 @@ export function AvatarUpload({
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Upload Profile Picture</DialogTitle>
+            <DialogTitle>Upload {entityName}</DialogTitle>
             <DialogDescription>
-              Choose a new profile picture. The image will be cropped to a
-              square and resized to fit.
+              Choose a new {entityName.toLowerCase()}. The image will be cropped
+              to a square and resized to fit.
             </DialogDescription>
           </DialogHeader>
 
