@@ -79,9 +79,6 @@ export const createProfileTabs = (
   components: {
     personal: React.ReactNode;
     security: React.ReactNode;
-    notifications: React.ReactNode;
-    privacy: React.ReactNode;
-    preferences: React.ReactNode;
   },
   metrics?: {
     securityScore?: number;
@@ -104,28 +101,5 @@ export const createProfileTabs = (
       metrics?.securityScore && metrics.securityScore < 60 ? '!' : undefined,
     description: 'Security settings, sessions, and authentication methods',
     component: components.security,
-  },
-  {
-    id: 'notifications',
-    label: 'Notifications',
-    icon: <Bell className="h-4 w-4" />,
-    badge: metrics?.unreadNotifications || undefined,
-    description: 'Configure how and when you receive notifications',
-    component: components.notifications,
-  },
-  {
-    id: 'privacy',
-    label: 'Privacy & Data',
-    icon: <Eye className="h-4 w-4" />,
-    badge: metrics?.pendingVerifications || undefined,
-    description: 'Control your privacy settings and data management',
-    component: components.privacy,
-  },
-  {
-    id: 'preferences',
-    label: 'Preferences',
-    icon: <Settings className="h-4 w-4" />,
-    description: 'Customize your account preferences and experience',
-    component: components.preferences,
   },
 ];

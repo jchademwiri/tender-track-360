@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Building2, CalendarDays, Users } from 'lucide-react';
+import { Building2, CalendarDays, Users, Clock } from 'lucide-react';
 
 interface OrganizationMembership {
   id: string;
@@ -18,9 +18,13 @@ interface OrganizationMembership {
 
 interface OrganizationInfoProps {
   membership: OrganizationMembership | null;
+  userUpdatedAt: Date;
 }
 
-export function OrganizationInfo({ membership }: OrganizationInfoProps) {
+export function OrganizationInfo({
+  membership,
+  userUpdatedAt,
+}: OrganizationInfoProps) {
   // Format date for display
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -37,6 +41,10 @@ export function OrganizationInfo({ membership }: OrganizationInfoProps) {
           <CardTitle
             id="organization-info-heading"
             className="flex items-center space-x-2 text-base sm:text-lg"
+            // If they are not in an org, maybe "Account Settings" is a better title?
+            // But user said "Right column... showing organization information".
+            // Let's keep "Organization" or maybe "Organization & Account" if requested,
+            // but sticking to user request "Organization info" for now.
           >
             <Building2 className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
             <span>Organization</span>
@@ -44,7 +52,8 @@ export function OrganizationInfo({ membership }: OrganizationInfoProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           {membership ? (
-            <div className="space-y-4">
+            <div className="space-y-6">
+              {/* Org Name & Role */}
               <div>
                 <label
                   className="text-sm font-medium text-muted-foreground"
@@ -107,31 +116,79 @@ export function OrganizationInfo({ membership }: OrganizationInfoProps) {
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label
-                  className="text-sm font-medium text-muted-foreground"
-                  id="organization-created-label"
-                >
-                  Organization Created
-                </label>
-                <p
-                  className="mt-1 text-sm sm:text-base"
-                  aria-labelledby="organization-created-label"
-                >
-                  {formatDate(membership.organization.createdAt)}
-                </p>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                <div className="space-y-1">
+                  <label
+                    className="text-sm font-medium text-muted-foreground"
+                    id="organization-created-label"
+                  >
+                    Organization Created
+                  </label>
+                  <p
+                    className="mt-1 text-sm sm:text-base"
+                    aria-labelledby="organization-created-label"
+                  >
+                    {formatDate(membership.organization.createdAt)}
+                  </p>
+                </div>
+
+                {/* Last Updated (Moved from Sidebar) */}
+                <div className="space-y-1">
+                  <label
+                    className="text-sm font-medium text-muted-foreground"
+                    id="user-updated-label"
+                  >
+                    Profile Last Updated
+                  </label>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <Clock
+                      className="h-4 w-4 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                    <p
+                      className="text-sm sm:text-base"
+                      aria-labelledby="user-updated-label"
+                    >
+                      {formatDate(userUpdatedAt)}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <Building2
-                className="h-8 w-8 mx-auto mb-2 opacity-50"
-                aria-hidden="true"
-              />
-              <p className="text-sm">No organization membership</p>
-              <p className="text-xs mt-1">
-                You are not currently a member of any organization
-              </p>
+            <div className="space-y-6">
+              <div className="text-center py-6 text-muted-foreground border-b border-border pb-6">
+                <Building2
+                  className="h-8 w-8 mx-auto mb-2 opacity-50"
+                  aria-hidden="true"
+                />
+                <p className="text-sm">No organization membership</p>
+                <p className="text-xs mt-1">
+                  You are not currently a member of any organization
+                </p>
+              </div>
+
+              {/* Show generic account info even if no org */}
+              <div className="space-y-1">
+                <label
+                  className="text-sm font-medium text-muted-foreground"
+                  id="user-updated-label-no-org"
+                >
+                  Profile Last Updated
+                </label>
+                <div className="flex items-center space-x-2 mt-1">
+                  <Clock
+                    className="h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  <p
+                    className="text-sm sm:text-base"
+                    aria-labelledby="user-updated-label-no-org"
+                  >
+                    {formatDate(userUpdatedAt)}
+                  </p>
+                </div>
+              </div>
             </div>
           )}
         </CardContent>

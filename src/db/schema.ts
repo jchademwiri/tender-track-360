@@ -269,6 +269,7 @@ export const tender = pgTable('tender', {
   submissionDate: timestamp('submission_date'),
   value: text('value'), // String for currency formatting
   status: text('status').default('draft').notNull(), // draft, submitted, won, lost, pending
+  evaluationDate: timestamp('evaluation_date'), // Current validated period deadline
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   deletedAt: timestamp('deleted_at'), // Soft deletion
@@ -314,8 +315,9 @@ export const purchaseOrder = pgTable('purchase_order', {
   deletedAt: timestamp('deleted_at'), // Soft deletion
 });
 
-// Follow-up table with tender and user relationships
-export const followUp = pgTable('follow_up', {
+
+// Tender Extension table (replacing Follow-up)
+export const tenderExtension = pgTable('tender_extension', {
   id: text('id').primaryKey(),
   organizationId: text('organization_id')
     .notNull()
@@ -323,9 +325,12 @@ export const followUp = pgTable('follow_up', {
   tenderId: text('tender_id')
     .notNull()
     .references(() => tender.id, { onDelete: 'cascade' }),
-  notes: text('notes').notNull(),
-  contactPerson: text('contact_person'),
-  nextFollowUpDate: timestamp('next_follow_up_date'),
+  extensionDate: timestamp('extension_date').notNull(), // Date of the extension letter
+  newEvaluationDate: timestamp('new_evaluation_date').notNull(), // New validated deadline
+  contactName: text('contact_name'),
+  contactEmail: text('contact_email').notNull(), // Mandatory
+  contactPhone: text('contact_phone'), // Optional
+  notes: text('notes'),
   createdBy: text('created_by')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
@@ -356,6 +361,9 @@ export const document = pgTable('document', {
       onDelete: 'cascade',
     }
   ),
+  extensionId: text('extension_id').references(() => tenderExtension.id, {
+    onDelete: 'cascade',
+  }),
   uploadedBy: text('uploaded_by')
     .notNull()
     .references(() => user.id),
@@ -408,7 +416,7 @@ export type Client = typeof client.$inferSelect;
 export type Tender = typeof tender.$inferSelect;
 export type Project = typeof project.$inferSelect;
 export type PurchaseOrder = typeof purchaseOrder.$inferSelect;
-export type FollowUp = typeof followUp.$inferSelect;
+export type TenderExtension = typeof tenderExtension.$inferSelect;
 export type Document = typeof document.$inferSelect;
 
 // Notification Preferences Relations
@@ -502,7 +510,7 @@ export const tenderRelations = relations(tender, ({ one, many }) => ({
     references: [client.id],
   }),
   projects: many(project),
-  followUps: many(followUp),
+  extensions: many(tenderExtension),
 }));
 
 export const projectRelations = relations(project, ({ one, many }) => ({
@@ -532,17 +540,17 @@ export const purchaseOrderRelations = relations(purchaseOrder, ({ one }) => ({
   }),
 }));
 
-export const followUpRelations = relations(followUp, ({ one }) => ({
+export const tenderExtensionRelations = relations(tenderExtension, ({ one }) => ({
   organization: one(organization, {
-    fields: [followUp.organizationId],
+    fields: [tenderExtension.organizationId],
     references: [organization.id],
   }),
   tender: one(tender, {
-    fields: [followUp.tenderId],
+    fields: [tenderExtension.tenderId],
     references: [tender.id],
   }),
   createdByUser: one(user, {
-    fields: [followUp.createdBy],
+    fields: [tenderExtension.createdBy],
     references: [user.id],
   }),
 }));
@@ -563,6 +571,10 @@ export const documentRelations = relations(document, ({ one }) => ({
   purchaseOrder: one(purchaseOrder, {
     fields: [document.purchaseOrderId],
     references: [purchaseOrder.id],
+  }),
+  extension: one(tenderExtension, {
+    fields: [document.extensionId],
+    references: [tenderExtension.id],
   }),
   uploader: one(user, {
     fields: [document.uploadedBy],
@@ -591,7 +603,7 @@ export const schema = {
   tender,
   project,
   purchaseOrder,
-  followUp,
+  tenderExtension,
   document,
   // Relations
   organizationRelations,
@@ -607,7 +619,7 @@ export const schema = {
   tenderRelations,
   projectRelations,
   purchaseOrderRelations,
-  followUpRelations,
+  tenderExtensionRelations,
   documentRelations,
   // Other
   waitlist,

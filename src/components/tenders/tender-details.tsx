@@ -56,10 +56,13 @@ interface Document {
   url?: string;
 }
 
+import { ExtensionList, ExtendedTenderExtension } from './extension-list';
+
 interface TenderDetailsProps {
   tender: TenderWithClient;
   organizationId: string;
   documents: Document[];
+  extensions: ExtendedTenderExtension[];
 }
 
 const statusColors = {
@@ -82,6 +85,7 @@ export function TenderDetails({
   tender,
   organizationId,
   documents,
+  extensions,
 }: TenderDetailsProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -208,6 +212,7 @@ export function TenderDetails({
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="extensions">Extensions</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-6">
@@ -561,6 +566,14 @@ export function TenderDetails({
             entityId={tender.id}
             entityType="tender"
             initialDocuments={documents}
+          />
+        </TabsContent>
+
+        <TabsContent value="extensions" className="mt-6">
+          <ExtensionList
+            extensions={extensions}
+            organizationId={organizationId}
+            tenderId={tender.id}
           />
         </TabsContent>
       </Tabs>
