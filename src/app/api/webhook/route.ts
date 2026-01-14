@@ -6,7 +6,6 @@ import { nanoid } from 'nanoid';
 export async function POST(req: NextRequest) {
   try {
     const requestBody = await req.json();
-    console.log('Received webhook:', requestBody);
 
     const email = requestBody.email || requestBody.data?.email;
     const companyName =

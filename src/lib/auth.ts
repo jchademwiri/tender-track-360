@@ -91,11 +91,6 @@ export const auth = betterAuth({
           console.error('Error sending reset password email:', error);
           throw error;
         }
-
-        console.log(
-          `Reset password email sent successfully to ${user.email} with token ${url}`
-        );
-        console.log('Email data:', data);
       } catch (error) {
         console.error('Failed to send reset password email:', error);
         throw error;
@@ -165,9 +160,6 @@ export const auth = betterAuth({
               organizationId: string;
             }) => {
               // This ensures the session gets updated with the new active organization
-              console.log(
-                `Organization switched to ${organizationId} for user ${user.id}`
-              );
             },
           },
         },

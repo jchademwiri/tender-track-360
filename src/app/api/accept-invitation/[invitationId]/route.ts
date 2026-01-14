@@ -17,7 +17,7 @@ export async function GET(
       },
       headers: await headers(),
     });
-    console.log(data);
+
     return NextResponse.redirect(
       new URL(`/dashboard?invitationId=${invitationId}`, request.url)
     );
