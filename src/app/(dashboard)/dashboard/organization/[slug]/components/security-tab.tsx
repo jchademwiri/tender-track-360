@@ -134,7 +134,7 @@ export function SecurityTab({
   const handleExportSecurityLog = async () => {
     try {
       // TODO: Implement export security log functionality
-      console.log('Exporting security log for organization:', organization.id);
+
       toast.success('Security log exported successfully');
     } catch (error) {
       console.error('Error exporting security log:', error);
@@ -145,7 +145,7 @@ export function SecurityTab({
   const handleTerminateSession = async (sessionId: string) => {
     try {
       // TODO: Implement terminate session functionality
-      console.log('Terminating session:', sessionId);
+
       setActiveSessions((prev) =>
         prev.filter((session) => session.id !== sessionId)
       );

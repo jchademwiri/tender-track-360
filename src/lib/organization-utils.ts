@@ -25,28 +25,28 @@ export async function switchOrganization({
 }: OrganizationSwitchOptions): Promise<{ success: boolean; error?: string }> {
   try {
     // Step 1: Switch the active organization using direct API call
-    console.log(`Attempting to switch to organization: ${organizationId}`);
 
-    const baseUrl = typeof window !== 'undefined'
-      ? window.location.origin
-      : 'http://localhost:3000';
+    const baseUrl =
+      typeof window !== 'undefined'
+        ? window.location.origin
+        : 'http://localhost:3000';
 
-    const response = await fetch(`${baseUrl}/api/auth/organization/set-active`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        organizationId,
-      }),
-      credentials: 'include',
-    });
-
-    console.log('Organization switch response status:', response.status);
+    const response = await fetch(
+      `${baseUrl}/api/auth/organization/set-active`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          organizationId,
+        }),
+        credentials: 'include',
+      }
+    );
 
     if (response.ok) {
       const result = await response.json();
-      console.log('Organization switch successful:', result);
 
       // Step 2: Force session refresh to ensure server components get updated data
       try {
@@ -56,7 +56,10 @@ export async function switchOrganization({
           },
         });
       } catch (sessionError) {
-        console.warn('Session refresh failed, continuing with router refresh:', sessionError);
+        console.warn(
+          'Session refresh failed, continuing with router refresh:',
+          sessionError
+        );
       }
 
       // Step 3: Navigate to new URL if provided
@@ -116,7 +119,6 @@ export async function switchOrganizationWithReload({
 }> {
   try {
     // Step 1: Switch the active organization
-    console.log(`Attempting to switch to organization: ${organizationId}`);
 
     // Try multiple approaches for organization switching
     let result;
@@ -126,7 +128,6 @@ export async function switchOrganizationWithReload({
       result = await authClient.organization.setActive({
         organizationId,
       });
-      console.log('Method 1 (setActive) result:', result);
     } catch (method1Error) {
       console.warn('Method 1 failed:', method1Error);
 
@@ -146,7 +147,6 @@ export async function switchOrganizationWithReload({
 
         if (response.ok) {
           result = { success: true };
-          console.log('Method 2 (direct API call) succeeded');
         } else {
           throw new Error(`API call failed with status: ${response.status}`);
         }
@@ -162,7 +162,6 @@ export async function switchOrganizationWithReload({
             },
           });
           result = { success: true };
-          console.log('Method 3 (session refresh) succeeded');
         } catch (method3Error) {
           console.error('All methods failed:', method3Error);
           throw method3Error;

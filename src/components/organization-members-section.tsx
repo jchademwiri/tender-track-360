@@ -41,7 +41,6 @@ export function OrganizationMembersSection({
       onInviteClick();
     } else {
       // TODO: Implement invite modal functionality
-      console.log('Invite member clicked');
     }
   };
 

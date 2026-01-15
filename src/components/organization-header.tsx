@@ -150,7 +150,6 @@ export function OrganizationHeader({
       setIsProcessing(true);
       // TODO: Implement edit functionality in future tasks
       // setIsEditing(true);
-      console.log('Edit organization clicked');
 
       // Removed simulated delay; this will be replaced with real async work
 
@@ -171,7 +170,6 @@ export function OrganizationHeader({
     try {
       setIsProcessing(true);
       // TODO: Navigate to organization settings
-      console.log('Organization settings clicked');
 
       // Removed simulated delay; navigate immediately when implemented
 

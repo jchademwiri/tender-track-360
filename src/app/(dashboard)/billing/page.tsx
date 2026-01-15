@@ -208,7 +208,6 @@ export default function BillingPage() {
 
   const handleDownloadInvoice = (invoiceId: string) => {
     // TODO: Implement invoice download
-    console.log('Download invoice:', invoiceId);
   };
 
   const getStatusColor = (status: string) => {
