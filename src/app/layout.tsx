@@ -4,6 +4,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/shared/providers';
 import { Analytics } from '@vercel/analytics/next';
+import { BetaLabel } from '@/components/shared/beta-label';
+import { HelpWidget } from '@/components/shared/help-widget';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -41,6 +43,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <main>{children}</main>
+          <BetaLabel />
+          <HelpWidget />
         </ThemeProvider>
         <Toaster />
         <Analytics />

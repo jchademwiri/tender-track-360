@@ -235,6 +235,30 @@ export const waitlist = pgTable('waitlist', {
 });
 
 /* =========================
+   FEEDBACK
+========================= */
+export const feedback = pgTable('feedback', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+  message: text('message').notNull(),
+  type: text('type').notNull(), // bug, feature, other
+  url: text('url'),
+  name: text('name'),
+  email: text('email'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const supportTickets = pgTable('support_tickets', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+  name: text('name').notNull(),
+  email: text('email').notNull(),
+  message: text('message').notNull(),
+  status: text('status').default('open').notNull(), // open, closed, in_progress
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+/* =========================
    TENDER MANAGEMENT TABLES
 ========================= */
 
@@ -314,7 +338,6 @@ export const purchaseOrder = pgTable('purchase_order', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   deletedAt: timestamp('deleted_at'), // Soft deletion
 });
-
 
 // Tender Extension table (replacing Follow-up)
 export const tenderExtension = pgTable('tender_extension', {
@@ -540,20 +563,23 @@ export const purchaseOrderRelations = relations(purchaseOrder, ({ one }) => ({
   }),
 }));
 
-export const tenderExtensionRelations = relations(tenderExtension, ({ one }) => ({
-  organization: one(organization, {
-    fields: [tenderExtension.organizationId],
-    references: [organization.id],
-  }),
-  tender: one(tender, {
-    fields: [tenderExtension.tenderId],
-    references: [tender.id],
-  }),
-  createdByUser: one(user, {
-    fields: [tenderExtension.createdBy],
-    references: [user.id],
-  }),
-}));
+export const tenderExtensionRelations = relations(
+  tenderExtension,
+  ({ one }) => ({
+    organization: one(organization, {
+      fields: [tenderExtension.organizationId],
+      references: [organization.id],
+    }),
+    tender: one(tender, {
+      fields: [tenderExtension.tenderId],
+      references: [tender.id],
+    }),
+    createdByUser: one(user, {
+      fields: [tenderExtension.createdBy],
+      references: [user.id],
+    }),
+  })
+);
 
 export const documentRelations = relations(document, ({ one }) => ({
   organization: one(organization, {
@@ -623,4 +649,9 @@ export const schema = {
   documentRelations,
   // Other
   waitlist,
+  feedback,
+  supportTickets,
 };
+
+export type Feedback = typeof feedback.$inferSelect;
+export type SupportTicket = typeof supportTickets.$inferSelect;
