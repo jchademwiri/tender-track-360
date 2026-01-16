@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import {
   MessageSquarePlus,
   HelpCircle,
@@ -40,6 +40,7 @@ import { submitFeedback } from '@/server/feedback';
 import { createSupportTicket } from '@/server/support';
 import { usePathname } from 'next/navigation';
 import { CONTACT_INFO } from '@/lib/constants';
+import { authClient } from '@/lib/auth-client';
 
 type DialogMode = 'feedback' | 'support' | null;
 
@@ -48,6 +49,9 @@ export function HelpWidget() {
   const [feedbackType, setFeedbackType] = useState<'bug' | 'feature' | 'other'>(
     'other'
   );
+
+  // Session State
+  const { data: session } = authClient.useSession();
 
   // Feedback Form State
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -61,6 +65,15 @@ export function HelpWidget() {
   const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
 
+  // Update form defaults when session loads
+  useEffect(() => {
+    if (session?.user) {
+      if (!feedbackEmail) setFeedbackEmail(session.user.email || '');
+      if (!supportEmail) setSupportEmail(session.user.email || '');
+      if (!supportName) setSupportName(session.user.name || '');
+    }
+  }, [session]);
+
   const handleFeedbackSubmit = () => {
     if (!feedbackMessage.trim()) {
       toast.error('Please enter a message');
@@ -73,13 +86,16 @@ export function HelpWidget() {
         type: feedbackType,
         url: pathname,
         email: feedbackEmail || undefined,
+        userId: session?.user?.id,
+        name: session?.user?.name || undefined,
       });
 
       if (result.success) {
         toast.success('Thank you for your feedback!');
         setDialogMode(null);
         setFeedbackMessage('');
-        setFeedbackEmail('');
+        // Don't clear email if logged in
+        if (!session?.user) setFeedbackEmail('');
         setFeedbackType('other');
       } else {
         toast.error(result.error || 'Something went wrong');
@@ -98,13 +114,17 @@ export function HelpWidget() {
         name: supportName,
         email: supportEmail,
         message: supportMessage,
+        userId: session?.user?.id,
       });
 
       if (result.success) {
         toast.success('Support ticket created! We will contact you shortly.');
         setDialogMode(null);
-        setSupportName('');
-        setSupportEmail('');
+        // Don't clear name/email if logged in
+        if (!session?.user) {
+          setSupportName('');
+          setSupportEmail('');
+        }
         setSupportMessage('');
       } else {
         toast.error(result.error || 'Failed to submit support request');
