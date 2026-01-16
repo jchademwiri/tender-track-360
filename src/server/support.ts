@@ -29,6 +29,41 @@ export async function createSupportTicket(input: SupportTicketInput) {
       status: 'open',
     });
 
+    // Send email notification to admin
+    try {
+      if (
+        process.env.RESEND_API_KEY &&
+        process.env.SENDER_SUPPORT_EMAIL &&
+        process.env.REPLY_TO_EMAIL
+      ) {
+        const { Resend } = await import('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const supportFromEmail = process.env.SENDER_SUPPORT_EMAIL;
+        const supportToEmail = process.env.REPLY_TO_EMAIL;
+
+        await resend.emails.send({
+          from: `Tender Track 360 Support <${supportFromEmail}>`,
+          to: supportToEmail,
+          subject: `New Support Ticket from ${validated.name}`,
+          html: `
+            <h2>New Support Ticket Created</h2>
+            <p><strong>Name:</strong> ${validated.name}</p>
+            <p><strong>Email:</strong> ${validated.email}</p>
+            <p><strong>Message:</strong></p>
+            <blockquote style="background: #f9f9f9; padding: 10px; border-left: 4px solid #ccc;">${validated.message}</blockquote>
+            <p><strong>User ID:</strong> ${validated.userId || 'N/A'}</p>
+          `,
+        });
+      } else {
+        console.warn(
+          'Email configuration missing (RESEND_API_KEY, SENDER_SUPPORT_EMAIL, or REPLY_TO_EMAIL not set), skipping email notification'
+        );
+      }
+    } catch (emailError) {
+      console.error('Failed to send support ticket email:', emailError);
+      // Don't block the response if email fails
+    }
+
     return { success: true };
   } catch (error) {
     console.error('Failed to create support ticket:', error);
