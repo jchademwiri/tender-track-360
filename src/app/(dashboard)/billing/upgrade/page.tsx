@@ -26,7 +26,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 interface PricingTier {
   id: string;
   name: string;
-  price: string | number;
+  price: number;
   period: string;
   description: string;
   features: string[];
