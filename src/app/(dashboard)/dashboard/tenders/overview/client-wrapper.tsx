@@ -118,7 +118,6 @@ export function TendersOverviewClient({
 
   const handleDeleteTender = useCallback((tenderId: string) => {
     // TODO: Implement delete functionality
-    console.log('Delete tender:', tenderId);
   }, []);
 
   const handleRowClick = useCallback((tenderId: string) => {

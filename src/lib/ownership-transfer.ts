@@ -167,9 +167,6 @@ class OwnershipTransferManager {
             expiresInHours: this.TRANSFER_EXPIRY_HOURS,
           }),
         });
-        console.log(
-          `Sent ownership transfer email to ${toUser.email} (routed to info@tendertrack360.co.za)`
-        );
       }
 
       return {
@@ -254,10 +251,6 @@ class OwnershipTransferManager {
           .update(ownershipTransfer)
           .set({ status: 'accepted', acceptedAt: new Date() })
           .where(eq(ownershipTransfer.id, transferId));
-
-        console.log(
-          `Ownership transfer ${transferId} accepted. Org ${orgId} new owner ${acceptingUserId}`
-        );
 
         return {
           success: true,
@@ -494,7 +487,6 @@ class OwnershipTransferManager {
     transferId: string
   ): Promise<void> {
     // Already handled in initiateOwnershipTransfer, but good for retries
-    console.log(`Sending transfer notification email for: ${transferId}`);
   }
 
   private async sendTransferCompletionEmails(

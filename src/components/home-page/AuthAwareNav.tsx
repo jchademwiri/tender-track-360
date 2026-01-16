@@ -8,18 +8,14 @@ import Logout from '../ui/logout';
 export default function AuthAwareNav() {
   const { data: session, isPending } = authClient.useSession();
 
-  if (isPending) {
-    return (
-      <div className="flex items-center gap-3">
-        {/* <Button variant="ghost" asChild size="sm">
-          <Link href="/login">Sign In</Link>
-        </Button> */}
-        <Button size="sm" asChild>
-          <Link href="/waitlist">Join Waitlist</Link>
-        </Button>
-      </div>
-    );
-  }
+  <div className="flex items-center gap-3">
+    <Button variant="ghost" asChild size="sm">
+      <Link href="/login">Sign In</Link>
+    </Button>
+    <Button size="sm" asChild>
+      <Link href="/sign-up">Sign Up</Link>
+    </Button>
+  </div>;
 
   if (session?.user) {
     return (
@@ -34,11 +30,11 @@ export default function AuthAwareNav() {
 
   return (
     <div className="flex items-center gap-3">
-      {/* <Button variant="ghost" asChild size="sm">
+      <Button variant="ghost" asChild size="sm">
         <Link href="/login">Sign In</Link>
-      </Button> */}
+      </Button>
       <Button size="sm" asChild>
-        <Link href="/waitlist">Join Waitlist</Link>
+        <Link href="/sign-up">Sign Up</Link>
       </Button>
     </div>
   );

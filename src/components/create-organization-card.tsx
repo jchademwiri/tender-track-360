@@ -15,12 +15,9 @@ export function CreateOrganizationCard({
   className,
 }: CreateOrganizationCardProps) {
   const handleClick = () => {
-    console.log('CreateOrganizationCard handleClick called');
     if (onClick) {
-      console.log('Calling onClick callback');
       onClick();
     } else {
-      console.log('No onClick callback provided');
     }
   };
 

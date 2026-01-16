@@ -26,7 +26,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 interface PricingTier {
   id: string;
   name: string;
-  price: string | number;
+  price: number;
   period: string;
   description: string;
   features: string[];
@@ -317,7 +317,7 @@ export default function UpgradePage() {
                   style={{ transitionDelay: `${300 + index * 100}ms` }}
                 >
                   {tier.popular && (
-                    <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-1">
+                    <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-linear-to-r from-blue-600 to-indigo-600 px-4 py-1">
                       <Star className="h-3 w-3 mr-1" />
                       Most Popular
                     </Badge>
@@ -335,19 +335,34 @@ export default function UpgradePage() {
                       </div>
 
                       <div className="space-y-2">
-                        <div className="flex items-baseline justify-center gap-2">
-                          <span className="text-4xl font-bold text-gray-900 dark:text-white">
-                            {typeof tier.price === 'number'
-                              ? formatCurrency(tier.price)
-                              : tier.price}
-                          </span>
-                          <span className="text-gray-600 dark:text-gray-300">
-                            {tier.period}
-                          </span>
+                        <div className="flex flex-col items-center justify-center gap-1">
+                          {tier.price > 0 && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg text-muted-foreground line-through decoration-red-500/50">
+                                {formatCurrency(tier.price)}
+                              </span>
+                              <Badge
+                                variant="secondary"
+                                className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800"
+                              >
+                                Free during Beta
+                              </Badge>
+                            </div>
+                          )}
+                          <div className="flex items-baseline justify-center gap-2">
+                            <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                              {tier.price > 0
+                                ? formatCurrency(0)
+                                : formatCurrency(0)}
+                            </span>
+                            <span className="text-gray-600 dark:text-gray-300">
+                              {tier.period}
+                            </span>
+                          </div>
                         </div>
                         {tier.id === 'pro' && (
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            14-day free trial • No credit card required
+                            Full access • No credit card required
                           </p>
                         )}
                       </div>
@@ -359,7 +374,7 @@ export default function UpgradePage() {
                           key={featureIndex}
                           className="flex items-start gap-3"
                         >
-                          <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                          <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
                           <span className="text-gray-700 dark:text-gray-300">
                             {feature}
                           </span>
@@ -376,7 +391,7 @@ export default function UpgradePage() {
                         currentPlan === tier.id
                           ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/40 cursor-default'
                           : tier.popular
-                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
+                            ? 'bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
                             : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                       }`}
                     >
@@ -394,8 +409,8 @@ export default function UpgradePage() {
                         </>
                       ) : (
                         <>
-                          <CreditCard className="h-5 w-5 mr-2" />
-                          {tier.ctaText}
+                          <Crown className="h-5 w-5 mr-2" />
+                          {tier.price > 0 ? 'Upgrade for Free' : tier.ctaText}
                         </>
                       )}
                     </Button>
