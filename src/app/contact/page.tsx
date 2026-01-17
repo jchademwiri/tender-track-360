@@ -58,6 +58,25 @@ export default function Page() {
 
               <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
                 <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <Phone className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">WhatsApp</h3>
+                  <a
+                    href={`https://wa.me/${CONTACT_INFO.whatsapp
+                      .replace(/\s/g, '')
+                      .replace('+', '')}`}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Chat on WhatsApp
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
                   <Clock className="h-6 w-6" />
                 </div>
                 <div>
