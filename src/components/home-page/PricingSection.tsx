@@ -35,7 +35,7 @@ export function PricingSection() {
         'Community support',
       ],
       ctaText: 'Get Started Free',
-      href: '/auth/sign-up',
+      href: '/dashboard',
     },
     {
       id: 'starter',
@@ -53,7 +53,7 @@ export function PricingSection() {
       ],
       ctaText: 'Start Free Trial',
       popular: true,
-      href: '/auth/sign-up?plan=starter',
+      href: '/dashboard',
     },
     {
       id: 'pro',
@@ -70,7 +70,7 @@ export function PricingSection() {
         'Advanced analytics',
       ],
       ctaText: 'Start Pro Trial',
-      href: '/auth/sign-up?plan=pro',
+      href: '/dashboard',
     },
   ];
 

@@ -5,7 +5,7 @@ export function FooterSection() {
   return (
     <footer className="bg-muted border-t py-16">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           <div>
             <h3 className="text-xl font-bold mb-4 text-foreground">
               Tender Track 360
@@ -118,6 +118,36 @@ export function FooterSection() {
                   className="hover:text-foreground transition-colors"
                 >
                   Training
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-4 text-foreground">Company</h4>
+            <ul className="space-y-2 text-muted-foreground">
+              <li>
+                <Link
+                  href="/about"
+                  className="hover:text-foreground transition-colors"
+                >
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/careers"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Careers
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/blog"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Blog
                 </Link>
               </li>
             </ul>
