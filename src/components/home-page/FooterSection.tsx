@@ -87,18 +87,18 @@ export function FooterSection() {
             <h4 className="font-semibold mb-4 text-foreground">Support</h4>
             <ul className="space-y-2 text-muted-foreground">
               <li>
-                <a
+                <Link
                   href="https://docs.tendertrack360.co.za"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-foreground transition-colors"
                 >
                   Documentation
-                </a>
+                </Link>
               </li>
               <li>
                 <Link
-                  href="#help"
+                  href="/help"
                   className="hover:text-foreground transition-colors"
                 >
                   Help Center
@@ -106,7 +106,7 @@ export function FooterSection() {
               </li>
               <li>
                 <Link
-                  href="#contact"
+                  href="/contact"
                   className="hover:text-foreground transition-colors"
                 >
                   Contact Us
@@ -114,7 +114,7 @@ export function FooterSection() {
               </li>
               <li>
                 <Link
-                  href="#training"
+                  href="/training"
                   className="hover:text-foreground transition-colors"
                 >
                   Training
@@ -155,22 +155,35 @@ export function FooterSection() {
 
           <div>
             <h4 className="font-semibold mb-4 text-foreground">Contact</h4>
-            <div className="space-y-2 text-muted-foreground">
-              <Link
-                href="mailto:info@tendertrack360.co.za"
-                className="hover:text-foreground transition-colors"
-              >
-                📧 info@tendertrack360.co.za
-              </Link>
-              <Link
-                href="tel:+27686478157"
-                className="hover:text-foreground transition-colors"
-              >
-                📞 +27 68 647 8157
-              </Link>
+            <ul className="space-y-2 text-muted-foreground">
+              <li>
+                <Link
+                  href="mailto:info@tendertrack360.co.za"
+                  className="hover:text-foreground transition-colors"
+                >
+                  📧 info@tendertrack360.co.za
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="tel:+27686478157"
+                  className="hover:text-foreground transition-colors"
+                >
+                  📞 +27 68 647 8157
+                </Link>
+              </li>
               {/* <div>📍 123 Business Ave, Suite 100</div> */}
-              <div>🌐 www.tendertrack360.co.za</div>
-            </div>
+              <li>
+                <Link
+                  href="https://wa.me/27686478157"
+                  className="hover:text-foreground transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  💬 Chat on WhatsApp
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
 
