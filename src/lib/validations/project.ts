@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const ProjectCreateSchema = z.object({
   projectNumber: z.string().min(1, 'Project number is required'),
   description: z.string().optional(),
-  clientId: z.string().min(1, 'Client is required'),
+  clientId: z.string().optional(),
   tenderId: z.string().optional(),
   status: z.enum(['active', 'completed', 'cancelled']),
 });

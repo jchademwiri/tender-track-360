@@ -163,6 +163,20 @@ export function ClientCreateDialog({
 
             <FormField
               control={form.control}
+              name="contactPhone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Phone number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="notes"
               render={({ field }) => (
                 <FormItem>
