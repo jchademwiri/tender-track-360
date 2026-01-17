@@ -1,5 +1,6 @@
 import { Twitter, Linkedin, Github } from 'lucide-react';
 import Link from 'next/link';
+import { CONTACT_INFO } from '@/lib/constants';
 
 export function FooterSection() {
   return (
@@ -166,16 +167,18 @@ export function FooterSection() {
               </li>
               <li>
                 <Link
-                  href="tel:+27686478157"
+                  href={`tel:${CONTACT_INFO.phone.replace(/\s/g, '')}`}
                   className="hover:text-foreground transition-colors"
                 >
-                  📞 +27 68 647 8157
+                  📞 {CONTACT_INFO.phone}
                 </Link>
               </li>
               {/* <div>📍 123 Business Ave, Suite 100</div> */}
               <li>
                 <Link
-                  href="https://wa.me/27686478157"
+                  href={`https://wa.me/${CONTACT_INFO.whatsapp
+                    .replace(/\s/g, '')
+                    .replace('+', '')}`}
                   className="hover:text-foreground transition-colors"
                   target="_blank"
                   rel="noopener noreferrer"

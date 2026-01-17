@@ -1,5 +1,6 @@
 import { ContactForm } from './form';
 import { Mail, Phone, Clock, MapPin } from 'lucide-react';
+import { CONTACT_INFO } from '@/lib/constants';
 
 export default function Page() {
   return (
@@ -47,10 +48,10 @@ export default function Page() {
                 <div>
                   <h3 className="font-semibold mb-1">Call Us</h3>
                   <a
-                    href="tel:+27686478157"
+                    href={`tel:${CONTACT_INFO.phone.replace(/\s/g, '')}`}
                     className="text-muted-foreground hover:text-primary transition-colors"
                   >
-                    +27 68 647 8157
+                    {CONTACT_INFO.phone}
                   </a>
                 </div>
               </div>
