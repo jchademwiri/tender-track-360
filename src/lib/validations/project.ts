@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const ProjectCreateSchema = z.object({
   projectNumber: z.string().min(1, 'Project number is required'),
   description: z.string().optional(),
-  clientId: z.string().optional(),
+  clientId: z.string().min(1, 'Client is required'),
   tenderId: z.string().optional(),
   status: z.enum(['active', 'completed', 'cancelled']),
 });
@@ -18,4 +18,6 @@ export const ProjectStatusUpdateSchema = z.object({
 
 export type ProjectCreateInput = z.infer<typeof ProjectCreateSchema>;
 export type ProjectUpdateInput = z.infer<typeof ProjectUpdateSchema>;
-export type ProjectStatusUpdateInput = z.infer<typeof ProjectStatusUpdateSchema>;
+export type ProjectStatusUpdateInput = z.infer<
+  typeof ProjectStatusUpdateSchema
+>;

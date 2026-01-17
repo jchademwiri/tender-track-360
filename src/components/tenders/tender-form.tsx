@@ -40,6 +40,7 @@ import {
 } from '@/lib/validations/tender';
 import { FileUploader } from '@/components/ui/file-uploader';
 import { uploadDocument } from '@/server/documents';
+import { ClientCreateDialog } from '@/components/clients/client-create-dialog';
 
 interface TenderWithClient {
   id: string;
@@ -230,36 +231,54 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Client *</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={isPending || loadingClients}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a client" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {loadingClients ? (
-                            <SelectItem value="loading" disabled>
-                              Loading clients...
-                            </SelectItem>
-                          ) : clients.length === 0 ? (
-                            <SelectItem value="no-clients" disabled>
-                              No clients available
-                            </SelectItem>
-                          ) : (
-                            clients.map((client) => (
-                              <SelectItem key={client.id} value={client.id}>
-                                <div className="flex flex-col">
-                                  <span>{client.name}</span>
-                                </div>
+                      <div className="flex items-center gap-2">
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={isPending || loadingClients}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select a client" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {loadingClients ? (
+                              <SelectItem value="loading" disabled>
+                                Loading clients...
                               </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
+                            ) : clients.length === 0 ? (
+                              <SelectItem value="no-clients" disabled>
+                                No clients available
+                              </SelectItem>
+                            ) : (
+                              clients.map((client) => (
+                                <SelectItem key={client.id} value={client.id}>
+                                  <div className="flex flex-col">
+                                    <span>{client.name}</span>
+                                  </div>
+                                </SelectItem>
+                              ))
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <ClientCreateDialog
+                          organizationId={organizationId}
+                          onClientCreated={(newClient) => {
+                            setClients((prev) => [
+                              ...prev,
+                              {
+                                id: newClient.id,
+                                name: newClient.name,
+                                contactName: null,
+                                contactEmail: null,
+                                contactPhone: null,
+                              },
+                            ]);
+                            form.setValue('clientId', newClient.id);
+                          }}
+                        />
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
