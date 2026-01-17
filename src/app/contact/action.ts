@@ -1,6 +1,7 @@
-"use server";
+'use server';
 
-import { formSchema } from "./schema";
+import { createSupportTicket } from '@/server/support';
+import { formSchema } from './schema';
 
 type FormState = {
   message: string;
@@ -14,28 +15,22 @@ export async function submitContactForm(
   const parsed = formSchema.safeParse(formData);
 
   if (!parsed.success) {
-    return { message: "Invalid form data" };
+    return { message: 'Invalid form data' };
   }
 
   try {
-    const response = await fetch(
-      "https://app.router.so/api/endpoints/lqpsrjza",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.ROUTER_API_KEY}`,
-        },
-        body: JSON.stringify(parsed.data),
-      }
-    );
+    const result = await createSupportTicket({
+      name: parsed.data.name,
+      email: parsed.data.email,
+      message: parsed.data.details,
+    });
 
-    if (!response.ok) {
-      return { message: "Failed to submit form" };
+    if (!result.success) {
+      return { message: result.error || 'Failed to submit form' };
     }
 
-    return { message: "Message sent successfully!" };
+    return { message: 'Message sent successfully!' };
   } catch (error) {
-    return { message: "Failed to submit form. Please try again." };
+    return { message: 'Failed to submit form. Please try again.' };
   }
 }
