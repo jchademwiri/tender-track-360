@@ -1,5 +1,15 @@
 import { ContactForm } from './form';
-import { Mail, Phone, Clock, MapPin } from 'lucide-react';
+import {
+  Mail,
+  Phone,
+  Clock,
+  Twitter,
+  Linkedin,
+  Github,
+  MessageCircle,
+  Share2,
+  X,
+} from 'lucide-react';
 import { CONTACT_INFO } from '@/lib/constants';
 
 export default function Page() {
@@ -12,78 +22,115 @@ export default function Page() {
       </div>
 
       <div className="container mx-auto px-4 py-24">
+        {/* Header Section */}
+        <div className="max-w-2xl mx-auto text-center mb-12 space-y-4">
+          <h1 className="text-4xl font-bold tracking-tight lg:text-5xl">
+            Get in touch
+          </h1>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            Have questions about our tender management solutions? We're here to
+            help you streamline your workflow and win more business.
+          </p>
+        </div>
+
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-24 items-start max-w-6xl mx-auto">
           {/* Left Column: Info */}
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <h1 className="text-4xl font-bold tracking-tight lg:text-5xl">
-                Get in touch
-              </h1>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Have questions about our tender management solutions? We're here
-                to help you streamline your workflow and win more business.
-              </p>
+          <div className="space-y-5">
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <Mail className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1">Email Us</h3>
+                <a
+                  href="mailto:info@tendertrack360.co.za"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  info@tendertrack360.co.za
+                </a>
+              </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
-                <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                  <Mail className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-1">Email Us</h3>
-                  <a
-                    href="mailto:info@tendertrack360.co.za"
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    info@tendertrack360.co.za
-                  </a>
-                </div>
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <Phone className="h-6 w-6" />
               </div>
-
-              <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
-                <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                  <Phone className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-1">Call Us</h3>
-                  <a
-                    href={`tel:${CONTACT_INFO.phone.replace(/\s/g, '')}`}
-                    className="text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {CONTACT_INFO.phone}
-                  </a>
-                </div>
+              <div>
+                <h3 className="font-semibold mb-1">Call Us</h3>
+                <a
+                  href={`tel:${CONTACT_INFO.phone.replace(/\s/g, '')}`}
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {CONTACT_INFO.phone}
+                </a>
               </div>
+            </div>
 
-              <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
-                <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                  <Phone className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-1">WhatsApp</h3>
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <MessageCircle className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1">WhatsApp</h3>
+                <a
+                  href={`https://wa.me/${CONTACT_INFO.whatsapp
+                    .replace(/\s/g, '')
+                    .replace('+', '')}`}
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Chat on WhatsApp
+                </a>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <Clock className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1">Business Hours</h3>
+                <p className="text-muted-foreground">
+                  Monday - Friday: 8:00 AM - 5:00 PM (SAST)
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <Share2 className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-3">Connect with Us</h3>
+                <div className="flex space-x-4">
                   <a
-                    href={`https://wa.me/${CONTACT_INFO.whatsapp
-                      .replace(/\s/g, '')
-                      .replace('+', '')}`}
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    href="https://twitter.com/tendertrack360"
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="w-8 h-8 bg-background rounded flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors text-muted-foreground border border-border"
+                    aria-label="Follow us on X"
                   >
-                    Chat on WhatsApp
+                    <X className="w-4 h-4" />
                   </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
-                <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                  <Clock className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-1">Business Hours</h3>
-                  <p className="text-muted-foreground">
-                    Monday - Friday: 8:00 AM - 5:00 PM (SAST)
-                  </p>
+                  <a
+                    href="https://linkedin.com/organization/tendertrack360"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 bg-background rounded flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors text-muted-foreground border border-border"
+                    aria-label="Follow us on LinkedIn"
+                  >
+                    <Linkedin className="w-4 h-4" />
+                  </a>
+                  <a
+                    href="https://github.com/tendertrack360"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 bg-background rounded flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors text-muted-foreground border border-border"
+                    aria-label="View our GitHub"
+                  >
+                    <Github className="w-4 h-4" />
+                  </a>
                 </div>
               </div>
             </div>
