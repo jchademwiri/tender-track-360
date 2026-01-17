@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useActionState, useRef, useTransition } from "react";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { useActionState, useRef, useTransition } from 'react';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -13,25 +13,25 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { submitContactForm } from "./action";
-import { formSchema } from "./schema";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { submitContactForm } from './action';
+import { formSchema } from './schema';
 
 type FormValues = z.infer<typeof formSchema>;
 
 export function ContactForm() {
   const [state, formAction] = useActionState(submitContactForm, {
-    message: "",
+    message: '',
   });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      details: "",
+      name: '',
+      email: '',
+      details: '',
     },
   });
 
@@ -47,14 +47,15 @@ export function ContactForm() {
   const [isPending, startTransition] = useTransition();
 
   return (
-    <div className="max-w-md w-full mx-auto space-y-6">
-      <div className="space-y-2 text-center">
-        <h2 className="text-3xl font-bold">Contact Us</h2>
-        <p className="text-muted-foreground">
-          Fill out the form below and we'll get back to you as soon as possible.
+    <div className="w-full space-y-6">
+      <div className="text-left mb-6">
+        <h2 className="text-2xl font-bold">Send us a message</h2>
+        <p className="text-sm text-muted-foreground mt-2">
+          Fill out the form below and we'll get back to you shortly.
         </p>
+
         {state.message && (
-          <div className="inline-block px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+          <div className="mt-4 px-3 py-2 rounded-md text-sm bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
             {state.message}
           </div>
         )}
@@ -125,7 +126,7 @@ export function ContactForm() {
           />
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Sending..." : "Contact Us"}
+            {isPending ? 'Sending...' : 'Contact Us'}
           </Button>
         </form>
       </Form>

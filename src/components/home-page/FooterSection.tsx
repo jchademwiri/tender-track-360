@@ -190,7 +190,8 @@ export function FooterSection() {
         <div className="border-t border-border pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-muted-foreground text-sm mb-4 md:mb-0">
-              © 2024 Tender Track 360. All rights reserved.
+              © {new Date().getFullYear()} Tender Track 360. All rights
+              reserved.
             </div>
             <div className="flex space-x-6 text-sm text-muted-foreground">
               <Link

@@ -1,9 +1,82 @@
-import { ContactForm } from "./form";
+import { ContactForm } from './form';
+import { Mail, Phone, Clock, MapPin } from 'lucide-react';
 
 export default function Page() {
   return (
-    <>
-      <ContactForm />
-    </>
+    <div className="relative min-h-screen bg-background selection:bg-primary/10 selection:text-primary">
+      {/* Background gradients */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-full max-w-[1000px] bg-primary/20 blur-[100px] opacity-20" />
+        <div className="absolute bottom-0 right-0 h-[500px] w-[500px] bg-secondary/20 blur-[100px] opacity-20" />
+      </div>
+
+      <div className="container mx-auto px-4 py-24">
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-24 items-start max-w-6xl mx-auto">
+          {/* Left Column: Info */}
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold tracking-tight lg:text-5xl">
+                Get in touch
+              </h1>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Have questions about our tender management solutions? We're here
+                to help you streamline your workflow and win more business.
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <Mail className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Email Us</h3>
+                  <a
+                    href="mailto:info@tendertrack360.co.za"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    info@tendertrack360.co.za
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <Phone className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Call Us</h3>
+                  <a
+                    href="tel:+27686478157"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    +27 68 647 8157
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <Clock className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">Business Hours</h3>
+                  <p className="text-muted-foreground">
+                    Monday - Friday: 8:00 AM - 5:00 PM (SAST)
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Form */}
+          <div className="relative">
+            <div className="rounded-2xl border bg-card/50 backdrop-blur-sm p-8 shadow-2xl">
+              <ContactForm />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
