@@ -30,18 +30,32 @@ import {
   updatePurchaseOrder,
 } from '@/server/purchase-orders';
 import { getProjects } from '@/server/projects';
+import { ProjectCreateDialog } from '@/components/projects/project-create-dialog';
 
-const poFormSchema = z.object({
-  poNumber: z.string().min(1, 'PO Number is required'),
-  projectId: z.string().min(1, 'Project is required'),
-  supplierName: z.string().optional(),
-  description: z.string().min(1, 'Description is required'),
-  totalAmount: z.string().min(1, 'Total amount is required'),
-  status: z.enum(['draft', 'sent', 'delivered']),
-  poDate: z.date().optional(),
-  expectedDeliveryDate: z.date().optional(),
-  deliveryAddress: z.string().optional(),
-});
+const poFormSchema = z
+  .object({
+    poNumber: z.string().min(1, 'PO Number is required'),
+    projectId: z.string().min(1, 'Project is required'),
+    supplierName: z.string().optional(),
+    description: z.string().min(1, 'Description is required'),
+    totalAmount: z.string().min(1, 'Total amount is required'),
+    status: z.enum(['draft', 'sent', 'delivered']),
+    poDate: z.date().optional(),
+    expectedDeliveryDate: z.date().optional(),
+    deliveryAddress: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.poDate && data.expectedDeliveryDate) {
+        return data.expectedDeliveryDate > data.poDate;
+      }
+      return true;
+    },
+    {
+      message: 'Expected delivery date must be after the PO date',
+      path: ['expectedDeliveryDate'],
+    }
+  );
 
 type POFormValues = z.infer<typeof poFormSchema>;
 
@@ -328,34 +342,52 @@ export function POForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Project *</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={loadingProjects}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a project" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {loadingProjects ? (
-                            <SelectItem value="loading" disabled>
-                              Loading projects...
-                            </SelectItem>
-                          ) : projects.length === 0 ? (
-                            <SelectItem value="none" disabled>
-                              No projects available
-                            </SelectItem>
-                          ) : (
-                            projects.map((project) => (
-                              <SelectItem key={project.id} value={project.id}>
-                                {project.projectNumber.toUpperCase()}
+                      <div className="flex items-center gap-2">
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={loadingProjects}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select a project" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {loadingProjects ? (
+                              <SelectItem value="loading" disabled>
+                                Loading projects...
                               </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
+                            ) : projects.length === 0 ? (
+                              <SelectItem value="none" disabled>
+                                No projects available
+                              </SelectItem>
+                            ) : (
+                              projects.map((project) => (
+                                <SelectItem key={project.id} value={project.id}>
+                                  {project.projectNumber.toUpperCase()}
+                                </SelectItem>
+                              ))
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <ProjectCreateDialog
+                          organizationId={organizationId}
+                          onProjectCreated={(newProject) => {
+                            setProjects((prev) => [
+                              ...prev,
+                              {
+                                id: newProject.id,
+                                projectNumber: newProject.projectNumber,
+                                description: '',
+                                status: 'active',
+                                client: null,
+                              },
+                            ]);
+                            form.setValue('projectId', newProject.id);
+                          }}
+                        />
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}

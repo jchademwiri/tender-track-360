@@ -30,7 +30,7 @@ export function HeroSection() {
 
           <div className="flex w-full flex-col items-center justify-center gap-4 sm:flex-row">
             <Button size="lg" asChild className="px-8">
-              <Link href="/waitlist">Join Waitlist</Link>
+              <Link href="/dashboard">Get Started</Link>
             </Button>
             <Button size="lg" variant="outline" asChild className="px-8">
               <Link href="#features">Learn More</Link>

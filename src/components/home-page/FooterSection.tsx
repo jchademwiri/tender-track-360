@@ -1,11 +1,12 @@
 import { Twitter, Linkedin, Github } from 'lucide-react';
 import Link from 'next/link';
+import { CONTACT_INFO } from '@/lib/constants';
 
 export function FooterSection() {
   return (
     <footer className="bg-muted border-t py-16">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           <div>
             <h3 className="text-xl font-bold mb-4 text-foreground">
               Tender Track 360
@@ -87,18 +88,18 @@ export function FooterSection() {
             <h4 className="font-semibold mb-4 text-foreground">Support</h4>
             <ul className="space-y-2 text-muted-foreground">
               <li>
-                <a
+                <Link
                   href="https://docs.tendertrack360.co.za"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-foreground transition-colors"
                 >
                   Documentation
-                </a>
+                </Link>
               </li>
               <li>
                 <Link
-                  href="#help"
+                  href="/help"
                   className="hover:text-foreground transition-colors"
                 >
                   Help Center
@@ -106,7 +107,7 @@ export function FooterSection() {
               </li>
               <li>
                 <Link
-                  href="#contact"
+                  href="/contact"
                   className="hover:text-foreground transition-colors"
                 >
                   Contact Us
@@ -114,7 +115,7 @@ export function FooterSection() {
               </li>
               <li>
                 <Link
-                  href="#training"
+                  href="/training"
                   className="hover:text-foreground transition-colors"
                 >
                   Training
@@ -124,30 +125,76 @@ export function FooterSection() {
           </div>
 
           <div>
+            <h4 className="font-semibold mb-4 text-foreground">Company</h4>
+            <ul className="space-y-2 text-muted-foreground">
+              <li>
+                <Link
+                  href="/about"
+                  className="hover:text-foreground transition-colors"
+                >
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/careers"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Careers
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/blog"
+                  className="hover:text-foreground transition-colors"
+                >
+                  Blog
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
             <h4 className="font-semibold mb-4 text-foreground">Contact</h4>
-            <div className="space-y-2 text-muted-foreground">
-              <Link
-                href="mailto:info@tendertrack360.co.za"
-                className="hover:text-foreground transition-colors"
-              >
-                📧 info@tendertrack360.co.za
-              </Link>
-              <Link
-                href="tel:+27686478157"
-                className="hover:text-foreground transition-colors"
-              >
-                📞 +27 68 647 8157
-              </Link>
+            <ul className="space-y-2 text-muted-foreground">
+              <li>
+                <Link
+                  href="mailto:info@tendertrack360.co.za"
+                  className="hover:text-foreground transition-colors"
+                >
+                  📧 info@tendertrack360.co.za
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={`tel:${CONTACT_INFO.phone.replace(/\s/g, '')}`}
+                  className="hover:text-foreground transition-colors"
+                >
+                  📞 {CONTACT_INFO.phone}
+                </Link>
+              </li>
               {/* <div>📍 123 Business Ave, Suite 100</div> */}
-              <div>🌐 www.tendertrack360.co.za</div>
-            </div>
+              <li>
+                <Link
+                  href={`https://wa.me/${CONTACT_INFO.whatsapp
+                    .replace(/\s/g, '')
+                    .replace('+', '')}`}
+                  className="hover:text-foreground transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  💬 Chat on WhatsApp
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
 
         <div className="border-t border-border pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-muted-foreground text-sm mb-4 md:mb-0">
-              © 2024 Tender Track 360. All rights reserved.
+              © {new Date().getFullYear()} Tender Track 360. All rights
+              reserved.
             </div>
             <div className="flex space-x-6 text-sm text-muted-foreground">
               <Link
