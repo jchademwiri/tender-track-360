@@ -79,6 +79,7 @@ export function UpcomingDeadlinesList({
                 size="icon"
                 className="h-8 w-8 shrink-0"
                 asChild
+                aria-label="View tender details"
               >
                 <Link href={`/dashboard/tenders/${item.id}`}>
                   <ArrowRight className="h-4 w-4" />

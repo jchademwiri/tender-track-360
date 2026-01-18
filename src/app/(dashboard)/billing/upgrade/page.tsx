@@ -351,9 +351,7 @@ export default function UpgradePage() {
                           )}
                           <div className="flex items-baseline justify-center gap-2">
                             <span className="text-4xl font-bold text-gray-900 dark:text-white">
-                              {tier.price > 0
-                                ? formatCurrency(0)
-                                : formatCurrency(0)}
+                              {formatCurrency(tier.price)}
                             </span>
                             <span className="text-gray-600 dark:text-gray-300">
                               {tier.period}

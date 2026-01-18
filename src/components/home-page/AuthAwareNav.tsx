@@ -28,6 +28,21 @@ export default function AuthAwareNav() {
     );
   }
 
+  if (isPending) {
+    return (
+      <>
+        <div className="hidden md:flex gap-2">
+          <Button variant="ghost" size="sm" disabled>
+            Sign In
+          </Button>
+          <Button size="sm" disabled>
+            Sign Up
+          </Button>
+        </div>
+      </>
+    );
+  }
+
   return (
     <div className="flex items-center gap-3">
       <Button variant="ghost" asChild size="sm">
