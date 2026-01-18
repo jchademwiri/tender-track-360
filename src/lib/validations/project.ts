@@ -18,4 +18,6 @@ export const ProjectStatusUpdateSchema = z.object({
 
 export type ProjectCreateInput = z.infer<typeof ProjectCreateSchema>;
 export type ProjectUpdateInput = z.infer<typeof ProjectUpdateSchema>;
-export type ProjectStatusUpdateInput = z.infer<typeof ProjectStatusUpdateSchema>;
+export type ProjectStatusUpdateInput = z.infer<
+  typeof ProjectStatusUpdateSchema
+>;

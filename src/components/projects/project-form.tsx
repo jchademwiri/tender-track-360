@@ -4,13 +4,7 @@ import { useState, useTransition, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Save,
-  ArrowLeft,
-  FileText,
-  User,
-  Building,
-} from 'lucide-react';
+import { Save, ArrowLeft, FileText, User, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -38,6 +32,7 @@ import {
   ProjectCreateSchema,
   type ProjectCreateInput,
 } from '@/lib/validations/project';
+import { ClientCreateDialog } from '@/components/clients/client-create-dialog';
 
 interface ProjectWithRelations {
   id: string;
@@ -84,7 +79,11 @@ interface ProjectFormProps {
   mode: 'create' | 'edit';
 }
 
-export function ProjectForm({ organizationId, project, mode }: ProjectFormProps) {
+export function ProjectForm({
+  organizationId,
+  project,
+  mode,
+}: ProjectFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -101,10 +100,7 @@ export function ProjectForm({ organizationId, project, mode }: ProjectFormProps)
       clientId: project?.client?.id || 'none',
       tenderId: project?.tender?.id || 'none',
       status:
-        (project?.status as
-          | 'active'
-          | 'completed'
-          | 'cancelled') || 'active',
+        (project?.status as 'active' | 'completed' | 'cancelled') || 'active',
     },
   });
 
@@ -127,20 +123,31 @@ export function ProjectForm({ organizationId, project, mode }: ProjectFormProps)
   // Load tenders on component mount and when client changes
   const selectedClientId = form.watch('clientId');
 
-  const loadTenders = useCallback(async (clientId?: string) => {
-    try {
-      setLoadingTenders(true);
-      const result = await getAvailableTendersForProjects(organizationId, clientId, 1, 100);
-      setTenders(result.tenders);
-    } catch (error) {
-      console.error('Error loading tenders:', error);
-    } finally {
-      setLoadingTenders(false);
-    }
-  }, [organizationId]);
+  const loadTenders = useCallback(
+    async (clientId?: string) => {
+      try {
+        setLoadingTenders(true);
+        const result = await getAvailableTendersForProjects(
+          organizationId,
+          clientId,
+          1,
+          100
+        );
+        setTenders(result.tenders);
+      } catch (error) {
+        console.error('Error loading tenders:', error);
+      } finally {
+        setLoadingTenders(false);
+      }
+    },
+    [organizationId]
+  );
 
   useEffect(() => {
-    const clientId = selectedClientId && selectedClientId !== 'none' ? selectedClientId : undefined;
+    const clientId =
+      selectedClientId && selectedClientId !== 'none'
+        ? selectedClientId
+        : undefined;
     loadTenders(clientId);
   }, [selectedClientId, loadTenders]);
 
@@ -148,14 +155,17 @@ export function ProjectForm({ organizationId, project, mode }: ProjectFormProps)
   const selectedTenderId = form.watch('tenderId');
   useEffect(() => {
     if (selectedTenderId && selectedTenderId !== 'none') {
-      const selectedTender = tenders.find(t => t.id === selectedTenderId);
+      const selectedTender = tenders.find((t) => t.id === selectedTenderId);
       if (selectedTender) {
         // Prefill project number and description from tender
         form.setValue('projectNumber', selectedTender.tenderNumber);
         form.setValue('description', selectedTender.description || '');
 
         // Prefill client if not already set
-        if (!form.getValues('clientId') || form.getValues('clientId') === 'none') {
+        if (
+          !form.getValues('clientId') ||
+          form.getValues('clientId') === 'none'
+        ) {
           form.setValue('clientId', selectedTender.client?.id || 'none');
         }
       }
@@ -179,7 +189,11 @@ export function ProjectForm({ organizationId, project, mode }: ProjectFormProps)
         if (mode === 'create') {
           result = await createProject(organizationId, processedData);
         } else if (project) {
-          result = await updateProject(organizationId, project.id, processedData);
+          result = await updateProject(
+            organizationId,
+            project.id,
+            processedData
+          );
         }
 
         if (result?.success) {
@@ -267,35 +281,53 @@ export function ProjectForm({ organizationId, project, mode }: ProjectFormProps)
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Client</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={isPending || loadingClients}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a client (optional)" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none">No client</SelectItem>
-                          {loadingClients ? (
-                            <SelectItem value="loading" disabled>
-                              Loading clients...
-                            </SelectItem>
-                          ) : clients.length === 0 ? (
-                            <SelectItem value="no-clients" disabled>
-                              No clients available
-                            </SelectItem>
-                          ) : (
-                            clients.map((client) => (
-                              <SelectItem key={client.id} value={client.id}>
-                                {client.name}
+                      <div className="flex items-center gap-2">
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={isPending || loadingClients}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select a client (optional)" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="none">No client</SelectItem>
+                            {loadingClients ? (
+                              <SelectItem value="loading" disabled>
+                                Loading clients...
                               </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
+                            ) : clients.length === 0 ? (
+                              <SelectItem value="no-clients" disabled>
+                                No clients available
+                              </SelectItem>
+                            ) : (
+                              clients.map((client) => (
+                                <SelectItem key={client.id} value={client.id}>
+                                  {client.name}
+                                </SelectItem>
+                              ))
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <ClientCreateDialog
+                          organizationId={organizationId}
+                          onClientCreated={(newClient) => {
+                            setClients((prev) => [
+                              ...prev,
+                              {
+                                id: newClient.id,
+                                name: newClient.name,
+                                contactName: null,
+                                contactEmail: null,
+                                contactPhone: null,
+                              },
+                            ]);
+                            form.setValue('clientId', newClient.id);
+                          }}
+                        />
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
