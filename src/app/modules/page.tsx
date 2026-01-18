@@ -7,9 +7,18 @@ import {
   Briefcase,
   FolderOpen,
   Key,
+  MessageSquare,
+  File,
 } from 'lucide-react';
 
 import { getAccent } from '../../lib/module-accents';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'System Architecture & Modules',
+  description:
+    'Explore the modular architecture of Tender Track 360. Understanding our system modules and data relationships.',
+};
 
 export default function ModuleDiagram() {
   // Toggle between 'system' and 'premium' palettes here.
@@ -35,7 +44,7 @@ export default function ModuleDiagram() {
       name: 'Notifications & Preferences',
       icon: Bell,
       accent: 'notifications',
-      tables: ['notificationPreferences'],
+      tables: ['notificationPreferences', 'notification'],
       description: 'User notifications',
     },
     {
@@ -73,6 +82,20 @@ export default function ModuleDiagram() {
       tables: ['project', 'purchaseOrder'],
       description: 'Projects, POs',
     },
+    {
+      name: 'Support & Feedback',
+      icon: MessageSquare,
+      accent: 'support',
+      tables: ['feedback', 'support_tickets'],
+      description: 'User support & feedback',
+    },
+    {
+      name: 'Document Management',
+      icon: File,
+      accent: 'document',
+      tables: ['document'],
+      description: 'Centralized file storage',
+    },
   ];
 
   const connections = [
@@ -99,7 +122,7 @@ export default function ModuleDiagram() {
             </h1>
           </div>
           <p className="text-muted-foreground text-lg">
-            8 Core Modules with Database Schema Mapping
+            10 Core Modules with Database Schema Mapping
           </p>
         </div>
 
@@ -229,6 +252,15 @@ export default function ModuleDiagram() {
                     <span>
                       <strong>Ownership Transfer</strong> manages org
                       transitions
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-muted/50 rounded">
+                    <div
+                      className={`w-2 h-2 ${getAccent('document', THEME_VARIANT).dot} rounded-full`}
+                    ></div>
+                    <span>
+                      <strong>Documents</strong> linked to Tender, Project, PO,
+                      & Extensions
                     </span>
                   </div>
                 </div>

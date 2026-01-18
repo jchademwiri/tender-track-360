@@ -1,3 +1,12 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Careers',
+  robots: {
+    index: false,
+  },
+};
+
 export default function CareersPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4 text-center">
