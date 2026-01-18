@@ -270,12 +270,14 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
                               {
                                 id: newClient.id,
                                 name: newClient.name,
-                                contactName: null,
-                                contactEmail: null,
-                                contactPhone: null,
+                                contactName: newClient.contactName || null,
+                                contactEmail: newClient.contactEmail || null,
+                                contactPhone: newClient.contactPhone || null,
                               },
                             ]);
-                            form.setValue('clientId', newClient.id);
+                            form.setValue('clientId', newClient.id, {
+                              shouldValidate: true,
+                            });
                           }}
                         />
                       </div>
