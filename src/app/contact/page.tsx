@@ -1,4 +1,5 @@
 import { ContactForm } from './form';
+import type { Metadata } from 'next';
 import {
   Mail,
   Phone,
@@ -11,9 +12,44 @@ import {
 import { FaXTwitter } from 'react-icons/fa6';
 import { CONTACT_INFO } from '@/lib/constants';
 
+export const metadata: Metadata = {
+  title: 'Contact Us',
+  description:
+    'Get in touch with the Tender Track 360 team for support, sales inquiries, or assistance with our tender management platform.',
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: 'Contact Us | Tender Track 360',
+  description: 'Get in touch with the Tender Track 360 team.',
+  mainEntity: {
+    '@type': 'Organization',
+    name: 'Tender Track 360',
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        telephone: CONTACT_INFO.phone,
+        contactType: 'customer service',
+        areaServed: 'ZA',
+        availableLanguage: 'English',
+      },
+      {
+        '@type': 'ContactPoint',
+        email: CONTACT_INFO.email,
+        contactType: 'customer service',
+      },
+    ],
+  },
+};
+
 export default function Page() {
   return (
     <div className="relative min-h-screen bg-background selection:bg-primary/10 selection:text-primary">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Background gradients */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-full max-w-[1000px] bg-primary/20 blur-[100px] opacity-20" />

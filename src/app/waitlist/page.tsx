@@ -1,4 +1,11 @@
 import { WaitlistForm } from './form';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Join the Waitlist',
+  description:
+    'Be the first to experience Tender Track 360. Join our exclusive waitlist for early access.',
+};
 
 export default function Page() {
   return (
