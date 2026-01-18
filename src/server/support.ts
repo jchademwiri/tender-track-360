@@ -59,6 +59,34 @@ export async function createSupportTicket(input: SupportTicketInput) {
           'Email configuration missing (RESEND_API_KEY, SENDER_SUPPORT_EMAIL, or REPLY_TO_EMAIL not set), skipping email notification'
         );
       }
+
+      // Send confirmation email to user
+      try {
+        if (process.env.RESEND_API_KEY && process.env.SENDER_SUPPORT_EMAIL) {
+          const { Resend } = await import('resend');
+          const resend = new Resend(process.env.RESEND_API_KEY);
+          const supportFromEmail = process.env.SENDER_SUPPORT_EMAIL;
+
+          await resend.emails.send({
+            from: `Tender Track 360 Support <${supportFromEmail}>`,
+            to: validated.email,
+            subject: `We received your request: ${validated.name}`,
+            html: `
+              <h2>Hello ${validated.name},</h2>
+              <p>Thank you for contacting Tender Track 360. We have received your message and will get back to you shortly.</p>
+              <p><strong>Your Message:</strong></p>
+              <blockquote style="background: #f9f9f9; padding: 10px; border-left: 4px solid #ccc;">${validated.message}</blockquote>
+              <p>Best Regards,<br/>Tender Track 360 Team</p>
+            `,
+          });
+        }
+      } catch (userEmailError) {
+        console.error(
+          'Failed to send user confirmation email:',
+          userEmailError
+        );
+        // Don't block response
+      }
     } catch (emailError) {
       console.error('Failed to send support ticket email:', emailError);
       // Don't block the response if email fails
