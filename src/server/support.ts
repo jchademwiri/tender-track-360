@@ -54,13 +54,11 @@ export async function createSupportTicket(input: SupportTicketInput) {
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
         const supportFromEmail = process.env.SENDER_SUPPORT_EMAIL;
-        const supportToEmail = process.env.REPLY_TO_EMAIL;
+        // supportToEmail dead code removed
 
         const { error: emailError } = await resend.emails.send({
           from: `Tender Track 360 Support <${supportFromEmail}>`,
-          to: [
-            process.env.RECEIVER_SUPPORT_EMAIL || 'info@tendertrack360.co.za',
-          ], // Ensure type safety or default
+          to: [process.env.RECEIVER_SUPPORT_EMAIL], // Guaranteed string by outer check
           subject: `New Support Ticket from ${safeName}`,
           html: `
             <h2>New Support Request</h2>
@@ -72,6 +70,11 @@ export async function createSupportTicket(input: SupportTicketInput) {
             </blockquote>
           `,
         });
+
+        if (emailError) {
+          console.error('Failed to send support email:', emailError);
+          // Optional: throw new Error('Failed to send email');
+        }
       } else {
         console.warn(
           'Email configuration missing (RESEND_API_KEY, SENDER_SUPPORT_EMAIL, or RECEIVER_SUPPORT_EMAIL not set), skipping email notification'
@@ -87,7 +90,7 @@ export async function createSupportTicket(input: SupportTicketInput) {
 
           // Send confirmation to user
           await resend.emails.send({
-            from: 'Tender Track 360 <onboarding@resend.dev>',
+            from: `Tender Track 360 Support <${supportFromEmail}>`,
             to: [validated.email],
             subject: `Support request received`,
             html: `

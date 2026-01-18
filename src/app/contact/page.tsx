@@ -110,7 +110,7 @@ export default function Page() {
                     className="w-8 h-8 bg-background rounded flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors text-muted-foreground border border-border"
                     aria-label="Follow us on X"
                   >
-                    <FaXTwitter className="h-5 w-5" />
+                    <FaXTwitter className="h-4 w-4" />
                   </a>
                   <a
                     href="https://linkedin.com/company/tendertrack360"

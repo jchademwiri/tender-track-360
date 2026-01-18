@@ -107,7 +107,6 @@ export const member = pgTable(
     createdAt: timestamp('created_at').notNull(),
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.organizationId, table.userId] }),
     orgUserUnique: unique('member_organization_id_user_id_unique').on(
       table.organizationId,
       table.userId
