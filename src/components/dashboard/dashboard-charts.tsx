@@ -56,6 +56,13 @@ export async function DashboardCharts({
                                 ? 'bg-yellow-500'
                                 : 'bg-gray-500'
                       }`}
+                      role="progressbar"
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={
+                        typeof width === 'string' ? parseFloat(width) : width
+                      }
+                      aria-label={`Progress: ${width}`}
                       style={{ width }}
                     />
                   </div>

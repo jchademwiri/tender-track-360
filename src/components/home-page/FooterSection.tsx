@@ -158,33 +158,39 @@ export function FooterSection() {
             <h4 className="font-semibold mb-4 text-foreground">Contact</h4>
             <ul className="space-y-2 text-muted-foreground">
               <li>
-                <Link
-                  href="mailto:info@tendertrack360.co.za"
-                  className="hover:text-foreground transition-colors"
+                <a
+                  href={`mailto:${CONTACT_INFO.email}`}
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                 >
-                  📧 info@tendertrack360.co.za
-                </Link>
+                  <span aria-hidden="true">📧</span>
+                  <span className="sr-only">Email:</span>
+                  {CONTACT_INFO.email}
+                </a>
               </li>
               <li>
-                <Link
+                <a
                   href={`tel:${CONTACT_INFO.phone.replace(/\s/g, '')}`}
-                  className="hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                 >
-                  📞 {CONTACT_INFO.phone}
-                </Link>
+                  <span aria-hidden="true">📞</span>
+                  <span className="sr-only">Phone:</span>
+                  {CONTACT_INFO.phone}
+                </a>
               </li>
               {/* <div>📍 123 Business Ave, Suite 100</div> */}
               <li>
-                <Link
+                <a
                   href={`https://wa.me/${CONTACT_INFO.whatsapp
                     .replace(/\s/g, '')
                     .replace('+', '')}`}
-                  className="hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  💬 Chat on WhatsApp
-                </Link>
+                  <span aria-hidden="true">💬</span>
+                  <span className="sr-only">WhatsApp:</span>
+                  {CONTACT_INFO.whatsapp}
+                </a>
               </li>
             </ul>
           </div>

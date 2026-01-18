@@ -1,5 +1,13 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, text, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  pgEnum,
+  primaryKey,
+  unique,
+} from 'drizzle-orm/pg-core';
 
 /* =========================
    AUTH & ORG TABLES
@@ -85,17 +93,27 @@ export const organization = pgTable('organization', {
 export const role = pgEnum('role', ['owner', 'admin', 'manager', 'member']);
 export type Role = (typeof role.enumValues)[number];
 
-export const member = pgTable('member', {
-  id: text('id').primaryKey(),
-  organizationId: text('organization_id')
-    .notNull()
-    .references(() => organization.id, { onDelete: 'cascade' }),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  role: role('role').default('member').notNull(),
-  createdAt: timestamp('created_at').notNull(),
-});
+export const member = pgTable(
+  'member',
+  {
+    id: text('id').primaryKey(),
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    role: role('role').default('member').notNull(),
+    createdAt: timestamp('created_at').notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.organizationId, table.userId] }),
+    orgUserUnique: unique('member_organization_id_user_id_unique').on(
+      table.organizationId,
+      table.userId
+    ),
+  })
+);
 
 export type Member = typeof member.$inferSelect & {
   user: typeof user.$inferSelect;
@@ -122,22 +140,30 @@ export const invitation = pgTable('invitation', {
 /* =========================
    NOTIFICATION PREFERENCES
 ========================= */
-export const notificationPreferences = pgTable('notification_preferences', {
-  id: text('id').primaryKey(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  emailNotifications: boolean('email_notifications').default(true).notNull(),
-  pushNotifications: boolean('push_notifications').default(true).notNull(),
-  smsNotifications: boolean('sms_notifications').default(false).notNull(),
-  tenderReminders: boolean('tender_reminders').default(true).notNull(),
-  projectUpdates: boolean('project_updates').default(true).notNull(),
-  calendarReminders: boolean('calendar_reminders').default(true).notNull(),
-  systemAlerts: boolean('system_alerts').default(true).notNull(),
-  marketingEmails: boolean('marketing_emails').default(false).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+export const notificationPreferences = pgTable(
+  'notification_preferences',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    emailNotifications: boolean('email_notifications').default(true).notNull(),
+    pushNotifications: boolean('push_notifications').default(true).notNull(),
+    smsNotifications: boolean('sms_notifications').default(false).notNull(),
+    tenderReminders: boolean('tender_reminders').default(true).notNull(),
+    projectUpdates: boolean('project_updates').default(true).notNull(),
+    calendarReminders: boolean('calendar_reminders').default(true).notNull(),
+    systemAlerts: boolean('system_alerts').default(true).notNull(),
+    marketingEmails: boolean('marketing_emails').default(false).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userIdUnique: unique('notification_preferences_user_id_unique').on(
+      table.userId
+    ),
+  })
+);
 
 export const notification = pgTable('notification', {
   id: text('id').primaryKey(),
@@ -187,9 +213,7 @@ export const securityAuditLog = pgTable('security_audit_log', {
   organizationId: text('organization_id')
     .notNull()
     .references(() => organization.id, { onDelete: 'cascade' }),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
+  userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
   action: text('action').notNull(),
   resourceType: text('resource_type').notNull(),
   resourceId: text('resource_id'),

@@ -29,34 +29,52 @@ export async function createSupportTicket(input: SupportTicketInput) {
       status: 'open',
     });
 
+    const escapeHtml = (unsafe: string) => {
+      return unsafe
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    };
+
+    const safeMessage = escapeHtml(validated.message).replace(/\n/g, '<br>');
+    const safeName = escapeHtml(validated.name);
+    const safeEmail = escapeHtml(validated.email);
+    const safeUserId = validated.userId ? escapeHtml(validated.userId) : 'N/A';
+
     // Send email notification to admin
     try {
       if (
         process.env.RESEND_API_KEY &&
         process.env.SENDER_SUPPORT_EMAIL &&
-        process.env.REPLY_TO_EMAIL
+        process.env.REPLY_TO_EMAIL &&
+        process.env.RECEIVER_SUPPORT_EMAIL
       ) {
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
         const supportFromEmail = process.env.SENDER_SUPPORT_EMAIL;
         const supportToEmail = process.env.REPLY_TO_EMAIL;
 
-        await resend.emails.send({
+        const { error: emailError } = await resend.emails.send({
           from: `Tender Track 360 Support <${supportFromEmail}>`,
-          to: supportToEmail,
-          subject: `New Support Ticket from ${validated.name}`,
+          to: [
+            process.env.RECEIVER_SUPPORT_EMAIL || 'info@tendertrack360.co.za',
+          ], // Ensure type safety or default
+          subject: `New Support Ticket from ${safeName}`,
           html: `
-            <h2>New Support Ticket Created</h2>
-            <p><strong>Name:</strong> ${validated.name}</p>
-            <p><strong>Email:</strong> ${validated.email}</p>
+            <h2>New Support Request</h2>
+            <p><strong>From:</strong> ${safeName} (${safeEmail})</p>
+            <p><strong>User ID:</strong> ${safeUserId}</p>
             <p><strong>Message:</strong></p>
-            <blockquote style="background: #f9f9f9; padding: 10px; border-left: 4px solid #ccc;">${validated.message}</blockquote>
-            <p><strong>User ID:</strong> ${validated.userId || 'N/A'}</p>
+            <blockquote style="background: #f9f9f9; padding: 10px; border-left: 5px solid #ccc;">
+              ${safeMessage}
+            </blockquote>
           `,
         });
       } else {
         console.warn(
-          'Email configuration missing (RESEND_API_KEY, SENDER_SUPPORT_EMAIL, or REPLY_TO_EMAIL not set), skipping email notification'
+          'Email configuration missing (RESEND_API_KEY, SENDER_SUPPORT_EMAIL, or RECEIVER_SUPPORT_EMAIL not set), skipping email notification'
         );
       }
 
@@ -67,16 +85,19 @@ export async function createSupportTicket(input: SupportTicketInput) {
           const resend = new Resend(process.env.RESEND_API_KEY);
           const supportFromEmail = process.env.SENDER_SUPPORT_EMAIL;
 
+          // Send confirmation to user
           await resend.emails.send({
-            from: `Tender Track 360 Support <${supportFromEmail}>`,
-            to: validated.email,
-            subject: `We received your request: ${validated.name}`,
+            from: 'Tender Track 360 <onboarding@resend.dev>',
+            to: [validated.email],
+            subject: `Support request received`,
             html: `
-              <h2>Hello ${validated.name},</h2>
-              <p>Thank you for contacting Tender Track 360. We have received your message and will get back to you shortly.</p>
-              <p><strong>Your Message:</strong></p>
-              <blockquote style="background: #f9f9f9; padding: 10px; border-left: 4px solid #ccc;">${validated.message}</blockquote>
-              <p>Best Regards,<br/>Tender Track 360 Team</p>
+              <h2>We received your request</h2>
+              <p>Hi ${safeName},</p>
+              <p>Thanks for reaching out. We've received your message and will get back to you as soon as possible.</p>
+              <p><strong>Your message:</strong></p>
+              <blockquote style="background: #f9f9f9; padding: 10px; border-left: 5px solid #ccc;">
+                ${safeMessage}
+              </blockquote>
             `,
           });
         }

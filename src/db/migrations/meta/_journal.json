@@ -92,6 +92,13 @@
       "when": 1768448783068,
       "tag": "0012_rapid_living_mummy",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1768716188276,
+      "tag": "0013_special_grey_gargoyle",
+      "breakpoints": true
     }
   ]
 }

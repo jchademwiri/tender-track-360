@@ -3,13 +3,12 @@ import {
   Mail,
   Phone,
   Clock,
-  Twitter,
   Linkedin,
   Github,
   MessageCircle,
   Share2,
-  X,
 } from 'lucide-react';
+import { FaXTwitter } from 'react-icons/fa6';
 import { CONTACT_INFO } from '@/lib/constants';
 
 export default function Page() {
@@ -105,16 +104,16 @@ export default function Page() {
                 <h3 className="font-semibold mb-3">Connect with Us</h3>
                 <div className="flex space-x-4">
                   <a
-                    href="https://twitter.com/tendertrack360"
+                    href="https://x.com/tendertrack360"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-8 h-8 bg-background rounded flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors text-muted-foreground border border-border"
                     aria-label="Follow us on X"
                   >
-                    <X className="w-4 h-4" />
+                    <FaXTwitter className="h-5 w-5" />
                   </a>
                   <a
-                    href="https://linkedin.com/organization/tendertrack360"
+                    href="https://linkedin.com/company/tendertrack360"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-8 h-8 bg-background rounded flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors text-muted-foreground border border-border"

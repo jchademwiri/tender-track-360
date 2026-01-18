@@ -32,7 +32,13 @@ import {
 
 interface ClientCreateDialogProps {
   organizationId: string;
-  onClientCreated: (client: { id: string; name: string }) => void;
+  onClientCreated: (client: {
+    id: string;
+    name: string;
+    contactName?: string | null;
+    contactEmail?: string | null;
+    contactPhone?: string | null;
+  }) => void;
   trigger?: React.ReactNode;
 }
 
@@ -49,27 +55,36 @@ export function ClientCreateDialog({
     resolver: zodResolver(ClientCreateSchema),
     defaultValues: {
       name: '',
-      notes: '',
       contactName: '',
       contactEmail: '',
       contactPhone: '',
+      notes: '',
     },
   });
 
-  const onSubmit = (data: ClientCreateInput) => {
-    setError(null);
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    if (!newOpen) {
+      form.reset();
+      setError(null);
+    }
+  };
 
+  function onSubmit(data: ClientCreateInput) {
+    setError(null);
     startTransition(async () => {
       try {
         const result = await createClient(organizationId, data);
 
         if (result.success && result.client) {
-          form.reset();
-          setOpen(false);
           onClientCreated({
             id: result.client.id,
             name: result.client.name,
+            contactName: result.client.contactName,
+            contactEmail: result.client.contactEmail,
+            contactPhone: result.client.contactPhone,
           });
+          handleOpenChange(false);
         } else {
           setError(result.error || 'Failed to create client');
         }
@@ -78,15 +93,7 @@ export function ClientCreateDialog({
         console.error('Client creation error:', err);
       }
     });
-  };
-
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
-      form.reset();
-      setError(null);
-    }
-    setOpen(newOpen);
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -198,7 +205,7 @@ export function ClientCreateDialog({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setOpen(false)}
+                onClick={() => handleOpenChange(false)}
                 disabled={isPending}
               >
                 Cancel

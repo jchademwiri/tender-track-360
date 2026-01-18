@@ -16,16 +16,48 @@ interface DashboardMetricsProps {
 export async function DashboardMetrics({
   organizationId,
 }: DashboardMetricsProps) {
-  const [tenderStatsResult, clientStatsResult, projectStatsResult] =
-    await Promise.all([
-      getTenderStats(organizationId),
-      getClientStats(organizationId),
-      getProjectStats(organizationId),
-    ]);
+  let tenderStats = null;
+  let clientStats = null;
+  let projectStats = null;
 
-  const tenderStats = tenderStatsResult.stats;
-  const projectStats = projectStatsResult.stats;
-  const clientStats = clientStatsResult.stats;
+  try {
+    const [tenderStatsResult, clientStatsResult, projectStatsResult] =
+      await Promise.all([
+        getTenderStats(organizationId),
+        getClientStats(organizationId),
+        getProjectStats(organizationId),
+      ]);
+
+    if (tenderStatsResult?.success) tenderStats = tenderStatsResult.stats;
+    if (clientStatsResult?.success) clientStats = clientStatsResult.stats;
+    if (projectStatsResult?.success) projectStats = projectStatsResult.stats;
+  } catch (error) {
+    console.error('Failed to fetch dashboard metrics:', error);
+  }
+
+  // Use fallback values if stats are missing
+  if (!tenderStats)
+    tenderStats = {
+      totalValue: 0,
+      winRate: 0,
+      trends: { value: 0, winRate: 0 },
+      upcomingDeadlines: 0,
+      totalTenders: 0,
+      statusCounts: { draft: 0, submitted: 0 },
+      overdueCount: 0,
+    };
+  if (!clientStats)
+    clientStats = {
+      clientsWithContact: 0,
+      totalClients: 0,
+    };
+  if (!projectStats)
+    projectStats = {
+      totalProjects: 0,
+      growth: 0,
+      activePOs: 0,
+      totalPOAmount: 0,
+    };
 
   return (
     <>
@@ -58,7 +90,7 @@ export async function DashboardMetrics({
           icon={<TrendingUp className="h-4 w-4" />}
           trend={{
             value: projectStats.growth,
-            isPositive: projectStats.growth > 0,
+            isPositive: projectStats.growth >= 0,
           }}
         />
         <MetricCard
