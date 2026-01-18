@@ -1,4 +1,9 @@
 import { SignUpForm } from '@/components/forms';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Create an Account - Start Your Free Trial',
+};
 
 export default function SignUp() {
   return (

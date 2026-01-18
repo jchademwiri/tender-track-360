@@ -10,6 +10,13 @@ import {
 } from 'lucide-react';
 
 import { getAccent } from '../../lib/module-accents';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'System Architecture & Modules',
+  description:
+    'Explore the modular architecture of Tender Track 360. Understanding our system modules and data relationships.',
+};
 
 export default function ModuleDiagram() {
   // Toggle between 'system' and 'premium' palettes here.
