@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import { useState, useCallback } from 'react';
 import {
   TendersSearchFilters,
@@ -106,24 +108,35 @@ export function TendersOverviewClient({
     [organizationId, filters]
   );
 
-  const handleViewTender = useCallback((tenderId: string) => {
-    // Navigate to tender detail page
-    window.location.href = `/dashboard/tenders/${tenderId}`;
-  }, []);
+  const router = useRouter();
 
-  const handleEditTender = useCallback((tenderId: string) => {
-    // Navigate to tender edit page
-    window.location.href = `/dashboard/tenders/${tenderId}/edit`;
-  }, []);
+  const handleViewTender = useCallback(
+    (tenderId: string) => {
+      // Navigate to tender detail page
+      router.push(`/dashboard/tenders/${tenderId}`);
+    },
+    [router]
+  );
+
+  const handleEditTender = useCallback(
+    (tenderId: string) => {
+      // Navigate to tender edit page
+      router.push(`/dashboard/tenders/${tenderId}/edit`);
+    },
+    [router]
+  );
 
   const handleDeleteTender = useCallback((tenderId: string) => {
     // TODO: Implement delete functionality
   }, []);
 
-  const handleRowClick = useCallback((tenderId: string) => {
-    // Navigate to tender detail page on row click
-    window.location.href = `/dashboard/tenders/${tenderId}`;
-  }, []);
+  const handleRowClick = useCallback(
+    (tenderId: string) => {
+      // Navigate to tender detail page on row click
+      router.push(`/dashboard/tenders/${tenderId}`);
+    },
+    [router]
+  );
 
   return (
     <div className="space-y-4 ">
