@@ -1,6 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description:
+    'Read the Tender Track 360 Privacy Policy. Learn how we handle your data in compliance with POPIA.',
+};
 
 export default function PrivacyPage() {
   return (

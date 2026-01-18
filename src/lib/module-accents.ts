@@ -45,6 +45,16 @@ export const moduleAccents: Record<
     title: 'text-slate-900',
     dot: 'bg-indigo-500',
   },
+  support: {
+    bg: 'bg-cyan-50 border-cyan-200',
+    title: 'text-slate-900',
+    dot: 'bg-cyan-500',
+  },
+  document: {
+    bg: 'bg-slate-50 border-slate-200',
+    title: 'text-slate-900',
+    dot: 'bg-slate-500',
+  },
 };
 
 export default moduleAccents;
@@ -92,6 +102,16 @@ export const moduleAccentsPremium: Record<
     bg: 'bg-indigo-100 border-indigo-300',
     title: 'text-slate-900',
     dot: 'bg-indigo-700',
+  },
+  support: {
+    bg: 'bg-cyan-100 border-cyan-300',
+    title: 'text-slate-900',
+    dot: 'bg-cyan-700',
+  },
+  document: {
+    bg: 'bg-slate-100 border-slate-300',
+    title: 'text-slate-900',
+    dot: 'bg-slate-700',
   },
 };
 
