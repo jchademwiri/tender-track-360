@@ -27,6 +27,7 @@ export const user = pgTable('user', {
     .$defaultFn(() => new Date())
     .notNull(),
   plan: text('plan').default('free').notNull(),
+  role: text('role').default('user').notNull(),
 });
 
 export type User = typeof user.$inferSelect;
