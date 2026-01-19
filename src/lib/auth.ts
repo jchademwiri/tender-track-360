@@ -66,7 +66,7 @@ export const auth = betterAuth({
   },
   callbacks: {
     session: {
-      after: async (session, user) => {
+      after: async (session: any, user: any) => {
         return {
           ...session,
           user: {
