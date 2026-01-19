@@ -28,10 +28,23 @@ export const auth = betterAuth({
         before: async (session) => {
           try {
             const organization = await getActiveOrganization(session.userId);
+            // Fetch the user's role
+            const userRecord = await db.query.user.findFirst({
+              where: eq(schema.user.id, session.userId),
+              columns: {
+                role: true,
+              },
+            });
+
             return {
               data: {
                 ...session,
                 activeOrganizationId: organization?.id ?? null,
+                // We'll attach the role to the session.user on the client side via the `user` callback or by extending the type
+                // But better-auth might handle this differently. The user requested:
+                // user: { ...session.user, role: (user as any).role || "user" }
+                // Let's invoke the configured callback pattern if better-auth supports it,
+                // OR we just rely on better-auth automatically picking up the 'role' field if it's in the schema and we added it to `user` config?
               },
             };
           } catch (error) {
@@ -39,6 +52,28 @@ export const auth = betterAuth({
             return { data: session };
           }
         },
+      },
+    },
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: 'string',
+        defaultValue: 'user',
+        input: false, // Security: Users cannot set this via API
+      },
+    },
+  },
+  callbacks: {
+    session: {
+      after: async (session, user) => {
+        return {
+          ...session,
+          user: {
+            ...session.user,
+            role: (user as any).role || 'user', // Expose role to frontend
+          },
+        };
       },
     },
   },

@@ -1,27 +1,58 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+export function proxy(request: NextRequest) {
+  // 1. Get the current URL and Hostname
+  const url = request.nextUrl;
+  const hostname = request.headers.get('host') || '';
 
-  // Check for ANY better-auth cookie
-  const hasBetterAuthCookie = request.cookies
-    .getAll()
-    .some(
-      (cookie) =>
-        cookie.name.startsWith('better-auth') ||
-        cookie.name.includes('session') ||
-        cookie.name.includes('auth')
-    );
+  // 2. Identify if we are on the Admin Subdomain
+  // This robust check works for 'admin.localhost:3000' and 'admin.tendertrack360.co.za'
+  const isAdminSubdomain = hostname.startsWith('admin.');
 
-  // If no auth cookies at all, redirect to login
-  if (!hasBetterAuthCookie) {
-    const loginUrl = new URL('/login', request.url);
-    return NextResponse.redirect(loginUrl);
+  // ---------------------------------------------------------
+  // SCENARIO A: Request is coming from admin.domain.com
+  // ---------------------------------------------------------
+  if (isAdminSubdomain) {
+    // PROXY LOGIC: Rewrite the URL to serve content from the /admin folder.
+    // Example: https://admin.site.com/dashboard -> internally serves /admin/dashboard
+
+    // We clone the URL to modify it safely (Best Practice for Next.js 15+)
+    const rewriteUrl = url.clone();
+
+    // Map the root path to /admin, and all other paths relative to it
+    rewriteUrl.pathname = `/admin${url.pathname}`;
+
+    return NextResponse.rewrite(rewriteUrl);
   }
 
+  // ---------------------------------------------------------
+  // SCENARIO B: Request is coming from main domain (app.com)
+  // ---------------------------------------------------------
+
+  // Security: Prevent direct access to the /admin folder from the main domain.
+  // We don't want users guessing https://tendertrack360.co.za/admin
+  if (url.pathname.startsWith('/admin')) {
+    // Rewrite to a 404 page to effectively "hide" the admin routes
+    return NextResponse.rewrite(new URL('/404', request.url));
+  }
+
+  // Allow all other requests to proceed normally
   return NextResponse.next();
 }
 
+// ---------------------------------------------------------
+// CONFIGURATION
+// ---------------------------------------------------------
 export const config = {
-  matcher: ['/dashboard/:path*', '/onboarding', '/organization/:path*'],
+  matcher: [
+    /*
+     * Match all request paths except for:
+     * 1. /api/ routes (we typically want these accessible globally or handled by logic)
+     * 2. /_next/ (static files, chunks, etc.)
+     * 3. /static (public folder assets)
+     * 4. File extensions like .png, .jpg, .svg, .ico
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 };
