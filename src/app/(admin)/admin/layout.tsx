@@ -2,6 +2,7 @@ import React from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { auth } from '@/lib/auth'; // Adjust import based on your actual auth setup
 import { headers } from 'next/headers';
+import Logout from '@/components/ui/logout';
 
 // Placeholder for Admin Sidebar and Header components
 // You should create these components in src/components/admin/
@@ -48,7 +49,7 @@ export default async function AdminLayout({
          TODO: Add AdminSidebar here
          <AdminSidebar />
        */}
-      <aside className="w-64 border-r bg-sidebar text-sidebar-foreground p-4 hidden md:block">
+      <aside className="w-64 border-r bg-sidebar text-sidebar-foreground p-4 hidden md:flex flex-col">
         <div className="font-bold text-lg mb-6">Admin Portal</div>
         <nav className="space-y-2">
           <div className="text-sm font-medium text-muted-foreground p-2">
@@ -66,6 +67,7 @@ export default async function AdminLayout({
           >
             Users
           </a>
+
           <a
             href="/organizations"
             className="block p-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded"
@@ -73,6 +75,9 @@ export default async function AdminLayout({
             Organizations
           </a>
         </nav>
+        <div className="mt-auto pt-4 border-t">
+          <Logout />
+        </div>
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
