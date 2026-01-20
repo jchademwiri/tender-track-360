@@ -14,6 +14,21 @@ export function proxy(request: NextRequest) {
   // SCENARIO A: Request is coming from admin.domain.com
   // ---------------------------------------------------------
   if (isAdminSubdomain) {
+    // List of public auth routes that should NOT be rewritten to /admin/...
+    // This ensures that redirects to /login (from auth guards) work correctly.
+    const isPublicAuthRoute = [
+      '/login',
+      '/sign-up',
+      '/forgot-password',
+      '/reset-password',
+      '/invite', // Invite acceptance might start here
+    ].some((route) => url.pathname.startsWith(route));
+
+    if (isPublicAuthRoute) {
+      // Don't rewrite public auth routes, let standard routing handle them
+      return NextResponse.next();
+    }
+
     // PROXY LOGIC: Rewrite the URL to serve content from the /admin folder.
     // Example: https://admin.site.com/dashboard -> internally serves /admin/dashboard
 
