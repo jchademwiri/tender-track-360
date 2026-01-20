@@ -38,7 +38,8 @@ export default async function AdminLayout({
   // Ensure user has 'admin' role
   if ((user as any).role !== 'admin') {
     console.log('Unauthorized access attempt to Admin Portal by:', user.email);
-    return redirect('/dashboard');
+    const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+    return redirect(`${baseUrl}/dashboard`);
   }
 
   return (
