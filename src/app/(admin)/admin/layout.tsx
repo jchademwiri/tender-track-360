@@ -35,13 +35,11 @@ export default async function AdminLayout({
     return redirect('/login');
   }
 
-  /* 
-  // UNCOMMENT WHEN ROLE IS FULLY IMPLEMENTED
-  if ((user as any).role !== 'superadmin' && (user as any).role !== 'admin') {
-     console.log('Unauthorized access attempt to Admin Portal by:', user.email);
-     return notFound(); // Or redirect to home
+  // Ensure user has 'admin' role
+  if ((user as any).role !== 'admin') {
+    console.log('Unauthorized access attempt to Admin Portal by:', user.email);
+    return redirect('/dashboard');
   }
-  */
 
   return (
     <div className="flex h-screen w-full bg-slate-50 dark:bg-slate-900">
