@@ -29,6 +29,7 @@ export default function AdminLayoutClient({
          - Visible on desktop (md:flex)
        */}
       <aside
+        id="mobile-menu"
         className={`
           fixed inset-y-0 left-0 z-50 w-64 bg-sidebar text-sidebar-foreground border-r transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:flex flex-col p-4
           ${isMobileMenuOpen ? 'translate-x-0 shadow-lg' : '-translate-x-full'}
