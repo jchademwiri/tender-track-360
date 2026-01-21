@@ -27,7 +27,7 @@ import {
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { Loader } from 'lucide-react';
-import { signInWithGoogle } from '@/lib/auth-client';
+import { signInWithGoogle, getRedirectPath } from '@/lib/auth-client';
 import { LockKeyhole } from 'lucide-react';
 
 const loginFormSchema = z.object({
@@ -58,13 +58,13 @@ export function LoginForm({
     const { success, message } = await signIn(values.email, values.password);
     if (success) {
       toast.success(message as string);
-      // If a `next` param is present in the URL, return there after login; otherwise go to dashboard
+      // If a `next` param is present in the URL, return there after login; otherwise go to dashboard or root depending on subdomain
       try {
         const params = new URLSearchParams(window.location.search);
         const next = params.get('next') || params.get('callbackUrl');
-        window.location.replace(next || '/dashboard');
+        window.location.replace(next || getRedirectPath());
       } catch (e) {
-        window.location.replace('/dashboard');
+        window.location.replace(getRedirectPath());
       }
     } else {
       toast.error(message as string);

@@ -43,7 +43,7 @@ export default function AdminOrganizationsPage() {
       </div>
 
       {/* Placeholder for Org Table */}
-      <div className="bg-white rounded-lg border shadow-sm min-h-[400px] flex items-center justify-center text-muted-foreground">
+      <div className="bg-card text-card-foreground rounded-lg border shadow-sm min-h-[400px] flex items-center justify-center text-muted-foreground">
         <div className="text-center p-8">
           <p className="mb-2 font-medium">
             Organization Table Component Placeholder

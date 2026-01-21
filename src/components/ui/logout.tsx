@@ -8,7 +8,8 @@ export default function Logout() {
   const router = useRouter();
   const handleLogout = async () => {
     await signOut();
-    router.push('/');
+    const baseUrl = process.env.NEXT_PUBLIC_URL || '/';
+    window.location.href = baseUrl;
   };
 
   return (
