@@ -68,6 +68,6 @@ export const config = {
      * 3. /static (public folder assets)
      * 4. File extensions like .png, .jpg, .svg, .ico
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|_next/static|_next/image|static|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
