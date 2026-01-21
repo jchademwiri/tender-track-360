@@ -65,6 +65,13 @@ export function HelpWidget() {
   const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
 
+  // Client-side only rendering to prevent hydration mismatch
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   // Update form defaults when session loads
   useEffect(() => {
     if (session?.user) {
@@ -135,6 +142,10 @@ export function HelpWidget() {
   const whatsappMessage = encodeURIComponent(
     "Hi, I'm interested in Tender Track 360 and would like to know more."
   );
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <>

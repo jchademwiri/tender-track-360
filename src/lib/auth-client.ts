@@ -6,8 +6,32 @@ export const authClient = createAuthClient({
   plugins: [organizationClient()],
 });
 
+export function getRedirectPath(): string {
+  if (typeof window === 'undefined') return '/dashboard';
+
+  const hostname = window.location.hostname;
+  const mainDomainUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+  let mainHostname = 'localhost';
+  try {
+    mainHostname = new URL(mainDomainUrl).hostname;
+  } catch (e) {
+    // Fallback if URL parsing fails
+  }
+
+  // Remove 'www.' for comparison
+  const currentHost = hostname.replace(/^www\./, '');
+  const rootHost = mainHostname.replace(/^www\./, '');
+
+  // Check if it's a subdomain
+  if (currentHost !== rootHost && currentHost.endsWith(rootHost)) {
+    return '/';
+  }
+
+  return '/dashboard';
+}
+
 export const signInWithGoogle = async (callbackURL?: string) => {
-  const finalCallbackURL = callbackURL || '/dashboard';
+  const finalCallbackURL = callbackURL || getRedirectPath();
   try {
     await authClient.signIn.social({
       provider: 'google',
