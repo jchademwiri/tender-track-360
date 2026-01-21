@@ -116,6 +116,36 @@
   --sidebar-ring: oklch(0.646 0.222 41.116);
 }
 
+/* Admin Theme Scoped Overrides - Only active in Dark Mode under .admin-theme class */
+.admin-theme.dark,
+.dark .admin-theme {
+  /* Navy Background */
+  --background: oklch(0.12 0.04 260);
+  --foreground: oklch(0.98 0 0);
+
+  /* Dark Navy Sidebar/Cards (Full Dark Theme) */
+  --card: oklch(0.15 0.04 260);
+  /* Slightly lighter than bg */
+  --card-foreground: oklch(0.98 0 0);
+
+  --popover: oklch(0.15 0.04 260);
+  --popover-foreground: oklch(0.98 0 0);
+
+  --sidebar: oklch(0.15 0.04 260);
+  --sidebar-foreground: oklch(0.98 0 0);
+
+  --sidebar-primary: oklch(0.40 0.20 260);
+  /* Brand Blue */
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+
+  --sidebar-accent: oklch(0.20 0.04 260);
+  /* Even lighter for hover */
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+
+  --sidebar-border: oklch(0.20 0.04 260);
+  --sidebar-ring: oklch(0.40 0.20 260);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -39,7 +39,7 @@ export default function AdminDashboardPage() {
 
       {/* Placeholder for KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="p-6 bg-white rounded-lg border shadow-sm">
+        <div className="p-6 bg-card text-card-foreground rounded-lg border shadow-sm">
           <div className="text-sm font-medium text-muted-foreground">
             Total Users
           </div>
@@ -48,7 +48,7 @@ export default function AdminDashboardPage() {
             Waitlist & Active
           </div>
         </div>
-        <div className="p-6 bg-white rounded-lg border shadow-sm">
+        <div className="p-6 bg-card text-card-foreground rounded-lg border shadow-sm">
           <div className="text-sm font-medium text-muted-foreground">
             Active Orgs
           </div>
@@ -57,7 +57,7 @@ export default function AdminDashboardPage() {
             Organizations on platform
           </div>
         </div>
-        <div className="p-6 bg-white rounded-lg border shadow-sm">
+        <div className="p-6 bg-card text-card-foreground rounded-lg border shadow-sm">
           <div className="text-sm font-medium text-muted-foreground">
             Total Tenders
           </div>
@@ -66,7 +66,7 @@ export default function AdminDashboardPage() {
             Across all orgs
           </div>
         </div>
-        <div className="p-6 bg-white rounded-lg border shadow-sm">
+        <div className="p-6 bg-card text-card-foreground rounded-lg border shadow-sm">
           <div className="text-sm font-medium text-muted-foreground">
             System Health
           </div>
@@ -80,7 +80,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Placeholder for Recent Activity */}
-      <div className="bg-white rounded-lg border shadow-sm p-6">
+      <div className="bg-card text-card-foreground rounded-lg border shadow-sm p-6">
         <h3 className="text-lg font-medium mb-4">Recent System Activity</h3>
         <div className="text-sm text-muted-foreground italic border-t pt-4">
           Audit logs will verify user actions, logins, and critical system

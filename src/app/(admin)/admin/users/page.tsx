@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '@/components/ui/button';
 
 // ----------------------------------------------------------------------
 // PAGE: User Management
@@ -42,13 +43,13 @@ export default function AdminUsersPage() {
             View, search, and manage platform users.
           </p>
         </div>
-        <button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded text-sm font-medium">
+        <Button variant="default" size="default">
           Export Users
-        </button>
+        </Button>
       </div>
 
       {/* Placeholder for User Table */}
-      <div className="bg-white rounded-lg border shadow-sm min-h-[400px] flex items-center justify-center text-muted-foreground">
+      <div className="bg-card text-card-foreground rounded-lg border shadow-sm min-h-[400px] flex items-center justify-center text-muted-foreground">
         <div className="text-center p-8">
           <p className="mb-2 font-medium">User Table Component Placeholder</p>
           <p className="text-sm max-w-md mx-auto">
