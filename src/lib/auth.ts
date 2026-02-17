@@ -20,6 +20,7 @@ export const auth = betterAuth({
   trustedOrigins: [
     'http://localhost:3000',
     'https://tender-track-360.vercel.app',
+    'https://admin.tendertrack360.co.za',
     ...(env.NEXT_PUBLIC_URL ? [new URL(env.NEXT_PUBLIC_URL).origin] : []),
   ],
   databaseHooks: {
