@@ -2,7 +2,10 @@ import { createAuthClient } from 'better-auth/react';
 import { organizationClient } from 'better-auth/client/plugins';
 
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
+  baseURL:
+    typeof window !== 'undefined'
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
   plugins: [organizationClient()],
 });
 
@@ -32,21 +35,10 @@ export function getRedirectPath(): string {
 
 export const signInWithGoogle = async (callbackURL?: string) => {
   const finalCallbackURL = callbackURL || getRedirectPath();
-  try {
-    await authClient.signIn.social({
-      provider: 'google',
-      callbackURL: finalCallbackURL,
-    });
-  } catch (error) {
-    console.error('Google sign in error:', error);
-    // Fallback to direct redirect
-    const baseUrl =
-      typeof window !== 'undefined'
-        ? window.location.origin
-        : process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
-
-    window.location.href = `${baseUrl}/api/auth/sign-in/google?callbackURL=${encodeURIComponent(finalCallbackURL)}`;
-  }
+  await authClient.signIn.social({
+    provider: 'google',
+    callbackURL: finalCallbackURL,
+  });
 };
 
 export const signOut = async () => {
