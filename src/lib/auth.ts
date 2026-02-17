@@ -23,6 +23,16 @@ export const auth = betterAuth({
     'https://admin.tendertrack360.co.za',
     ...(env.NEXT_PUBLIC_URL ? [new URL(env.NEXT_PUBLIC_URL).origin] : []),
   ],
+  advanced: {
+    cookiePrefix: 'tender-track-360',
+    crossSubdomainCookies: {
+      enabled: true,
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? 'tendertrack360.co.za'
+          : undefined,
+    },
+  },
   databaseHooks: {
     session: {
       create: {
