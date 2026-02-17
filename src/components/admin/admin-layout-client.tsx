@@ -1,118 +1,99 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import Logout from '@/components/ui/logout';
-import { Menu, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import * as React from 'react';
+import { usePathname } from 'next/navigation';
+
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
+import { AdminSidebar } from '@/components/admin/sidebar/admin-sidebar';
 
 interface AdminLayoutClientProps {
   children: React.ReactNode;
-  user: any; // User type is not strictly exported yet for frontend, so using any or a partial shape
+  user: any;
+}
+
+function getBreadcrumbs(pathname: string) {
+  // Remove trailing slash and split
+  const paths = pathname.replace(/\/$/, '').split('/').filter(Boolean);
+  // We assume /admin is the root
+  // If paths = ['admin'], breadcrumb = Admin Portal > Dashboard
+  // If paths = ['admin', 'users'], breadcrumb = Admin Portal > Users
+
+  if (paths.length <= 1) {
+    return (
+      <>
+        <BreadcrumbItem>
+          <BreadcrumbPage>Dashboard</BreadcrumbPage>
+        </BreadcrumbItem>
+      </>
+    );
+  }
+
+  return paths.slice(1).map((path, index, arr) => {
+    const isLast = index === arr.length - 1;
+    const title = path.charAt(0).toUpperCase() + path.slice(1);
+    const href = `/admin/${arr.slice(0, index + 1).join('/')}`;
+
+    return (
+      <React.Fragment key={path}>
+        <BreadcrumbItem>
+          {isLast ? (
+            <BreadcrumbPage>{title}</BreadcrumbPage>
+          ) : (
+            <BreadcrumbLink href={href}>{title}</BreadcrumbLink>
+          )}
+        </BreadcrumbItem>
+        {!isLast && <BreadcrumbSeparator />}
+      </React.Fragment>
+    );
+  });
 }
 
 export default function AdminLayoutClient({
   children,
   user,
 }: AdminLayoutClientProps) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  const pathname = usePathname();
 
   return (
-    <div className="admin-theme flex h-screen w-full bg-background text-foreground overflow-hidden">
-      {/* 
-         SIDEBAR
-         - Hidden on mobile by default (unless toggled open)
-         - Visible on desktop (md:flex)
-       */}
-      <aside
-        id="mobile-menu"
-        className={`
-          fixed inset-y-0 left-0 z-50 w-64 bg-sidebar text-sidebar-foreground border-r transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:flex flex-col p-4
-          ${isMobileMenuOpen ? 'translate-x-0 shadow-lg' : '-translate-x-full'}
-        `}
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div className="font-bold text-lg">Admin Portal</div>
-          {/* Mobile Close Button inside Sidebar */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={toggleMenu}
-            aria-label="Close menu"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
-
-        <nav className="space-y-2 flex-1">
-          <div className="text-sm font-medium text-muted-foreground p-2">
-            Menu
+    <SidebarProvider>
+      <AdminSidebar user={user} />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator
+              orientation="vertical"
+              className="mr-2 data-[orientation=vertical]:h-4"
+            />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="/admin">Admin Portal</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                {getBreadcrumbs(pathname)}
+              </BreadcrumbList>
+            </Breadcrumb>
           </div>
-          <Link
-            href="/admin"
-            className="block p-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/admin/users"
-            className="block p-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Users
-          </Link>
-
-          <Link
-            href="/admin/organizations"
-            className="block p-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Organizations
-          </Link>
-        </nav>
-        <div className="mt-auto pt-4 border-t">
-          <Logout />
-        </div>
-      </aside>
-
-      {/* OVERLAY for mobile when menu is open */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <header className="h-14 border-b bg-card text-card-foreground flex items-center px-4 md:px-6 shrink-0 gap-4">
-          {/* Mobile Hamburger Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={toggleMenu}
-            aria-controls="mobile-menu"
-            aria-expanded={isMobileMenuOpen}
-          >
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-
-          <h1 className="font-semibold text-lg md:text-xl">Super Admin</h1>
         </header>
-
-        <main className="flex-1 overflow-auto p-4 md:p-6 w-full">
-          {children}
-        </main>
-      </div>
-    </div>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          {/* Main Content */}
+          <main className="flex-1">{children}</main>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
