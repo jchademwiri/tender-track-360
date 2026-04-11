@@ -6,6 +6,7 @@ import { Search, Plus, MoreHorizontal, Mail, Phone, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from 'sonner';
 import {
   Table,
   TableBody,
@@ -63,6 +64,7 @@ export function ClientList({
         setCurrentPage(result.currentPage);
       } catch (error) {
         console.error('Error fetching clients:', error);
+        toast.error('Failed to load clients. Please try again.');
       } finally {
         setIsLoading(false);
       }

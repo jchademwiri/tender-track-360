@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import {
   Table,
@@ -112,6 +113,7 @@ export function ProjectList({
         setCurrentPage(result.currentPage);
       } catch (error) {
         console.error('Error fetching projects:', error);
+        toast.error('Failed to load projects. Please try again.');
       } finally {
         setIsLoading(false);
       }
