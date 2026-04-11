@@ -561,12 +561,16 @@ export function TenderDetails({
         </TabsContent>
 
         <TabsContent value="documents" className="mt-6">
-          <DocumentManager
-            organizationId={organizationId}
-            entityId={tender.id}
-            entityType="tender"
-            initialDocuments={documents}
-          />
+          <Card>
+            <CardContent className="py-12 text-center">
+              <p className="text-muted-foreground mb-2">
+                Document management is currently unavailable
+              </p>
+              <p className="text-sm text-muted-foreground/70">
+                Coming soon in a future update
+              </p>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="extensions" className="mt-6">

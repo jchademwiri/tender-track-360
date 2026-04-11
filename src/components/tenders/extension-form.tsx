@@ -229,16 +229,14 @@ export function ExtensionForm({
 
             <div className="space-y-2">
               <FormLabel>Extension Letter *</FormLabel>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="file"
-                  accept=".pdf,.doc,.docx,.jpg,.png"
-                  className="cursor-pointer"
-                />
+              <div className="p-4 border rounded-lg bg-muted/30 text-center">
+                <p className="text-muted-foreground text-sm">
+                  File upload is currently unavailable
+                </p>
+                <p className="text-xs text-muted-foreground/70">
+                  Coming soon in a future update
+                </p>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Upload the signed extension letter.
-              </p>
             </div>
 
             <div className="flex justify-end pt-4">

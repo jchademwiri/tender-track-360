@@ -456,21 +456,14 @@ export function TenderForm({ organizationId, tender, mode }: TenderFormProps) {
               </p>
             </CardHeader>
             <CardContent className="space-y-6 p-6">
-              <FileUploader
-                value={files}
-                onValueChange={setFiles}
-                maxFiles={10}
-                accept={{
-                  'application/pdf': ['.pdf'],
-                  'image/*': ['.png', '.jpg', '.jpeg', '.webp'],
-                  'application/msword': ['.doc'],
-                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-                    ['.docx'],
-                  'application/vnd.ms-excel': ['.xls'],
-                  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-                    ['.xlsx'],
-                }}
-              />
+              <div className="text-center py-8 border-2 border-dashed rounded-lg bg-muted/30">
+                <p className="text-muted-foreground mb-2">
+                  Document upload is currently unavailable
+                </p>
+                <p className="text-sm text-muted-foreground/70">
+                  Coming soon in a future update
+                </p>
+              </div>
             </CardContent>
           </Card>
 

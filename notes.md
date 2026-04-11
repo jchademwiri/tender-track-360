@@ -112,6 +112,30 @@ This document is the actionable developer guide to prepare TenderTrack360 for it
 
 ---
 
+## NEW: Disable Document Upload (Memory Cost) - ✅ COMPLETE
+
+**PROBLEM:** Document uploads cost storage (RDS/S3), but app is free MVP.
+
+**IMPLEMENTED:** Show "Coming soon" message instead of removing UI entirely.
+
+### Changes Made:
+
+1. **Tender Form** - `src/components/tenders/tender-form.tsx` (lines 446-475)
+   - Replaced FileUploader with "Coming soon" message
+
+2. **Tender Details** - `src/components/tenders/tender-details.tsx` (line 563-570)
+   - Replaced DocumentManager with "Coming soon" message
+
+3. **Extension Form** - `src/components/tenders/extension-form.tsx` (lines 230-242)
+   - Replaced file input with "Coming soon" message
+
+4. **Profile Avatar** - `src/app/.../profile/components/avatar-upload.tsx`
+   - Added `UPLOAD_DISABLED = true` constant
+   - Added toast notification on click: "Photo upload is currently unavailable. Coming soon!"
+   - Also affects Organization Logo (uses same component)
+
+---
+
 ## File Locations Reference
 
 | Feature                       | Location                                                                       |
