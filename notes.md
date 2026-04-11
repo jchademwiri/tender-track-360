@@ -136,6 +136,28 @@ This document is the actionable developer guide to prepare TenderTrack360 for it
 
 ---
 
+## Contact Info Updated (2026-04-11)
+
+**File:** `src/lib/constants.ts`
+
+```typescript
+export const CONTACT_INFO = {
+  phone: '+27 74 501 7094',
+  whatsapp: '+27 74 501 7094',
+  // ... unchanged
+};
+```
+
+This automatically updates:
+
+- Contact page (`src/app/contact/page.tsx`)
+- Footer (`src/components/home-page/FooterSection.tsx`)
+- Help widget (`src/components/shared/help-widget.tsx`)
+
+WhatsApp link format: `https://wa.me/27745017094`
+
+---
+
 ## File Locations Reference
 
 | Feature                       | Location                                                                       |
