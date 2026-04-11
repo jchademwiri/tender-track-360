@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/db';
-import { member, organization, invitation, user } from '@/db/schema';
+import { member, organization, invitation, user, project } from '@/db/schema';
 import type { Role } from '@/db/schema';
 
 type Organization = typeof organization.$inferSelect;
@@ -246,6 +246,20 @@ export async function getOrganizationBySlugWithUserRole(slug: string) {
 
     const memberCount = memberCountResult[0]?.count || 0;
 
+    // Get active projects count
+    const activeProjectsResult = await db
+      .select({ count: count() })
+      .from(project)
+      .where(
+        and(
+          eq(project.organizationId, organizationBySlug.id),
+          eq(project.status, 'active'),
+          isNull(project.deletedAt)
+        )
+      );
+
+    const activeProjects = activeProjectsResult[0]?.count || 0;
+
     // Generate signed URL for logo if it exists
     if (
       organizationBySlug.logo &&
@@ -260,6 +274,7 @@ export async function getOrganizationBySlugWithUserRole(slug: string) {
       ...organizationBySlug,
       userRole: userMembership?.role as Role,
       memberCount,
+      activeProjects,
     };
   } catch (error) {
     console.error('Error fetching organization by slug with user role:', error);

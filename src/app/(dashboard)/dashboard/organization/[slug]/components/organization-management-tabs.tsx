@@ -256,6 +256,7 @@ export function OrganizationManagementTabs({
               id: organization.id,
               name: organization.name,
               memberCount: organization.memberCount,
+              activeProjects: (organization as any).activeProjects,
             }}
             userRole={userRole}
             currentUser={currentUser}

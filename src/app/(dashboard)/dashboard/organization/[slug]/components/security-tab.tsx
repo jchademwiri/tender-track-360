@@ -32,6 +32,7 @@ interface SecurityTabProps {
     id: string;
     name: string;
     memberCount: number;
+    activeProjects?: number;
   };
   userRole: Role;
   currentUser: {
@@ -427,7 +428,10 @@ export function SecurityTab({
           userRole={userRole}
           organizationName={organization.name}
           memberCount={organization.memberCount}
-          hasActiveProjects={false} // TODO: Get real project data
+          hasActiveProjects={
+            organization.activeProjects !== undefined &&
+            organization.activeProjects > 0
+          }
         />
       )}
     </div>

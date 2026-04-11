@@ -158,6 +158,53 @@ WhatsApp link format: `https://wa.me/27745017094`
 
 ---
 
+## Bug Scan Results (2026-04-11)
+
+### Critical Issues
+
+1. **Hardcoded `hasActiveProjects={false}`**
+   - File: `src/app/(dashboard)/dashboard/organization/[slug]/components/security-tab.tsx:430`
+   - Should fetch real project data instead of hardcoded false
+
+2. **Pagination Not Fully Implemented**
+   - File: `src/components/tenders/tender-list.tsx:101`
+   - TODO comment: "use for pagination" - totalCount exists but not used properly
+
+3. **submitted-pending filter bug (FIXED)**
+   - Was passing "submitted-pending" to server which doesn't understand it
+   - Fixed by filtering client-side
+
+### Medium Priority
+
+4. **Unimplemented Features with TODOs**
+   - `src/components/organization-members-section.tsx:43` - Invite modal not implemented
+   - `src/components/members-table-action.tsx:68,90` - Role editing, resend invitation
+   - `src/app/(dashboard)/dashboard/tenders/overview/client-wrapper.tsx:130` - Delete functionality
+
+5. **Missing User-Facing Error Handling**
+   - Many components just `console.error` without showing toast/UI feedback
+   - Example: tender-list, project-list, client-list
+
+### Low Priority / Dead Code
+
+6. **Unused Components**
+   - `src/components/organization-members-section.tsx` - Not used anywhere
+   - `src/components/members-table-wrapper.tsx` - Not used
+
+7. **Hardcoded Values**
+   - Various places with TODO comments needing dynamic data
+
+---
+
+### Action Items from Bug Scan
+
+- [x] Fix hasActiveProjects in security-tab.tsx
+- [x] Pagination works (marked TODO as done - it's functional, could be optimized)
+- [ ] Add user-facing error toasts instead of just console.error
+- [ ] Remove or implement dead code (organization-members-section)
+
+---
+
 ## New: Mini Calendar Widget (2026-04-11)
 
 **Created:** `src/components/dashboard/mini-calendar-widget.tsx`
