@@ -158,6 +158,29 @@ WhatsApp link format: `https://wa.me/27745017094`
 
 ---
 
+## New: Mini Calendar Widget (2026-04-11)
+
+**Created:** `src/components/dashboard/mini-calendar-widget.tsx`
+
+A compact calendar with upcoming events list side-by-side:
+
+- **Left:** Small calendar (compact styling, month view only)
+- **Right:** Upcoming events list with event type badges and days-until
+
+**Updated:** `src/app/(dashboard)/dashboard/page.tsx`
+
+- Replaced DashboardActivity with MiniCalendarWidget in the bottom section
+- Grid layout: 2/3 calendar + events, 1/3 deadlines
+
+**Features:**
+
+- Shows only current month by default
+- Displays up to 5 upcoming events
+- Click events to navigate to tenders/projects
+- Color-coded by event type (tender, PO expected, PO delivered)
+
+---
+
 ## File Locations Reference
 
 | Feature                       | Location                                                                       |

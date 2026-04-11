@@ -147,12 +147,16 @@ export function TenderList({
     setCurrentPage(1);
 
     // Fetch fresh data for the new organization
+    // Pass undefined for 'submitted-pending' - we filter client-side
+    const serverStatus =
+      defaultStatusFilter === 'submitted-pending'
+        ? undefined
+        : defaultStatusFilter === 'all'
+          ? undefined
+          : defaultStatusFilter;
+
     if (organizationId) {
-      fetchTenders(
-        '',
-        1,
-        defaultStatusFilter === 'all' ? undefined : defaultStatusFilter
-      );
+      fetchTenders('', 1, serverStatus);
     }
   }, [organizationId, fetchTenders, defaultStatusFilter]);
 
