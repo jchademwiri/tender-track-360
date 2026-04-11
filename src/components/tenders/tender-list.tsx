@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 import {
   Table,
   TableBody,
@@ -131,6 +132,7 @@ export function TenderList({
         setCurrentPage(result.currentPage);
       } catch (error) {
         console.error('Error fetching tenders:', error);
+        toast.error('Failed to load tenders. Please try again.');
       } finally {
         setIsLoading(false);
       }
@@ -205,10 +207,10 @@ export function TenderList({
     startTransition(async () => {
       const result = await deleteTender(organizationId, tenderId);
       if (result.success) {
-        // Refresh the current page
+        toast.success('Tender deleted successfully');
         fetchTenders(searchQuery, currentPage, statusFilter);
       } else {
-        alert(result.error || 'Failed to delete tender');
+        toast.error(result.error || 'Failed to delete tender');
       }
     });
   };
