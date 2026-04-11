@@ -200,8 +200,30 @@ WhatsApp link format: `https://wa.me/27745017094`
 
 - [x] Fix hasActiveProjects in security-tab.tsx
 - [x] Pagination works (marked TODO as done - it's functional, could be optimized)
-- [ ] Add user-facing error toasts instead of just console.error
-- [ ] Remove or implement dead code (organization-members-section)
+- [x] Add user-facing error toasts instead of just console.error
+- [x] Remove or implement dead code (organization-members-section)
+
+---
+
+## Minor UI Polish (Optional - Score Impact: 0 pts)
+
+These are nice-to-have improvements but not blockers for launch:
+
+1. **Empty state illustrations** - Add friendly empty states with icons/text when lists are empty (currently showing basic cards)
+
+2. **Loading spinners** - Replace text "Loading..." with proper spinner components for better UX
+
+3. **Mobile responsive tweaks** - Test on mobile and fix any overflow issues
+
+4. **Hover states** - Add subtle hover effects on buttons and table rows
+
+5. **Form validation UX** - Improve inline validation messages (currently basic)
+
+6. **Toast positioning** - Ensure toasts don't overlap important UI elements
+
+7. **Color contrast** - Verify accessibility contrast ratios on some components
+
+**Verdict:** The app is fully functional without these polish items. Launch first, polish later.
 
 ---
 
