@@ -150,7 +150,6 @@ export function MiniCalendarWidget({ className }: MiniCalendarWidgetProps) {
                 datesSet={handleDatesSet}
                 height="auto"
                 dayMaxEvents={2}
-                expandable={false}
               />
               <style jsx global>{`
                 .mini-calendar .fc {
