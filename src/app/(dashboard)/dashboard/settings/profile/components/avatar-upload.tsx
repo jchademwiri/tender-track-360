@@ -14,7 +14,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
-import { Camera, Upload, Loader2, Check, Trash2 } from 'lucide-react';
+import {
+  Camera,
+  Upload,
+  Loader2,
+  Check,
+  Trash2,
+  AlertCircle,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AvatarUploadProps {
@@ -28,6 +35,8 @@ interface AvatarUploadProps {
   ) => Promise<{ success: boolean; imageUrl?: string; error?: string }>;
   entityName?: string; // e.g. "Profile picture" or "Organization logo"
 }
+
+const UPLOAD_DISABLED = true; // Disabled for free MVP - enable when billing is implemented
 
 export function AvatarUpload({
   currentImage,
@@ -181,10 +190,16 @@ export function AvatarUpload({
         {/* Upload Overlay */}
         <div
           className={`absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 ${
-            disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+            disabled || UPLOAD_DISABLED
+              ? 'cursor-not-allowed'
+              : 'cursor-pointer'
           }`}
           onClick={(e) => {
             e.stopPropagation(); // Prevent bubbling issues
+            if (UPLOAD_DISABLED) {
+              toast.info('Photo upload is currently unavailable. Coming soon!');
+              return;
+            }
             if (!disabled) fileInputRef.current?.click();
           }}
         >
@@ -197,7 +212,13 @@ export function AvatarUpload({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => {
+            if (UPLOAD_DISABLED) {
+              toast.info('Photo upload is currently unavailable. Coming soon!');
+              return;
+            }
+            fileInputRef.current?.click();
+          }}
           disabled={disabled}
           className="flex items-center space-x-2"
         >
