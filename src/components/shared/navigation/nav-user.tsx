@@ -102,12 +102,6 @@ export function NavUser({ user }: { user: User }) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link href="/billing/upgrade" className="cursor-pointer">
-                  <Sparkles />
-                  Upgrade to Pro
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
                 <Link
                   href="/dashboard/settings/notifications"
                   className="cursor-pointer"
@@ -125,12 +119,6 @@ export function NavUser({ user }: { user: User }) {
               >
                 <BadgeCheck />
                 Profile
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/billing" className="cursor-pointer">
-                  <CreditCard />
-                  Billing
-                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/dashboard/settings" className="cursor-pointer">

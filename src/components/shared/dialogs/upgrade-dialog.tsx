@@ -176,7 +176,7 @@ export function UpgradeDialog({
 
       // Redirect to the full upgrade page with the selected plan
       onOpenChange(false);
-      window.location.href = '/billing/upgrade?plan=pro';
+      window.location.href = '/dashboard';
     } catch (error) {
       console.error('Upgrade failed:', error);
       // Show error toast or alert
@@ -380,7 +380,7 @@ export function UpgradeDialog({
                 variant="outline"
                 onClick={() => {
                   onOpenChange(false);
-                  window.location.href = '/billing/upgrade?plan=free';
+                  window.location.href = '/dashboard';
                 }}
                 className="h-12 cursor-pointer"
               >
@@ -407,7 +407,7 @@ export function UpgradeDialog({
                   size="sm"
                   onClick={() => {
                     onOpenChange(false);
-                    window.location.href = '/billing/upgrade';
+                    window.location.href = '/dashboard';
                   }}
                   className="text-sm text-muted-foreground hover:text-foreground cursor-pointer"
                 >

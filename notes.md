@@ -13,18 +13,14 @@ This document is the actionable developer guide to prepare TenderTrack360 for it
 
 ### Phase 2: Member Invitations UI (Frontend Wiring)
 
-**STATUS: ✅ COMPLETE (CORRECTED)**
+**STATUS: ✅ COMPLETE**
 
-The invite modal IS properly integrated in the actual page that uses it:
-
-- Modal component: `src/components/shared/modals/invite-member-modal.tsx` ✅
-- Backend action: `src/server/invitations.ts` ✅
-- INTEGRATED in: `src/app/(dashboard)/dashboard/organization/[slug]/components/members-tab.tsx` ✅
+- Modal component: `src/components/shared/modals/invite-member-modal.tsx`
+- Backend action: `src/server/invitations.ts`
+- INTEGRATED in: `src/app/(dashboard)/dashboard/organization/[slug]/components/members-tab.tsx`
   - State: `const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)` (line 150)
   - Button: `<Button onClick={() => setIsInviteModalOpen(true)}>` (line 328)
   - Modal rendered: Lines 520-537
-
-Note: `src/components/organization-members-section.tsx` is NOT used in the current app - the actual implementation is in `members-tab.tsx`.
 
 ### Phase 3: Real Ownership Transfer (Wiring)
 
@@ -37,73 +33,41 @@ Note: `src/components/organization-members-section.tsx` is NOT used in the curre
 
 ### Phase 4: Final De-Bloating & Billing Removal
 
-**STATUS: ❌ INCOMPLETE - Needs Work**
+**STATUS: ✅ COMPLETE (ALL DONE!)**
 
 - Landing page pricing section removed ✅
-- Billing nav links still present in nav-user.tsx ❌
-- Billing pages NOT redirected ❌
-- Other billing references exist in upgrade-dialog.tsx ❌
+- Billing nav links removed from nav-user.tsx ✅
+- Billing pages redirected to /dashboard ✅
+- Upgrade dialog references updated to redirect to /dashboard ✅
 
 ---
 
-## Action Items for MVP Deploy
+## Changes Made (2026-04-11)
 
-### 4.1 REMOVE Billing Navigation from User Dropdown
+### 1. Removed Billing Links from User Dropdown
 
-In `src/components/shared/navigation/nav-user.tsx`:
+**File:** `src/components/shared/navigation/nav-user.tsx`
 
-**REMOVE lines 104-109** (Upgrade to Pro):
+- Removed "Upgrade to Pro" menu item (was lines 104-109)
+- Removed "Billing" menu item (was lines 129-134)
 
-```tsx
-<DropdownMenuItem asChild>
-  <Link href="/billing/upgrade" className="cursor-pointer">
-    <Sparkles />
-    Upgrade to Pro
-  </Link>
-</DropdownMenuItem>
-```
+### 2. Redirected Billing Pages
 
-**REMOVE lines 129-134** (Billing):
+**File:** `src/app/(dashboard)/billing/page.tsx`
 
-```tsx
-<DropdownMenuItem asChild>
-  <Link href="/billing" className="cursor-pointer">
-    <CreditCard />
-    Billing
-  </Link>
-</DropdownMenuItem>
-```
+- Replaced entire content with redirect to `/dashboard`
 
-### 4.2 REDIRECT Billing Routes
+**File:** `src/app/(dashboard)/billing/upgrade/page.tsx`
 
-In `src/app/(dashboard)/billing/page.tsx`, REPLACE with redirect:
+- Replaced entire content with redirect to `/dashboard`
 
-```tsx
-import { redirect } from 'next/navigation';
+### 3. Updated Upgrade Dialog References
 
-export default function BillingPage() {
-  redirect('/dashboard');
-}
-```
+**File:** `src/components/shared/dialogs/upgrade-dialog.tsx`
 
-In `src/app/(dashboard)/billing/upgrade/page.tsx`, REPLACE with redirect:
-
-```tsx
-import { redirect } from 'next/navigation';
-
-export default function UpgradePage() {
-  redirect('/dashboard');
-}
-```
-
-### 4.3 UPDATE Upgrade Dialog References
-
-In `src/components/shared/dialogs/upgrade-dialog.tsx`:
-
-Search for `/billing/upgrade` references and either:
-
-- Remove the buttons, OR
-- Change to redirect to `/dashboard`
+- Line 179: Changed `/billing/upgrade?plan=pro` → `/dashboard`
+- Line 383: Changed `/billing/upgrade?plan=free` → `/dashboard`
+- Line 410: Changed `/billing/upgrade` → `/dashboard`
 
 ---
 
@@ -115,9 +79,9 @@ Search for `/billing/upgrade` references and either:
 - [ ] Send invitation → verify invitation created in DB
 - [ ] As Owner, initiate transfer → recipient receives email
 - [ ] As recipient, accept transfer → verify roles swap correctly
-- [ ] Verify no "Billing" or "Upgrade" links in user dropdown
-- [ ] Type /billing in URL → should redirect to dashboard
-- [ ] Type /billing/upgrade in URL → should redirect to dashboard
+- [x] Verify no "Billing" or "Upgrade" links in user dropdown
+- [x] Type /billing in URL → should redirect to dashboard
+- [x] Type /billing/upgrade in URL → should redirect to dashboard
 
 ---
 
@@ -161,3 +125,4 @@ Search for `/billing/upgrade` references and either:
 | User dropdown (billing links) | `src/components/shared/navigation/nav-user.tsx`                                |
 | Billing page                  | `src/app/(dashboard)/billing/page.tsx`                                         |
 | Upgrade page                  | `src/app/(dashboard)/billing/upgrade/page.tsx`                                 |
+| Upgrade dialog                | `src/components/shared/dialogs/upgrade-dialog.tsx`                             |
