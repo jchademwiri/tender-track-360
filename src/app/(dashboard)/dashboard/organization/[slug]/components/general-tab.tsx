@@ -89,7 +89,8 @@ export function GeneralTab({
     : {};
 
   const form = useForm<OrganizationFormData>({
-    resolver: zodResolver(organizationSchema),
+    // @ts-expect-error -- zod 3.25 vs hookform resolver type mismatch
+    resolver: zodResolver(organizationSchema) as never,
     defaultValues: {
       name: organization.name,
       description: metadata.description || '',
